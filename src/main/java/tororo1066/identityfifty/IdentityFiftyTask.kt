@@ -119,7 +119,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     else-> "Prefix Error"
                 }
 
-
             }
         }
 
