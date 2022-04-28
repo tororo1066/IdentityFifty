@@ -1,0 +1,25 @@
+name: テストワールド
+
+world: world
+
+survivorLimit: 4
+hunterLimit: 1
+
+survivorSpawnLocations:
+  - 10,10,10
+  - 20,20,20
+  - 30,30,30
+  - 40,40,40
+
+hunterSpawnLocations:
+  - 10,10,10
+
+generatorLocations:
+  - 10,10,10
+
+escapeGeneratorLocations:
+  - -10,10,-10
+
+goalRegionId:
+  - test_goal_1
+  - test_goal_2

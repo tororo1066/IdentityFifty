@@ -1,0 +1,10 @@
+name: IdentityFifty
+version: '${version}'
+main: tororo1066.identityfifty.IdentityFifty
+api-version: 1.17
+
+depend:
+  - GlowAPI
+
+commands:
+  identity:
