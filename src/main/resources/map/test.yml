@@ -4,6 +4,8 @@ world: world
 
 survivorLimit: 4
 hunterLimit: 1
+generatorLimit: 1
+escapeGeneratorLimit: 1
 
 survivorSpawnLocations:
   - 10,10,10
@@ -15,10 +17,10 @@ hunterSpawnLocations:
   - 10,10,10
 
 generatorLocations:
-  - 10,10,10
+  - 10,10,10,25000
 
 escapeGeneratorLocations:
-  - -10,10,-10
+  - -10,10,-10,25000
 
 goalRegionId:
   - test_goal_1

@@ -14,6 +14,7 @@ import tororo1066.identityfifty.character.survivor.AbstractSurvivor
 import tororo1066.identityfifty.character.survivor.Nurse
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.tororopluginapi.SConfig
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -30,6 +31,7 @@ class IdentityFifty : SJavaPlugin() {
         val hunters = HashMap<UUID,HunterData>()
         lateinit var interactManager: SInteractItemManager
         lateinit var plugin: SJavaPlugin
+        lateinit var sConfig: SConfig
 
         fun stunEffect(p: Player){
             p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,60,0,true,false,false))
@@ -55,6 +57,7 @@ class IdentityFifty : SJavaPlugin() {
     override fun onEnable() {
         plugin = this
         interactManager = SInteractItemManager(this)
+        sConfig = SConfig(this)
         SEvent(this).register(PlayerJoinEvent::class.java){
             it.player.inventory.setItem(0,IdentityFifty.interactManager.createSInteractItem(SItem(Material.DIAMOND).setDisplayName("test")).setInteractEvent { e ->
                 GlowAPI.setGlowing(Bukkit.getPlayer("tororo_1066")!!,GlowAPI.Color.BLUE,e.player)
@@ -63,6 +66,7 @@ class IdentityFifty : SJavaPlugin() {
                 },100)
             }.setInitialCoolDown(100))
         }
+
     }
 
 

@@ -6,4 +6,5 @@ class SurvivorData : PlayerData() {
 
     lateinit var survivorClass: AbstractSurvivor
     var health = 4
+    var remainingTime = 120
 }
