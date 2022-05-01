@@ -3,13 +3,13 @@ package tororo1066.identityfifty.data
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.configuration.file.YamlConfiguration
 import tororo1066.identityfifty.IdentityFifty
 
 class MapData {
 
     companion object{
-        fun loadFromYml(name: String){
-            val config = IdentityFifty.sConfig.getConfig("map/${name}")?:throw NullPointerException()
+        fun loadFromYml(config: YamlConfiguration): MapData {
             val data = MapData()
             data.name = config.getString("name")?:"name"
             data.world = Bukkit.getWorld(config.getString("world")!!)!!
@@ -41,6 +41,14 @@ class MapData {
             }
             data.goalRegions.addAll(config.getStringList("goalRegionId"))
 
+            config.getStringList("prisonLocations").forEach {
+                val split = it.split(",")
+                val prisonData = PrisonData()
+                prisonData.spawnLoc = Location(data.world,split[0].toDouble(),split[1].toDouble(),split[2].toDouble())
+                prisonData.plateLoc = Location(data.world,split[3].toDouble(),split[4].toDouble(),split[5].toDouble())
+                data.prisons[prisonData.plateLoc] = prisonData
+            }
+            return data
         }
     }
 
@@ -55,4 +63,5 @@ class MapData {
     val generators = ArrayList<GeneratorData>()
     val escapeGenerators = ArrayList<GeneratorData>()
     val goalRegions = ArrayList<String>()
+    val prisons = HashMap<Location,PrisonData>()
 }

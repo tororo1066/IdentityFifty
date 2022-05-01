@@ -25,3 +25,6 @@ escapeGeneratorLocations:
 goalRegionId:
   - test_goal_1
   - test_goal_2
+
+prisonLocations:
+  - 50,10,50,55,10,50
