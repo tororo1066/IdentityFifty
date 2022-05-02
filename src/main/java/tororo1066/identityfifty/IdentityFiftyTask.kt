@@ -69,6 +69,11 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 Bukkit.getEntity(it)?.remove()
             }
         }
+        escapeGeneratorUUID.forEach {
+            runTask {
+                Bukkit.getEntity(it)?.remove()
+            }
+        }
         Bukkit.getOnlinePlayers().forEach {
             it.playSound(it.location,Sound.UI_TOAST_CHALLENGE_COMPLETE,1f,1f)
         }
@@ -181,7 +186,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 runTask {
                     map.world.spawn(data.location,Cow::class.java) {
                         it.setAI(false)
-                        it.customName = "§f§l牛型発電機"
+                        it.customName = "§f§l牛型発電機§5(§e${it.health.toInt()}§f/§b${data.health}§5)"
                         it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
                         it.health = data.health.toDouble()
                         it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER,1)
@@ -199,7 +204,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
                 escapeGeneratorUUID.remove(e.entity.uniqueId)
 
-                
+
 
 
 
@@ -320,6 +325,10 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             if (e.entity.type == EntityType.SHEEP && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER)){
                 e.entity.customName = "§f§l羊型発電機§5(§e${(e.entity as Sheep).health.toInt()}§f/§b${(e.entity as Sheep).getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()}§5)"
+            }
+
+            if (e.entity.type == EntityType.COW && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER)){
+                e.entity.customName = "§f§l牛型発電機§5(§e${(e.entity as Cow).health.toInt()}§f/§b${(e.entity as Cow).getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()}§5)"
             }
         }
 
