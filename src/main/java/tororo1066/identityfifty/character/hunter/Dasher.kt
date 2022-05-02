@@ -20,7 +20,7 @@ class Dasher : AbstractHunter("ダッシャー") {
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent {
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,1))
             p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
-        }.setInitialCoolDown(8000)
+        }.setInitialCoolDown(800)
 
         p.inventory.setItem(0,firstSkill)
 

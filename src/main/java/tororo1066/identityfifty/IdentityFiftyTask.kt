@@ -22,6 +22,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scoreboard.DisplaySlot
+import org.checkerframework.checker.units.qual.Volume
 import tororo1066.identityfifty.data.GeneratorData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.tororopluginapi.otherPlugin.SWorldGuardAPI
@@ -53,15 +54,56 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         })
     }
 
+    fun allPlayerSound(loc: Location, sound: Sound, volume: Float, pitch: Float){
+        allPlayerAction {
+            val p = Bukkit.getPlayer(it)!!
+            p.playSound(loc,sound, volume, pitch)
+        }
+    }
+
+    fun end(){
+        end = true
+        sEvent.unregisterAll()
+        generatorUUID.forEach {
+            runTask {
+                Bukkit.getEntity(it)?.remove()
+            }
+        }
+        Bukkit.getOnlinePlayers().forEach {
+            it.playSound(it.location,Sound.UI_TOAST_CHALLENGE_COMPLETE,1f,1f)
+        }
+        if (escapedSurvivor.size > survivorSize/2){
+            allPlayerAction {
+                val p = Bukkit.getPlayer(it)!!
+                p.showTitle(Title.title(Component.text("§e§lサバイバーの勝ち！"), Component.text(""), Title.Times.of(
+                    Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO)))
+            }
+        } else {
+            if (escapedSurvivor.size == survivorSize){
+                allPlayerAction {
+                    val p = Bukkit.getPlayer(it)!!
+                    p.showTitle(Title.title(Component.text("§b§l引き分け！"), Component.text(""), Title.Times.of(
+                        Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO)))
+                }
+            } else {
+                allPlayerAction {
+                    val p = Bukkit.getPlayer(it)!!
+                    p.showTitle(Title.title(Component.text("§c§lハンターの勝ち！"), Component.text(""), Title.Times.of(
+                        Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO)))
+                }
+            }
+        }
+    }
+
     var remainingGenerator = map.generatorLimit
     var worldGuard = SWorldGuardAPI()
     val sbManager = Bukkit.getScoreboardManager()
     val generatorUUID = ArrayList<UUID>()
+    val escapeGeneratorUUID = ArrayList<UUID>()
     val sEvent = SEvent(IdentityFifty.plugin)
     val survivorSize = IdentityFifty.survivors.size
     var survivorCount = IdentityFifty.survivors.size
     val escapedSurvivor = ArrayList<UUID>()
-    val plateSaverSecond = ArrayList<UUID>()
     var end = false
 
     override fun run() {
@@ -104,16 +146,20 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
-        val bossBar = Bukkit.createBossBar("残り暗号機：${map.generatorLimit}個",BarColor.YELLOW,BarStyle.SOLID)
+        val bossBar = Bukkit.createBossBar("残り暗号機：§c§l${map.generatorLimit}§f個",BarColor.YELLOW,BarStyle.SOLID)
         bossBar.isVisible = true
+        Bukkit.getOnlinePlayers().forEach {
+            bossBar.addPlayer(it)
+        }
 
 
         sEvent.register(EntityDeathEvent::class.java) { e ->
             if (e.entity.type != EntityType.SHEEP)return@register
             if (!e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"),
                     PersistentDataType.INTEGER))return@register
+            if (remainingGenerator == 0)return@register
             generatorUUID.remove(e.entity.uniqueId)
-            bossBar.setTitle("残り暗号機：${remainingGenerator}個")
+            bossBar.setTitle("残り暗号機：§c§l${remainingGenerator}§f個")
             bossBar.progress = remainingGenerator.toDouble() / map.generatorLimit.toDouble()
             IdentityFifty.hunters.forEach {
                 it.value.hunterClass.onFinishedGenerator(e.entity.location,Bukkit.getPlayer(it.key)!!)
@@ -123,6 +169,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
             remainingGenerator--
             if (remainingGenerator != 0)return@register
+
+            broadcast("§e§lゲート付近の発電機が開かれた！")
 
             Bukkit.getOnlinePlayers().forEach {
                 it.playSound(it.location,Sound.ENTITY_WITHER_SPAWN,1f,1f)
@@ -136,7 +184,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         it.customName = "§f§l牛型発電機"
                         it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
                         it.health = data.health.toDouble()
-                        it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER,1)
+                        it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER,1)
+                        escapeGeneratorUUID.add(it.uniqueId)
                     }
                 }
             }
@@ -145,15 +194,23 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             sEvent.register(EntityDeathEvent::class.java) second@{
 
                 if (e.entity.type != EntityType.COW)return@second
-                if (!e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"),
+                if (!e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"),
                         PersistentDataType.INTEGER))return@second
+
+                escapeGeneratorUUID.remove(e.entity.uniqueId)
+
+                
+
+
 
 
             }
 
 
             generatorUUID.forEach {
-                Bukkit.getEntity(it)?.remove()
+                runTask {
+                    Bukkit.getEntity(it)?.remove()
+                }
                 generatorUUID.remove(it)
             }
 
@@ -173,8 +230,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             if (from == to)return@register
 
-            if (plateSaverSecond.contains(e.player.uniqueId) && to.block.getRelative(BlockFace.DOWN).type != Material.HEAVY_WEIGHTED_PRESSURE_PLATE){
-                plateSaverSecond.remove(e.player.uniqueId)
+            if (IdentityFifty.plateSaver.contains(e.player.uniqueId) && to.block.getRelative(BlockFace.DOWN).type != Material.HEAVY_WEIGHTED_PRESSURE_PLATE){
+                IdentityFifty.plateSaver.remove(e.player.uniqueId)
             }
 
             val loc = to.toBlockLocation()
@@ -184,6 +241,12 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     if (data.inPlayer.contains(e.player.uniqueId)) {
                         data.inPlayer.remove(e.player.uniqueId)
                         val playerData = IdentityFifty.survivors[e.player.uniqueId]!!
+                        val helperData = IdentityFifty.survivors[data.lastPressUUID]!!
+                        helperData.survivorClass.onHelp(e.player,Bukkit.getPlayer(helperData.uuid)!!)
+                        playerData.survivorClass.onGotHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player)
+                        IdentityFifty.hunters.forEach {
+                            it.value.hunterClass.onSurvivorHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player,Bukkit.getPlayer(it.key)!!)
+                        }
                         playerData.setHealth(3,true)
                     }
                 }
@@ -199,11 +262,11 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
                 IdentityFifty.hunters.forEach { (uuid,data) ->
                     Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
-                        Random.nextDouble(-0.5,0.5),0.7,
-                        Random.nextDouble(-0.5,0.5), Particle.DustTransition(Color.RED,Color.WHITE,1f))
+                        Random.nextDouble(-0.2,0.2),0.2,
+                        Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.RED,Color.WHITE,1f))
                     Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
-                        Random.nextDouble(-0.5,0.5),0.7,
-                        Random.nextDouble(-0.5,0.5), Particle.DustTransition(Color.BLACK,Color.WHITE,1f))
+                        Random.nextDouble(-0.2,0.2),0.2,
+                        Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.BLACK,Color.WHITE,1f))
                 }
 
                 footprints--
@@ -216,29 +279,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             e.player.gameMode = GameMode.SPECTATOR
             broadcast("§e§l${e.player.name}§a§lは脱出に成功した！")
             if (survivorCount == 0){
-                end = true
-                sEvent.unregisterAll()
-                if (escapedSurvivor.size > survivorSize/2){
-                    allPlayerAction {
-                        val p = Bukkit.getPlayer(it)!!
-                        p.showTitle(Title.title(Component.text("§e§lサバイバーの勝ち！"), Component.text(""), Title.Times.of(
-                            Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO)))
-                    }
-                } else {
-                    if (escapedSurvivor.size == survivorSize){
-                        allPlayerAction {
-                            val p = Bukkit.getPlayer(it)!!
-                            p.showTitle(Title.title(Component.text("§b§l引き分け！"), Component.text(""), Title.Times.of(
-                                Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO)))
-                        }
-                    } else {
-                        allPlayerAction {
-                            val p = Bukkit.getPlayer(it)!!
-                            p.showTitle(Title.title(Component.text("§c§lハンターの勝ち！"), Component.text(""), Title.Times.of(
-                                Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO)))
-                        }
-                    }
-                }
+                end()
             }
         }
 
@@ -252,7 +293,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     var damage = hunterData.hunterClass.onAttack(e.entity as Player, e.damager as Player)
                     if (damage <= 0)return@register
                     if (survivorData.getHealth() < damage) damage = survivorData.getHealth()
-                    (e.entity as Player).playSound(e.entity.location,Sound.BLOCK_ANVIL_PLACE,1f,1.2f)
+                    e.entity.world.playSound(e.entity.location,Sound.BLOCK_ANVIL_PLACE,1f,0.5f)
                     if (!survivorData.survivorClass.onDamage(survivorData.getHealth()-damage,e.damager as Player, e.entity as Player)){
                         IdentityFifty.stunEffect(e.damager as Player)
                         return@register
@@ -276,6 +317,10 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     }
                 }
             }
+
+            if (e.entity.type == EntityType.SHEEP && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER)){
+                e.entity.customName = "§f§l羊型発電機§5(§e${(e.entity as Sheep).health.toInt()}§f/§b${(e.entity as Sheep).getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()}§5)"
+            }
         }
 
         SEvent(IdentityFifty.plugin).register(PlayerInteractEvent::class.java) { e ->
@@ -284,10 +329,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             if (e.clickedBlock?.type != Material.HEAVY_WEIGHTED_PRESSURE_PLATE)return@register
             if (!IdentityFifty.survivors.containsKey(e.player.uniqueId))return@register
             if (IdentityFifty.plateSaver.contains(e.player.uniqueId)){
-                e.isCancelled = true
-                return@register
-            }
-            if (plateSaverSecond.contains(e.player.uniqueId)){
                 e.isCancelled = true
                 return@register
             }
@@ -304,12 +345,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             val loc = e.clickedBlock!!.location.toBlockLocation()
             loc.yaw = 0f
             loc.pitch = 0f
-            Bukkit.broadcastMessage(loc.toString())
             val prisonData = map.prisons.entries.find { it.value.plateLoc == loc }!!
 
 
-
-            e.player.sendMessage("test")
 
 
 
@@ -332,10 +370,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     return@Consumer
                 } else {
                     if (helpTime <= 0) {
-                        IdentityFifty.plateSaver.remove(e.player.uniqueId)
-                        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
-                            plateSaverSecond.add(e.player.uniqueId)
-                        },1)
+                        plate.power = 1
+                        prisonData.value.lastPressUUID = e.player.uniqueId
                         it.cancel()
                     }
                     helpTime--
@@ -379,6 +415,10 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         survivorCount--
                         p.gameMode = GameMode.SPECTATOR
                         broadcast("§c§l${survivor.name}§4§lは死んでしまった...")
+                        if (survivorCount == 0){
+                            end()
+                            return@Consumer
+                        }
                         continue
                     }
                     survivor.remainingTime--

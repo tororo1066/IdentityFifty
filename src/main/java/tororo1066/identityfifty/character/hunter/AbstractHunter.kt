@@ -18,4 +18,6 @@ abstract class AbstractHunter(val name: String) {
         return 1
     }
 
+    open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}
+
 }

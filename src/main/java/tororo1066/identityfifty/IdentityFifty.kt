@@ -10,6 +10,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
@@ -52,10 +53,10 @@ class IdentityFifty : SJavaPlugin() {
 
         fun stunEffect(p: Player){
             Bukkit.getScheduler().runTask(plugin, Runnable {
-                p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,60,0,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,100,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,100,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,100,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,120,0,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,160,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,160,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,160,200,true,false,false))
             })
         }
 
@@ -84,7 +85,7 @@ class IdentityFifty : SJavaPlugin() {
         interactManager = SInteractItemManager(this)
         sConfig = SConfig(this)
         SEvent(this).register(PlayerJoinEvent::class.java){
-            it.player.inventory.setItem(0,IdentityFifty.interactManager.createSInteractItem(SItem(Material.DIAMOND).setDisplayName("test")).setInteractEvent { e ->
+            it.player.inventory.setItem(0,IdentityFifty.interactManager.createSInteractItem(SItem(Material.DIAMOND).setDisplayName("test"),true).setInteractEvent { e ->
                 GlowAPI.setGlowing(Bukkit.getPlayer("tororo_1066")!!,GlowAPI.Color.BLUE,e.player)
                 Bukkit.getScheduler().runTaskLater(this, Runnable {
                     GlowAPI.setGlowing(Bukkit.getPlayer("tororo_1066")!!,false,e.player)

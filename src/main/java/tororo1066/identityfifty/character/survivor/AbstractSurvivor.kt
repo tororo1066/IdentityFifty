@@ -18,5 +18,7 @@ abstract class AbstractSurvivor(val name: String) {
         return true
     }
 
-    open fun onHelp(helper: Player, p: Player) {}
+    open fun onHelp(helpedPlayer: Player, p: Player) {}
+
+    open fun onGotHelp(helper: Player, p: Player) {}
 }

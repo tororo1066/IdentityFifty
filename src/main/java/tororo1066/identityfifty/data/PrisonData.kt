@@ -8,5 +8,6 @@ class PrisonData {
     lateinit var spawnLoc: Location
     lateinit var plateLoc: Location
     val inPlayer = ArrayList<UUID>()
+    lateinit var lastPressUUID: UUID
 
 }
