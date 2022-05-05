@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.commands
 
+import org.bukkit.Bukkit
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
@@ -21,6 +22,20 @@ class IdentityCommand : SCommand("identity") {
                 IdentityFifty.survivors[it.sender.uniqueId] = data
 
                 it.sender.prefixMsg(abstractSurvivor.name + "になりました")
+            }
+        ))
+
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("asSurvivor")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray())).setExecutor(
+            Consumer<SCommandOnlyPlayerData> {
+                val p = Bukkit.getPlayer(it.args[1])!!
+                val abstractSurvivor = IdentityFifty.survivorsData[it.args[2]]!!
+                val data = SurvivorData()
+                data.uuid = p.uniqueId
+                data.name = p.name
+                abstractSurvivor.parameters(data)
+                IdentityFifty.survivors[p.uniqueId] = data
+
+                it.sender.prefixMsg(abstractSurvivor.name + "にしました")
             }
         ))
 

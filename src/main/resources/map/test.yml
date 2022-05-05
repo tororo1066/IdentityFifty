@@ -4,6 +4,7 @@ world: world
 
 survivorLimit: 4
 hunterLimit: 1
+generatorGoal: 1
 generatorLimit: 1
 escapeGeneratorLimit: 1
 
@@ -20,11 +21,14 @@ generatorLocations:
   - 10,10,10,25000
 
 escapeGeneratorLocations:
-  - -10,10,-10,25000
+  - -10,10,-10,-10,10,-11,25000
 
 goalRegionId:
   - test_goal_1
   - test_goal_2
 
 prisonLocations:
-  - 50,10,50,55,10,50
+  - 50,10,50,55,10,50,54,10,50
+
+woodPlates:
+  - 40,10,40,4,WEST

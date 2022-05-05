@@ -6,7 +6,8 @@ import java.util.UUID
 class PrisonData {
 
     lateinit var spawnLoc: Location
-    lateinit var plateLoc: Location
+    lateinit var escapeLoc: Location
+    lateinit var doorLoc: Location
     val inPlayer = ArrayList<UUID>()
     lateinit var lastPressUUID: UUID
 
