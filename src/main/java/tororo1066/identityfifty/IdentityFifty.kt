@@ -44,7 +44,6 @@ class IdentityFifty : SJavaPlugin() {
         val survivors = HashMap<UUID,SurvivorData>()
         val hunters = HashMap<UUID,HunterData>()
         val maps = HashMap<String,MapData>()
-        val plateSaver = ArrayList<UUID>()
         lateinit var interactManager: SInteractItemManager
         lateinit var plugin: SJavaPlugin
         lateinit var sConfig: SConfig
@@ -52,11 +51,16 @@ class IdentityFifty : SJavaPlugin() {
         const val prefix = "§b[§cIdentity§eFifty§b]§r"
 
         fun stunEffect(p: Player){
+            stunEffect(p,140,160)
+        }
+
+        fun stunEffect(p: Player, blindTime: Int, slowTime: Int){
+            p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location,10)
             Bukkit.getScheduler().runTask(plugin, Runnable {
-                p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,120,0,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,160,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,160,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,160,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,blindTime,0,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,slowTime,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,slowTime,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,slowTime,200,true,false,false))
             })
         }
 
@@ -84,14 +88,6 @@ class IdentityFifty : SJavaPlugin() {
         plugin = this
         interactManager = SInteractItemManager(this)
         sConfig = SConfig(this)
-        SEvent(this).register(PlayerJoinEvent::class.java){
-            it.player.inventory.setItem(0,IdentityFifty.interactManager.createSInteractItem(SItem(Material.DIAMOND).setDisplayName("test"),true).setInteractEvent { e ->
-                GlowAPI.setGlowing(Bukkit.getPlayer("tororo_1066")!!,GlowAPI.Color.BLUE,e.player)
-                Bukkit.getScheduler().runTaskLater(this, Runnable {
-                    GlowAPI.setGlowing(Bukkit.getPlayer("tororo_1066")!!,false,e.player)
-                },100)
-            }.setInitialCoolDown(100))
-        }
 
         registerAll()
 

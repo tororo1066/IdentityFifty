@@ -1,11 +1,11 @@
 package tororo1066.identityfifty
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.BlockFace
-import org.bukkit.block.data.AnaloguePowerable
 import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.type.Door
 import org.bukkit.block.data.type.Stairs
@@ -17,20 +17,22 @@ import org.bukkit.entity.Cow
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.Sheep
-import org.bukkit.event.block.Action
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDeathEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scoreboard.DisplaySlot
 import tororo1066.identityfifty.data.GeneratorData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.tororopluginapi.otherPlugin.SWorldGuardAPI
 import tororo1066.tororopluginapi.sEvent.SEvent
+import tororo1066.tororopluginapi.sItem.SItem
 import java.time.Duration
 import java.util.UUID
+import java.util.function.BiConsumer
 import java.util.function.Consumer
 import kotlin.random.Random
 
@@ -69,6 +71,16 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         }
     }
 
+    fun changeBlockFace(blockFace: BlockFace): BlockFace {
+        return when(blockFace){
+            BlockFace.WEST-> BlockFace.EAST
+            BlockFace.EAST-> BlockFace.WEST
+            BlockFace.NORTH-> BlockFace.SOUTH
+            BlockFace.SOUTH-> BlockFace.NORTH
+            else-> blockFace
+        }
+    }
+
     fun end(){
         end = true
         sEvent.unregisterAll()
@@ -84,7 +96,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
-        standUUID.forEach {
+        prisonUUID.forEach {
             runTask {
                 Bukkit.getEntity(it)?.remove()
             }
@@ -127,7 +139,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     val sbManager = Bukkit.getScoreboardManager()
     val generatorUUID = ArrayList<UUID>()
     val escapeGeneratorUUID = ArrayList<UUID>()
-    val standUUID = ArrayList<UUID>()
+    val prisonUUID = ArrayList<UUID>()
+    val woodPlateUUID = ArrayList<UUID>()
     val sEvent = SEvent(IdentityFifty.plugin)
     val survivorSize = IdentityFifty.survivors.size
     var survivorCount = IdentityFifty.survivors.size
@@ -167,36 +180,60 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         intArrayOf(it.key.blockX,it.key.blockY,it.key.blockZ))
                     stand.isInvisible = true
                     stand.isInvulnerable = true
-                    standUUID.add(stand.uniqueId)
+                    prisonUUID.add(stand.uniqueId)
                 }
             }
         }
 
         map.woodPlates.forEach {  (_,data) ->
-            var block = data.loc.block
-            for (i in 0 until data.length) {
-                block.type = Material.AIR
-                block = block.getRelative(data.face)
-            }
 
-            var upBlock = data.loc.block
-            for (i in 0 until data.length){
-                upBlock.type = Material.OAK_STAIRS
-                val blockData = upBlock.blockData as Stairs
-                blockData.shape = Shape.STRAIGHT
-                blockData.half = Bisected.Half.TOP
-                blockData.facing = data.face
-                block.blockData = blockData
-
-                runTask {
-                    map.world.spawn(data.loc,ArmorStand::class.java) {
-                        it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"WoodPlate"),
-                            PersistentDataType.INTEGER_ARRAY, intArrayOf(data.loc.blockX))
-                    }
+            runTask {
+                var block = data.loc.block
+                for (i in 0 until data.length) {
+                    block.type = Material.AIR
+                    block = block.getRelative(data.face)
                 }
 
-                upBlock = block.getRelative(BlockFace.UP)
+                val loc = data.loc.clone()
+                val centerValue = (data.length / 2).toDouble()
+                when (data.face) {
+                    BlockFace.NORTH -> {
+                        loc.add(0.0, 0.0, -centerValue)
+                    }
+                    BlockFace.SOUTH -> {
+                        loc.add(0.0, 0.0, centerValue)
+                    }
+                    BlockFace.WEST -> {
+                        loc.add(-centerValue, 0.0, 0.0)
+                    }
+                    BlockFace.EAST -> {
+                        loc.add(centerValue, 0.0, 0.0)
+                    }
+                    else -> {}
+                }
 
+                map.world.spawn(loc, ArmorStand::class.java) { stand ->
+                    stand.persistentDataContainer.set(
+                        NamespacedKey(IdentityFifty.plugin, "PlateLoc"), PersistentDataType.INTEGER_ARRAY,
+                        intArrayOf(data.loc.blockX, data.loc.blockY, data.loc.blockZ)
+                    )
+                    stand.isInvisible = true
+                    stand.isInvulnerable = true
+                    woodPlateUUID.add(stand.uniqueId)
+                }
+
+                var upBlock = data.loc.block
+                for (i in 0 until data.length) {
+                    upBlock.type = Material.OAK_STAIRS
+                    val blockData = upBlock.blockData as Stairs
+                    blockData.shape = Shape.STRAIGHT
+                    blockData.half = Bisected.Half.TOP
+                    blockData.facing = changeBlockFace(data.face)
+                    upBlock.blockData = blockData
+
+                    upBlock = upBlock.getRelative(BlockFace.UP)
+
+                }
             }
         }
 
@@ -297,58 +334,81 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         sEvent.register(PlayerToggleSneakEvent::class.java) { e ->
             if (!IdentityFifty.survivors.containsKey(e.player.uniqueId))return@register
             if (e.isSneaking){
+
                 e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0).forEach {
-                    if (!it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PrisonLoc"),
-                            PersistentDataType.INTEGER_ARRAY))return@forEach
-                    val persistentData = it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"PrisonLoc"), PersistentDataType.INTEGER_ARRAY]!!
-                    val prisonData = map.prisons[Location(map.world,persistentData[0].toDouble(),persistentData[1].toDouble(),persistentData[2].toDouble())]!!
-                    val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
+                    if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PrisonLoc"),
+                            PersistentDataType.INTEGER_ARRAY)){
+                        val persistentData = it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"PrisonLoc"), PersistentDataType.INTEGER_ARRAY]!!
+                        val prisonData = map.prisons[Location(map.world,persistentData[0].toDouble(),persistentData[1].toDouble(),persistentData[2].toDouble())]!!
+                        val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
 
-                    if (prisonData.inPlayer.isEmpty())return@forEach
+                        if (prisonData.inPlayer.isEmpty())return@forEach
 
-                    var helpTime = 0
-                    helpTime += helperData.helpTick
-                    for (uuid in prisonData.inPlayer){
-                        val data = IdentityFifty.survivors[uuid]!!
-                        helpTime += data.otherPlayerHelpDelay
-                    }
-
-                    for (uuid in prisonData.inPlayer){
-                        val data = IdentityFifty.survivors[uuid]!!
-                        helpTime += data.otherPlayerHelpDelayPercentage * helpTime
-                    }
-
-
-                    Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
-                        if (!e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0).contains(it)){
-                            task.cancel()
-                            return@Consumer
-                        } else {
-                            if (helpTime <= 0) {
-
-                                prisonData.lastPressUUID = e.player.uniqueId
-                                val block = map.world.getBlockAt(prisonData.doorLoc)
-                                val blockData = block.blockData as Door
-                                blockData.isOpen = true
-                                block.blockData = blockData
-                                map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_OPEN,1f,1f)
-                                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
-                                    blockData.isOpen = false
-                                    block.blockData = blockData
-                                    map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_CLOSE,1f,1f)
-                                },60)
-                                task.cancel()
-                            }
-                            helpTime--
+                        var helpTime = 0
+                        helpTime += helperData.helpTick
+                        for (uuid in prisonData.inPlayer){
+                            val data = IdentityFifty.survivors[uuid]!!
+                            helpTime += data.otherPlayerHelpDelay
                         }
-                    },0,1)
+
+                        for (uuid in prisonData.inPlayer){
+                            val data = IdentityFifty.survivors[uuid]!!
+                            helpTime += data.otherPlayerHelpDelayPercentage * helpTime
+                        }
+
+
+                        Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
+                            if (!e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0).contains(it)){
+                                task.cancel()
+                                return@Consumer
+                            } else {
+                                if (helpTime <= 0) {
+
+                                    prisonData.lastPressUUID = e.player.uniqueId
+                                    val block = map.world.getBlockAt(prisonData.doorLoc)
+                                    val blockData = block.blockData as Door
+                                    blockData.isOpen = true
+                                    block.blockData = blockData
+                                    map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_OPEN,1f,1f)
+                                    Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
+                                        blockData.isOpen = false
+                                        block.blockData = blockData
+                                        map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_CLOSE,1f,1f)
+                                    },60)
+                                    task.cancel()
+                                }
+                                helpTime--
+                            }
+                        },0,1)
+                        return@register
+                    }
+
+                }
+            }
+        }
+
+        sEvent.register(PlayerJumpEvent::class.java) { e ->
+            if (IdentityFifty.hunters.containsKey(e.player.uniqueId)){
+                e.isCancelled = true
+            }
+        }
+
+        sEvent.register(BlockBreakEvent::class.java) { e ->
+            if (IdentityFifty.survivors.containsKey(e.player.uniqueId)){
+                e.isCancelled = true
+                return@register
+            }
+
+            if (IdentityFifty.hunters.containsKey(e.player.uniqueId)){
+                if (e.block.type != Material.OAK_STAIRS){
+                    e.isCancelled = true
                     return@register
                 }
             }
         }
 
 
-        sEvent.register(PlayerMoveEvent::class.java){ e ->
+        sEvent.register(PlayerMoveEvent::class.java) { e ->
             if (!IdentityFifty.survivors.containsKey(e.player.uniqueId))return@register
             val from = e.from.clone()
             from.yaw = 0f
@@ -386,7 +446,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     it.cancel()
                 }
 
-                IdentityFifty.hunters.forEach { (uuid,data) ->
+                IdentityFifty.hunters.forEach { (uuid,_) ->
                     Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
                         Random.nextDouble(-0.2,0.2),0.2,
                         Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.RED,Color.WHITE,1f))
@@ -397,6 +457,60 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
                 footprints--
             },0,20)
+
+            val entities = e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0)
+
+            if (entities.isEmpty()){
+                if (e.player.inventory.itemInOffHand.type != Material.AIR){
+                    e.player.inventory.setItemInOffHand(ItemStack(Material.AIR))
+                }
+            } else {
+                if (e.player.inventory.itemInOffHand.type == Material.AIR){
+                    entities.forEach {
+
+                        if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PlateLoc"),
+                                PersistentDataType.INTEGER_ARRAY)){
+                                    val intArray = it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"PlateLoc"), PersistentDataType.INTEGER_ARRAY]!!
+                                    val plateData = map.woodPlates[Location(map.world,intArray[0].toDouble(),intArray[1].toDouble(),intArray[2].toDouble())]!!
+                                    val item = IdentityFifty.interactManager.createSInteractItem(SItem(Material.DIAMOND_HOE).setDisplayName("§e板倒し"),true).setInteractEvent { e, item ->
+                                        var upBlock = plateData.loc.block
+                                        for (i in 0 until plateData.length) {
+                                            upBlock.type = Material.AIR
+                                            upBlock = upBlock.getRelative(BlockFace.UP)
+                                        }
+
+                                        var faceBlock = plateData.loc.block
+
+                                        for (i in 0 until plateData.length){
+                                            faceBlock.type = Material.OAK_STAIRS
+                                            val blockData = faceBlock.blockData as Stairs
+                                            blockData.shape = Shape.STRAIGHT
+                                    blockData.half = Bisected.Half.TOP
+                                    blockData.facing = changeBlockFace(plateData.face)
+                                    faceBlock.blockData = blockData
+                                    faceBlock = faceBlock.getRelative(plateData.face)
+                                }
+
+                                map.world.playSound(it.location,Sound.BLOCK_WOODEN_TRAPDOOR_CLOSE,2f,0.8f)
+                                it.location.getNearbyPlayers(3.0).forEach second@ { p ->
+                                    if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
+                                    map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,1f,0.5f)
+                                    map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location,10)
+                                    IdentityFifty.stunEffect(p)
+                                }
+                                it.remove()
+                                item.delete()
+                            }
+
+                            e.player.inventory.setItemInOffHand(item)
+
+
+                        }
+                    }
+                }
+
+            }
+
 
             if (!worldGuard.inRegion(e.player,map.goalRegions))return@register
             escapedSurvivor.add(e.player.uniqueId)
