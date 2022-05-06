@@ -64,7 +64,7 @@ class IdentityCommand : SCommand("identity") {
             }
         ))
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("asHunter")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray())).setExecutor(
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("asHunter")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray())).setExecutor(
             Consumer<SCommandOnlyPlayerData> {
                 val p = Bukkit.getPlayer(it.args[1])!!
                 val abstractHunter = IdentityFifty.huntersData[it.args[2]]!!

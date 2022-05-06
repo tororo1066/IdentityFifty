@@ -61,6 +61,7 @@ class IdentityFifty : SJavaPlugin() {
                 p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,slowTime,200,true,false,false))
                 p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,slowTime,200,true,false,false))
                 p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,slowTime,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW_DIGGING,slowTime,200,true,false,false))
             })
         }
 

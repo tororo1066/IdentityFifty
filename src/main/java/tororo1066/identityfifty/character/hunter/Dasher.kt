@@ -15,7 +15,7 @@ import java.util.function.Consumer
 class Dasher : AbstractHunter("ダッシャー") {
 
     override fun onStart(p: Player) {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,2000000,0,false,false))
+        p.walkSpeed = 1.1f
         val firstSkillItem = SItem(Material.DIAMOND_SHOVEL).setDisplayName("§c§l燃え上がる§4§l怒り").addLore("§f自身の移動速度を大幅に上げる").addLore("§c§lクールタイム§f：§e§l40§b§l秒")
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, item ->
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,1))
