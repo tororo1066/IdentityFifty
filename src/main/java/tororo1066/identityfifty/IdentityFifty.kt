@@ -1,40 +1,25 @@
 package tororo1066.identityfifty
 
-import org.bukkit.*
-import org.bukkit.block.data.AnaloguePowerable
-import org.bukkit.block.data.Powerable
+import org.bukkit.Bukkit
+import org.bukkit.Particle
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.event.block.Action
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.persistence.PersistentDataType
-import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.scheduler.BukkitTask
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.character.hunter.AbstractHunter
 import tororo1066.identityfifty.character.hunter.Dasher
-import tororo1066.identityfifty.character.survivor.AbstractSurvivor
-import tororo1066.identityfifty.character.survivor.Nurse
+import tororo1066.identityfifty.character.survivor.*
 import tororo1066.identityfifty.commands.IdentityCommand
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.SConfig
 import tororo1066.tororopluginapi.SJavaPlugin
-import tororo1066.tororopluginapi.otherUtils.UsefulUtility
-import tororo1066.tororopluginapi.sEvent.SEvent
+import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.sItem.SInteractItemManager
-import tororo1066.tororopluginapi.sItem.SItem
 import java.io.File
-import java.util.UUID
-import java.util.function.Consumer
-import kotlin.random.Random
+import java.util.*
 
 class IdentityFifty : SJavaPlugin() {
 
@@ -47,6 +32,8 @@ class IdentityFifty : SJavaPlugin() {
         lateinit var interactManager: SInteractItemManager
         lateinit var plugin: SJavaPlugin
         lateinit var sConfig: SConfig
+        lateinit var sLang: SLang
+        var identityFiftyTask: IdentityFiftyTask? = null
 
         const val prefix = "§b[§cIdentity§eFifty§b]§r"
 
@@ -55,7 +42,7 @@ class IdentityFifty : SJavaPlugin() {
         }
 
         fun stunEffect(p: Player, blindTime: Int, slowTime: Int){
-            p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location,10)
+            p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),20)
             Bukkit.getScheduler().runTask(plugin, Runnable {
                 p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,blindTime,0,true,false,false))
                 p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,slowTime,200,true,false,false))
@@ -70,17 +57,20 @@ class IdentityFifty : SJavaPlugin() {
         }
     }
 
-    private fun register(string: String, abstractSurvivor: AbstractSurvivor){
-        survivorsData[string] = abstractSurvivor
+    private fun register(abstractSurvivor: AbstractSurvivor){
+        survivorsData[abstractSurvivor.name] = abstractSurvivor
     }
 
-    private fun register(string: String, abstractHunter: AbstractHunter){
-        huntersData[string] = abstractHunter
+    private fun register(abstractHunter: AbstractHunter){
+        huntersData[abstractHunter.name] = abstractHunter
     }
 
     private fun registerAll(){
-        register("nurse",Nurse())
-        register("dasher",Dasher())
+        register(Nurse())
+        register(Dasher())
+        register(RunAway())
+        register(Searcher())
+        register(Helper())
 
     }
 
@@ -89,6 +79,7 @@ class IdentityFifty : SJavaPlugin() {
         plugin = this
         interactManager = SInteractItemManager(this)
         sConfig = SConfig(this)
+        sLang = SLang(this, prefix)
 
         registerAll()
 
@@ -96,6 +87,7 @@ class IdentityFifty : SJavaPlugin() {
             maps[file.nameWithoutExtension] = MapData.loadFromYml(YamlConfiguration.loadConfiguration(file))
         }
         IdentityCommand()
+
 
 
 

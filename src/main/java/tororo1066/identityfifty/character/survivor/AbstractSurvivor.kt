@@ -10,7 +10,7 @@ abstract class AbstractSurvivor(val name: String) {
 
     abstract fun parameters(data: SurvivorData): SurvivorData
 
-    open fun onFinishedGenerator(dieLocation: Location, p: Player) {}
+    open fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {}
 
     open fun onFinishedEscapeGenerator(dieLocation: Location, p: Player) {}
 
@@ -21,4 +21,16 @@ abstract class AbstractSurvivor(val name: String) {
     open fun onHelp(helpedPlayer: Player, p: Player) {}
 
     open fun onGotHelp(helper: Player, p: Player) {}
+
+    open fun onDie(p: Player) {}
+
+    open fun onDieOtherSurvivor(diePlayer: Player, playerNumber: Int,p: Player) {}
+
+    open fun sheepGeneratorModify(damage: Double, remainingGenerator: Int, maxHealth: Double, nowHealth: Double, p: Player): Double {
+        return damage
+    }
+
+    open fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
+        return damage
+    }
 }

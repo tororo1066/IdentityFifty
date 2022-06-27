@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.data
 
+import org.bukkit.boss.BossBar
 import tororo1066.identityfifty.character.survivor.AbstractSurvivor
 import java.util.UUID
 
@@ -8,15 +9,19 @@ class SurvivorData : PlayerData() {
     lateinit var survivorClass: AbstractSurvivor
     private var health = 5
     var remainingTime = 180
-    var footprintsTime = 5
+    var footprintsCount = 0
+    var footprintsTime = 0
     var helpTick = 120
     var otherPlayerHelpDelay = 0
-    var otherPlayerHelpDelayPercentage = 0
+    var otherPlayerHelpDelayPercentage = 0.0
     var healProcess = 0.0
+    lateinit var healBossBar: BossBar
+    lateinit var helpBossBar: BossBar
     var healingPlayers = HashMap<UUID,SurvivorData>()
     var healTick = 200
     var otherPlayerHealDelay = 100
-    var otherPlayerHealDelayPercentage = 0
+    var otherPlayerHealDelayPercentage = 0.0
+    var heartProcess = 0.0
 
 
     fun setHealth(int: Int){

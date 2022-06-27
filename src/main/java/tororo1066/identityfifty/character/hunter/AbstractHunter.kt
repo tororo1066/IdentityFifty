@@ -10,12 +10,12 @@ abstract class AbstractHunter(val name: String) {
 
     abstract fun parameters(data: HunterData): HunterData
 
-    open fun onFinishedGenerator(dieLocation: Location, p: Player) {}
+    open fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {}
 
     open fun onFinishedEscapeGenerator(dieLocation: Location, p: Player) {}
 
-    open fun onAttack(attackPlayer: Player, p: Player): Int {
-        return 1
+    open fun onAttack(attackPlayer: Player, p: Player, isFinishedGenerator: Boolean): Int {
+        return if (isFinishedGenerator) 4 else 2
     }
 
     open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}

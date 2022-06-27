@@ -1,0 +1,31 @@
+passive: "§aPassive"
+hunter_passive: "§cPassive"
+
+survivor: "Survivor"
+hunter: "Hunter"
+
+nurse: "Nurse"
+nurse_passive_lore_1: "§f§l1.§eTime to treat a player goes from 10 seconds to 5 seconds."
+syringe: "§aSyringe"
+syringe_lore: "You can recover myself."
+
+runaway: "RunAway"
+runaway_passive_lore_1: "§f§l1.§eMovement speed increases by 40% for 5 seconds when struck."
+runaway_passive_lore_2: "§f§l2.§eMovement speed increases by 40% for 5 seconds when rescued."
+camouflage: "§aCamouflage"
+camouflage_lore_1: "§eBlinds the hunter within a 15 square radius for 7 seconds."
+camouflage_lore_2: "§c§lCool Time§f：§e§l60§b§ls"
+camouflage_hit_hunter: "§cYou have been blindsided!"
+camouflage_hit_survivor: "§bYou hit {0} with a blindfold!"
+
+dasher: "Dasher"
+dasher_passive_lore_1: "§f§l1.§eMovement speed is increases by 40% for 5 seconds when a survivor is rescued."
+hyper_engine: "§c§lHyper§6§lEngine"
+hyper_engine_lore_1: "§eIncrease movement speed by 40% for 3 seconds."
+hyper_engine_lore_2: "§c§lCool Time§f：§e§l40§b§ls"
+
+select_character: "Selected {0}"
+select_other_character: "{0} selected {1}"
+
+searcher: "Searcher"
+searcher_passive_lore_1: ""

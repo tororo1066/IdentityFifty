@@ -1,0 +1,45 @@
+passive: "§aパッシブ"
+hunter_passive: "§cパッシブ"
+
+survivor: "サバイバー"
+hunter: "ハンター"
+
+nurse: "医師"
+nurse_passive_lore_1: "§f§l治療意欲.§e他人を治療する時間が10秒から5秒になる"
+syringe: "§a自己修復剤"
+syringe_lore: "§e自分を回復できる"
+
+runaway: "逃亡者"
+runaway_passive_lore_1: "§f§l警戒心.§e殴られた時に移動速度が5秒間40%上がる"
+runaway_passive_lore_2: "§f§l自己中心.§e救助された時に移動速度が5秒間40%上がる"
+camouflage: "§a自己中逃走劇"
+camouflage_lore_1: "§e半径15マス以内のハンターに盲目を7秒付与する"
+camouflage_lore_2: "§c§lクールタイム§f：§e§l60§b§l秒"
+camouflage_hit_hunter: "§c目くらましを食らった！"
+camouflage_hit_survivor: "§b目くらましを§d{0}§bに当てた！"
+camouflage_miss: "§c近くにハンターがいませんでした"
+
+dasher: "ダッシャー"
+dasher_passive_lore_1: "§f§l疾風の目.§eサバイバーが救助されたとき移動速度が5秒間40%上がる"
+hyper_engine: "§c§lハイパー§6§lエンジン"
+hyper_engine_lore_1: "§e自身の移動速度を3秒間40%上げる"
+hyper_engine_lore_2: "§c§lクールタイム§f：§e§l40§b§l秒"
+
+select_character: "{0}になりました"
+select_other_character: "{0}を{1}にしました"
+
+searcher: "発見者"
+searcher_passive_lore_1: "§f§l悲観.§e他人を救助する時間が1.5倍になる"
+searcher_passive_lore_2: "§f§l自己嫌悪.§e他人から救助される時間が1.25倍になる"
+search_lens: "§a高性能レンズ"
+search_lens_lore_1: "§eサバイバー全員にハンターの位置を10秒間表示させる"
+search_lens_lore_2: "§c§lクールタイム§f：§e§l60§b§l秒"
+
+
+helper: "救助者"
+helper_passive_lore_1: "§f§l救助意欲.§e他人を救助する時間が6秒から4秒になる"
+helper_protect: "§aプロテクト"
+helper_protect_lore_1: "§e自分を3秒間無敵にする"
+helper_protect_lore_2: "§e近くに味方がいないと発動できない"
+helper_protect_lore_3: "§c§lクールタイム§f：§e§l30§b§l秒"
+helper_protect_cant_use: "§c近くに味方がいません"

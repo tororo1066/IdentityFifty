@@ -29,7 +29,7 @@ dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compileOnly fileTree(dir: 'libs', include: '*.jar')
-    compile 'com.github.tororo1066:TororoPluginAPI:154ce83ed1'
+    compile 'com.github.tororo1066:TororoPluginAPI:65afcb242d'
     compileOnly 'com.github.InventivetalentDev:GlowAPI:1.5.1-SNAPSHOT'
 }
 
