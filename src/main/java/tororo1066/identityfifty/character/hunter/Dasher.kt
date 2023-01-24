@@ -13,14 +13,15 @@ import tororo1066.tororopluginapi.sItem.SItem
 class Dasher : AbstractHunter("dasher") {
 
     override fun onStart(p: Player) {
-        val passiveItem = SItem(Material.STICK).setDisplayName(p.translate("hunter_passive")).setCustomModelData(1)
-            .addLore(p.translate("dasher_passive_lore_1"))
-        val firstSkillItem = SItem(Material.STICK).setDisplayName(p.translate("hyper_engine")).setCustomModelData(4)
-            .addLore(p.translate("hyper_engine_lore_1"))
-            .addLore(p.translate("hyper_engine_lore_2"))
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
+            .addLore(translate("dasher_passive_lore_1"))
+        val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("hyper_engine")).setCustomModelData(4)
+            .addLore(translate("hyper_engine_lore_1"))
+            .addLore(translate("hyper_engine_lore_2"))
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { _, _ ->
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,1))
             p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
+            return@setInteractEvent true
         }.setInitialCoolDown(800)
 
         p.inventory.setItem(0,passiveItem)

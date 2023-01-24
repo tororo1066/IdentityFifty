@@ -1,42 +1,43 @@
 package tororo1066.identityfifty.commands
 
 import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
-import tororo1066.identityfifty.data.GlowManager
-import tororo1066.identityfifty.data.HunterData
-import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.data.*
 import tororo1066.identityfifty.inventory.MapList
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
-import tororo1066.tororopluginapi.sCommand.*
-import java.util.function.Consumer
+import tororo1066.tororopluginapi.sCommand.SCommand
+import tororo1066.tororopluginapi.sCommand.SCommandArg
+import tororo1066.tororopluginapi.sCommand.SCommandArgType
+import tororo1066.tororopluginapi.sCommand.SCommandObject
 
 class IdentityCommand : SCommand("identity") {
 
     fun createSurvivorData(p: Player): SurvivorData {
-        val data = SurvivorData()
-        data.uuid = p.uniqueId
-        data.name = p.name
-        data.glowManager = GlowManager(p.uniqueId)
-        return data
+        return createPData(SurvivorData(),p)
     }
 
     fun createHunterData(p: Player): HunterData {
-        val data = HunterData()
+        return createPData(HunterData(),p)
+    }
+
+    fun <V: PlayerData>createPData(data: V, p: Player): V {
         data.uuid = p.uniqueId
         data.name = p.name
         data.glowManager = GlowManager(p.uniqueId)
+        data.skinModifier = SkinModifier(p.uniqueId)
         return data
     }
 
     init {
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray())).setExecutor(
-            Consumer<SCommandOnlyPlayerData> {
-                if (IdentityFifty.hunters.containsKey(it.sender.uniqueId)){
+        registerSLangCommand(IdentityFifty.plugin,"identity.op")
+
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
+            .setPlayerExecutor {
+                if (IdentityFifty.hunters.containsKey(it.sender.uniqueId)) {
                     IdentityFifty.hunters.remove(it.sender.uniqueId)
                 }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!
@@ -44,14 +45,13 @@ class IdentityCommand : SCommand("identity") {
                 abstractSurvivor.parameters(data)
                 IdentityFifty.survivors[it.sender.uniqueId] = data
 
-                it.sender.sendTranslateMsg("select_character",it.sender.translate(abstractSurvivor.name))
-            }
-        ))
+                it.sender.sendTranslateMsg("select_character", translate(abstractSurvivor.name))
+            })
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray())).setExecutor(
-            Consumer<SCommandData> {
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
+            .setNormalExecutor {
                 val p = Bukkit.getPlayer(it.args[2])!!
-                if (IdentityFifty.hunters.containsKey(p.uniqueId)){
+                if (IdentityFifty.hunters.containsKey(p.uniqueId)) {
                     IdentityFifty.hunters.remove(p.uniqueId)
                 }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[3]]!!
@@ -59,15 +59,14 @@ class IdentityCommand : SCommand("identity") {
                 abstractSurvivor.parameters(data)
                 IdentityFifty.survivors[p.uniqueId] = data
 
-                it.sender.sendTranslateMsg("select_other_character",p.name,p.translate(abstractSurvivor.name))
-            }
-        ))
+                it.sender.sendTranslateMsg("select_other_character", p.name, translate(abstractSurvivor.name))
+            })
 
 
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("hunter")).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray())).setExecutor(
-            Consumer<SCommandOnlyPlayerData> {
-                if (IdentityFifty.survivors.containsKey(it.sender.uniqueId)){
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("hunter")).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray()))
+            .setPlayerExecutor {
+                if (IdentityFifty.survivors.containsKey(it.sender.uniqueId)) {
                     IdentityFifty.survivors.remove(it.sender.uniqueId)
                 }
                 val abstractHunter = IdentityFifty.huntersData[it.args[1]]!!
@@ -75,14 +74,13 @@ class IdentityCommand : SCommand("identity") {
                 abstractHunter.parameters(data)
                 IdentityFifty.hunters[it.sender.uniqueId] = data
 
-                it.sender.sendTranslateMsg("select_character",it.sender.translate(abstractHunter.name))
-            }
-        ))
+                it.sender.sendTranslateMsg("select_character", translate(abstractHunter.name))
+            })
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("hunter")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray())).setExecutor(
-            Consumer<SCommandData> {
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("hunter")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray()))
+            .setNormalExecutor {
                 val p = Bukkit.getPlayer(it.args[2])!!
-                if (IdentityFifty.survivors.containsKey(p.uniqueId)){
+                if (IdentityFifty.survivors.containsKey(p.uniqueId)) {
                     IdentityFifty.survivors.remove(p.uniqueId)
                 }
                 val abstractHunter = IdentityFifty.huntersData[it.args[3]]!!
@@ -90,74 +88,61 @@ class IdentityCommand : SCommand("identity") {
                 abstractHunter.parameters(data)
                 IdentityFifty.hunters[p.uniqueId] = data
 
-                it.sender.sendTranslateMsg("select_other_character",p.name,p.translate(abstractHunter.name))
-            }
-        ))
+                it.sender.sendTranslateMsg("select_other_character", p.name, translate(abstractHunter.name))
+            })
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("unregister")).setExecutor(
-            Consumer<SCommandOnlyPlayerData> {
-                IdentityFifty.hunters.remove(it.sender.uniqueId)
-                IdentityFifty.survivors.remove(it.sender.uniqueId)
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("unregister")).setPlayerExecutor {
+            IdentityFifty.hunters.remove(it.sender.uniqueId)
+            IdentityFifty.survivors.remove(it.sender.uniqueId)
 
-                it.sender.prefixMsg("登録解除しました")
-            }
-        ))
+            it.sender.prefixMsg("登録解除しました")
+        })
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("unregister")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).setExecutor(
-            Consumer<SCommandData> {
-                val p = Bukkit.getPlayer(it.args[2])!!
-                IdentityFifty.hunters.remove(p.uniqueId)
-                IdentityFifty.survivors.remove(p.uniqueId)
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("unregister")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).setNormalExecutor {
+            val p = Bukkit.getPlayer(it.args[2])!!
+            IdentityFifty.hunters.remove(p.uniqueId)
+            IdentityFifty.survivors.remove(p.uniqueId)
 
-                it.sender.prefixMsg("登録解除させました")
-            }
-        ))
+            it.sender.prefixMsg("登録解除させました")
+        })
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("start")).addArg(SCommandArg().addAllowString(IdentityFifty.maps.keys.toTypedArray())).setExecutor(
-            Consumer<SCommandOnlyPlayerData> {
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("start")).addArg(SCommandArg().addAllowString(IdentityFifty.maps.keys.toTypedArray()))
+            .setPlayerExecutor {
                 val map = IdentityFifty.maps[it.args[1]]!!
-                if (map.survivorLimit < IdentityFifty.survivors.size){
+                if (map.survivorLimit < IdentityFifty.survivors.size) {
                     it.sender.prefixMsg("§cサバイバーは${map.survivorLimit}人までです！")
-                    return@Consumer
+                    return@setPlayerExecutor
                 }
 
-                if (map.hunterLimit < IdentityFifty.hunters.size){
+                if (map.hunterLimit < IdentityFifty.hunters.size) {
                     it.sender.prefixMsg("§cサバイバーは${map.hunterLimit}人までです！")
-                    return@Consumer
+                    return@setPlayerExecutor
                 }
 
                 IdentityFifty.identityFiftyTask = IdentityFiftyTask(map)
                 IdentityFifty.identityFiftyTask?.start()
+            })
+
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist")).setPlayerExecutor {
+            it.sender.sendMessage("§b${translate("survivor")}")
+            IdentityFifty.survivors.forEach { data ->
+                it.sender.sendMessage("§e${data.value.name} §d${translate(data.value.survivorClass.name)}")
             }
-        ))
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist")).setExecutor(
-            Consumer<SCommandOnlyPlayerData> {
-                it.sender.sendMessage("§b${it.sender.translate("survivor")}")
-                IdentityFifty.survivors.forEach { data ->
-                    it.sender.sendMessage("§e${data.value.name} §d${it.sender.translate(data.value.survivorClass.name)}")
-                }
-
-                it.sender.sendMessage("§c${it.sender.translate("hunter")}")
-                IdentityFifty.hunters.forEach { data ->
-                    it.sender.sendMessage("§e${data.value.name} §d${it.sender.translate(data.value.hunterClass.name)}")
-                }
+            it.sender.sendMessage("§c${translate("hunter")}")
+            IdentityFifty.hunters.forEach { data ->
+                it.sender.sendMessage("§e${data.value.name} §d${translate(data.value.hunterClass.name)}")
             }
-        ))
+        })
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("stop")).setExecutor(
-            Consumer<SCommandOnlyPlayerData> {
-                IdentityFifty.identityFiftyTask?.end()
-                it.sender.prefixMsg("§c停止しました")
-            }
-        ))
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("stop")).setPlayerExecutor {
+            IdentityFifty.identityFiftyTask?.end()
+            it.sender.prefixMsg("§c停止しました")
+        })
 
-        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("edit")).setExecutor(
-            Consumer<SCommandOnlyPlayerData> {
-                MapList().open(it.sender)
-            }
-        ))
-
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("edit")).setPlayerExecutor {
+            MapList().open(it.sender)
+        })
 
     }
 

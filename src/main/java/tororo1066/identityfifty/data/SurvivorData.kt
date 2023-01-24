@@ -10,8 +10,8 @@ class SurvivorData : PlayerData() {
     private var health = 5
     var remainingTime = 180
     var footprintsCount = 0
-    var footprintsTime = 0
-    var helpTick = 120
+    var footprintsTime = 2
+    var helpTick = 100
     var otherPlayerHelpDelay = 0
     var otherPlayerHelpDelayPercentage = 0.0
     var healProcess = 0.0
@@ -26,6 +26,10 @@ class SurvivorData : PlayerData() {
 
     fun setHealth(int: Int){
         if (health == 1){
+            return
+        }
+        if (int < 1){
+            health = 1
             return
         }
         if (int > 5){

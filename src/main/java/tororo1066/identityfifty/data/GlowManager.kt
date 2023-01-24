@@ -31,7 +31,7 @@ class GlowManager(private val uuid: UUID) {
                 it.cancel()
             }
 
-            if (tick <= 0){
+            if (tick <= 0 || otherGlow){
                 isGlowing = false
                 GlowAPI.setGlowing(p,false,seeablePlayer)
                 if (IdentityFifty.survivors.containsKey(uuid)){
@@ -46,9 +46,7 @@ class GlowManager(private val uuid: UUID) {
                 return@Consumer
             }
 
-            if (!GlowAPI.isGlowing(p,seeablePlayer,false)){
-                GlowAPI.setGlowing(p,color,seeablePlayer)
-            }
+            GlowAPI.setGlowing(p,color,seeablePlayer)
 
             tick--
         },0,1)

@@ -13,17 +13,18 @@ import tororo1066.tororopluginapi.sItem.SItem
 
 class Searcher : AbstractSurvivor("searcher") {
     override fun onStart(p: Player) {
-        val passiveItem = SItem(Material.STICK).setDisplayName(p.translate("passive"))
-            .addLore(p.translate("searcher_passive_lore_1"))
-            .addLore(p.translate("searcher_passive_lore_2"))
+        super.onStart(p)
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("searcher_passive_lore_1"))
+            .addLore(translate("searcher_passive_lore_2"))
 
         p.inventory.addItem(passiveItem)
 
-        val searchSkillItem = SItem(Material.STICK).setDisplayName(p.translate("search_lens")).setCustomModelData(5)
-            .addLore(p.translate("search_lens_lore_1"))
-            .addLore(p.translate("search_lens_lore_2"))
+        val searchSkillItem = SItem(Material.STICK).setDisplayName(translate("search_lens")).setCustomModelData(5)
+            .addLore(translate("search_lens_lore_1"))
+            .addLore(translate("search_lens_lore_2"))
 
-        val searchSkill = IdentityFifty.interactManager.createSInteractItem(searchSkillItem).setInteractEvent { e, item ->
+        val searchSkill = IdentityFifty.interactManager.createSInteractItem(searchSkillItem,true).setInteractEvent { e, item ->
             p.playSound(p.location, Sound.ENTITY_ARROW_HIT_PLAYER,1f,0.5f)
             p.prefixMsg("§aハンターの位置が表示された！")
             val players = ArrayList<Player>()
@@ -34,6 +35,7 @@ class Searcher : AbstractSurvivor("searcher") {
                 Bukkit.getPlayer(uuid)?:return@forEach
                 data.glowManager.glow(players, GlowAPI.Color.RED,200)
             }
+            return@setInteractEvent true
         }.setInitialCoolDown(1200)
 
         p.inventory.addItem(searchSkill)
@@ -42,8 +44,8 @@ class Searcher : AbstractSurvivor("searcher") {
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
-        data.helpTick = 200
-        data.otherPlayerHelpDelayPercentage = 0.30
+        data.helpTick = 150
+        data.otherPlayerHelpDelayPercentage = 0.25
         return data
     }
 }

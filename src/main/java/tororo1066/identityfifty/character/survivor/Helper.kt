@@ -17,19 +17,20 @@ class Helper : AbstractSurvivor("helper") {
     private var noDamage = false
 
     override fun onStart(p: Player) {
-        val passiveItem = SItem(Material.STICK).setDisplayName(p.translate("passive"))
-            .addLore(p.translate("helper_passive_lore_1"))
+        super.onStart(p)
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("helper_passive_lore_1"))
         p.inventory.addItem(passiveItem)
 
-        val protectSkill = SItem(Material.STICK).setDisplayName(p.translate("helper_protect"))
-            .addLore(p.translate("helper_protect_lore_1"))
-            .addLore(p.translate("helper_protect_lore_2"))
-            .addLore(p.translate("helper_protect_lore_3"))
+        val protectSkill = SItem(Material.STICK).setDisplayName(translate("helper_protect")).setCustomModelData(7)
+            .addLore(translate("helper_protect_lore_1"))
+            .addLore(translate("helper_protect_lore_2"))
+            .addLore(translate("helper_protect_lore_3"))
 
-        val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill).setInteractEvent { _, _ ->
+        val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { _, _ ->
             if (p.location.getNearbyPlayers(5.0).findLast { IdentityFifty.survivors.containsKey(it.uniqueId) } == null){
-                p.sendActionBar(Component.text(p.translate("helper_protect_cant_use")))
-                return@setInteractEvent
+                p.sendActionBar(Component.text(translate("helper_protect_cant_use")))
+                return@setInteractEvent false
             }
             noDamage = true
 
@@ -40,6 +41,8 @@ class Helper : AbstractSurvivor("helper") {
                 noDamage = false
             },60)
 
+            return@setInteractEvent true
+
         }.setInitialCoolDown(600)
 
         p.inventory.addItem(protectSkillItem)
@@ -48,13 +51,13 @@ class Helper : AbstractSurvivor("helper") {
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
-        data.helpTick = 80
+        data.helpTick = 60
 
         return data
     }
 
-    override fun onDamage(toHealth: Int, damager: Player, p: Player): Boolean {
-        if (noDamage) return false
-        return true
+    override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
+        if (noDamage) return Pair(true,0)
+        return Pair(true,damage)
     }
 }

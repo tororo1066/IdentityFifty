@@ -6,6 +6,7 @@ abstract class PlayerData {
     lateinit var uuid: UUID
     var name = ""
     lateinit var glowManager: GlowManager
+    lateinit var skinModifier: SkinModifier
 
 
 }

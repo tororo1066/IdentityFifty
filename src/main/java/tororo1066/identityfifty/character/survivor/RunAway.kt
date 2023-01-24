@@ -14,20 +14,27 @@ import tororo1066.tororopluginapi.sItem.SItem
 
 class RunAway : AbstractSurvivor("runaway") {
     override fun onStart(p: Player) {
-        val passiveItem = SItem(Material.STICK).setDisplayName(p.translate("passive"))
-            .addLore(p.translate("runaway_passive_lore_1"))
-            .addLore(p.translate("runaway_passive_lore_2"))
-        val blindSkillItem = SItem(Material.STICK).setDisplayName(p.translate("camouflage")).setCustomModelData(6)
-            .addLore(p.translate("camouflage_lore_1"))
-            .addLore(p.translate("camouflage_lore_2"))
+        super.onStart(p)
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("runaway_passive_lore_1"))
+            .addLore(translate("runaway_passive_lore_2"))
+        val blindSkillItem = SItem(Material.STICK).setDisplayName(translate("camouflage")).setCustomModelData(6)
+            .addLore(translate("camouflage_lore_1"))
+            .addLore(translate("camouflage_lore_2"))
         val blindSkill = IdentityFifty.interactManager.createSInteractItem(blindSkillItem,true).setInteractEvent { _, _ ->
-            p.location.getNearbyPlayers(15.0).forEach {
+            val entities = p.location.getNearbyPlayers(15.0)
+            if (entities.isEmpty()){
+                p.sendTranslateMsg("camouflage_miss")
+                return@setInteractEvent true
+            }
+            entities.forEach {
                 if (!IdentityFifty.hunters.containsKey(it.uniqueId))return@forEach
                 it.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,140,1,false,false,true))
                 it.sendTranslateMsg("camouflage_hit_hunter")
                 p.sendTranslateMsg("camouflage_hit_survivor",it.name)
                 it.playSound(it.location, Sound.ENTITY_COW_DEATH,1f,1f)
             }
+            return@setInteractEvent true
         }.setInitialCoolDown(1200)
         p.inventory.addItem(passiveItem)
         p.inventory.addItem(blindSkill)
@@ -42,9 +49,9 @@ class RunAway : AbstractSurvivor("runaway") {
         p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
     }
 
-    override fun onDamage(toHealth: Int, damager: Player, p: Player): Boolean {
+    override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
         p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
-        return true
+        return Pair(true,damage)
     }
 
 }

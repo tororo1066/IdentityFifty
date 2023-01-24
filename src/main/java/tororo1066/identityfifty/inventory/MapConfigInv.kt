@@ -3,6 +3,7 @@ package tororo1066.identityfifty.inventory
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -11,8 +12,8 @@ import tororo1066.identityfifty.data.GeneratorData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.WoodPlateData
-import tororo1066.tororopluginapi.SConfig
 import tororo1066.tororopluginapi.SInput
+import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
 import tororo1066.tororopluginapi.integer.PlusInt
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
@@ -36,6 +37,10 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
 
 
     override fun renderMenu(): Boolean {
+
+        setOnClick { e ->
+            (e.whoClicked as Player).playSound(e.whoClicked.location,Sound.UI_BUTTON_CLICK,1f,1f)
+        }
 
         editNow.add(name)
 
@@ -82,7 +87,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         val setGeneratorGoal = createInputItem(SItem(Material.LIME_WOOL).setDisplayName("§aゲートを出現させるために壊す発電機の数設定").addLore("§a現在の値：§e${mapData.generatorGoal}"),
             PlusInt::class.java) { int, p ->
             mapData.generatorGoal = int.get()
-            p.sendMessage("§aハンターの最大値を§d${int.get()}§aにしました")
+            p.sendMessage("§aゲートを出現させるために壊す発電機の数を§d${int.get()}§aにしました")
         }
 
         items.add(setGeneratorGoal)
@@ -410,7 +415,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         config.set("hunterSpawnLocations",mapData.hunterSpawnLocations.stream().map { "${it.blockX},${it.blockY},${it.blockZ}" }.toList())
         config.set("generatorLocations",mapData.generators.stream().map { "${it.location.blockX},${it.location.blockY},${it.location.blockZ},${it.health}" }.toList())
         config.set("escapeGeneratorLocations",mapData.escapeGenerators.stream().map { "${it.location.blockX},${it.location.blockY},${it.location.blockZ},${it.doorLocation.blockX},${it.doorLocation.blockY},${it.doorLocation.blockZ},${it.health}" }.toList())
-        config.set("goalRegionsId",mapData.goalRegions)
+        config.set("goalRegionId",mapData.goalRegions)
         config.set("prisonLocations",mapData.prisons.values.stream().map { "${it.spawnLoc.blockX},${it.spawnLoc.blockY},${it.spawnLoc.blockZ},${it.escapeLoc.blockX},${it.escapeLoc.blockY},${it.escapeLoc.blockZ},${it.doorLoc.blockX},${it.doorLoc.blockY},${it.doorLoc.blockZ}" }.toList())
         config.set("woodPlates",mapData.woodPlates.values.stream().map { "${it.loc.blockX},${it.loc.blockY},${it.loc.blockZ},${it.length},${it.face.name}" }.toList())
         sConfig.saveConfig(config,"map/${name}")
