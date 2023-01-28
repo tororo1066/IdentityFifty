@@ -81,7 +81,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         }
     }
 
-    private fun taskSurvivor(task: (Map.Entry<UUID,SurvivorData>)->Unit){
+    private fun taskLivingSurvivor(task: (Map.Entry<UUID,SurvivorData>)->Unit){
         IdentityFifty.survivors.forEach {
             if (it.value.getHealth() < 1)return@forEach
             task.invoke(it)
@@ -146,7 +146,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
         Bukkit.getOnlinePlayers().forEach {
             it.walkSpeed = 0.2f
-            it.playSound(it.location,Sound.UI_TOAST_CHALLENGE_COMPLETE,1f,1f)
+            it.playSound(it.location,Sound.UI_TOAST_CHALLENGE_COMPLETE,0.8f,1f)
         }
         if (escapedSurvivor.size > survivorSize/2){
 
@@ -184,7 +184,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     val escapedSurvivor = ArrayList<UUID>()
     val deadSurvivor = ArrayList<UUID>()
     private var end = false
-    var noOne = false
+    private var noOne = false
 
     val survivorTeam = scoreboard.registerNewTeam("Survivor")
     val hunterTeam = scoreboard.registerNewTeam("Hunter")
@@ -199,7 +199,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     }
 
     override fun run() {
-        onlinePlayersAction {p ->
+        onlinePlayersAction { p ->
             Bukkit.getBossBars().forEach {
                 it.removePlayer(p)
             }
@@ -239,7 +239,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 p.foodLevel = 20
                 p.gameMode = GameMode.SURVIVAL
                 p.inventory.clear()
-                p.getTargetEntity(2)
                 p.teleport(hunterSpawnList.removeAt(0))
                 data.hunterClass.onStart(p)
             }
@@ -373,7 +372,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     it.value.hunterClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
                 }
             }
-            taskSurvivor {
+            taskLivingSurvivor {
                 runTask {
                     it.value.survivorClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
                 }
@@ -436,7 +435,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 getBlock.blockData = blockData
                 map.world.playSound(getBlock.location,Sound.BLOCK_IRON_DOOR_OPEN,1f,1f)
 
-                taskSurvivor {
+                taskLivingSurvivor {
                     runTask {
                         it.value.survivorClass.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
                     }
@@ -740,6 +739,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                         map.world.playSound(it.location,Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,1f,0.8f)
                                         it.location.getNearbyPlayers(3.0).forEach second@ { p ->
                                             if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
+                                            val hunterData = IdentityFifty.hunters[p.uniqueId]!!
+                                            if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
                                             map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
                                             map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
                                             IdentityFifty.stunEffect(p)
@@ -957,7 +958,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                             return@Consumer
                         }
 
-                        taskSurvivor { data ->
+                        taskLivingSurvivor { data ->
                             if (data.key != p.uniqueId) runTask { data.value.survivorClass.onDieOtherSurvivor(p,survivorCount,Bukkit.getPlayer(data.key)!!) }
                         }
                         runTask { survivor.survivorClass.onDie(p) }

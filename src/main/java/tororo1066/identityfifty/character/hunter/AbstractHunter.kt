@@ -6,7 +6,7 @@ import tororo1066.identityfifty.data.HunterData
 
 abstract class AbstractHunter(val name: String) {
 
-    abstract fun onStart(p: Player)
+    open fun onStart(p: Player) {}
 
     abstract fun parameters(data: HunterData): HunterData
 
@@ -19,5 +19,9 @@ abstract class AbstractHunter(val name: String) {
     }
 
     open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}
+
+    open fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, p: Player): Boolean {
+        return true
+    }
 
 }

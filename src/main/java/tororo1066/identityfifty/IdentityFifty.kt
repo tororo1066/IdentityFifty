@@ -12,6 +12,7 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.character.hunter.AbstractHunter
 import tororo1066.identityfifty.character.hunter.AreaMan
 import tororo1066.identityfifty.character.hunter.Dasher
+import tororo1066.identityfifty.character.hunter.Gambler
 import tororo1066.identityfifty.character.survivor.*
 import tororo1066.identityfifty.commands.IdentityCommand
 import tororo1066.identityfifty.data.HunterData
@@ -77,6 +78,7 @@ class IdentityFifty : SJavaPlugin() {
         register(Helper())
         register(AreaMan())
         register(DisguisePlayer())
+        register(Gambler())
     }
 
     override fun onLoad() {
