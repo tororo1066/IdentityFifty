@@ -4,10 +4,13 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.sItem.SItem
 
-abstract class AbstractSurvivor(val name: String) {
+abstract class AbstractSurvivor(val name: String): Cloneable {
+
+    val tasks = ArrayList<BukkitTask>()
 
     open fun onStart(p: Player) {
         val sword = ItemStack(Material.IRON_SWORD)
@@ -39,5 +42,9 @@ abstract class AbstractSurvivor(val name: String) {
 
     open fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
         return damage
+    }
+
+    public override fun clone(): AbstractSurvivor {
+        return super.clone() as AbstractSurvivor
     }
 }

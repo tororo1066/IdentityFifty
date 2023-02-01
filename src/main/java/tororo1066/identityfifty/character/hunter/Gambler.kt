@@ -26,13 +26,13 @@ class Gambler: AbstractHunter("gambler") {
     override fun onStart(p: Player) {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("gambler_passive_lore_1"))
-        val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice")).setCustomModelData(100)
+        val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice"))
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { _, _ ->
             var count = 3
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, { task ->
-                if (count >= 0){
+                if (count <= 0){
                     p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2f, 1f)
                     when(Random.nextInt(1..100)){
                         in 1..15->{
@@ -69,6 +69,7 @@ class Gambler: AbstractHunter("gambler") {
                                     } else {
                                         it.health += 300
                                     }
+                                it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                             }
                         }
                         in 76..100->{
@@ -80,6 +81,7 @@ class Gambler: AbstractHunter("gambler") {
                                 } else {
                                     it.health -= 300
                                 }
+                                it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                             }
                         }
                     }
@@ -109,13 +111,13 @@ class Gambler: AbstractHunter("gambler") {
                 in 1..30 ->{
                     return 1
                 }
-                in 31..65->{
+                in 31..70->{
                     return 2
                 }
-                in 66..85->{
+                in 71..90->{
                     return 3
                 }
-                in 86..100->{
+                in 91..100->{
                     return 4
                 }
             }

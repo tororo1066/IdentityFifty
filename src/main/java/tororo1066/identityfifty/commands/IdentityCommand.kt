@@ -40,7 +40,7 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.hunters.containsKey(it.sender.uniqueId)) {
                     IdentityFifty.hunters.remove(it.sender.uniqueId)
                 }
-                val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!
+                val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!.clone()
                 val data = createSurvivorData(it.sender)
                 abstractSurvivor.parameters(data)
                 IdentityFifty.survivors[it.sender.uniqueId] = data
@@ -54,7 +54,7 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.hunters.containsKey(p.uniqueId)) {
                     IdentityFifty.hunters.remove(p.uniqueId)
                 }
-                val abstractSurvivor = IdentityFifty.survivorsData[it.args[3]]!!
+                val abstractSurvivor = IdentityFifty.survivorsData[it.args[3]]!!.clone()
                 val data = createSurvivorData(p)
                 abstractSurvivor.parameters(data)
                 IdentityFifty.survivors[p.uniqueId] = data
@@ -69,7 +69,7 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.survivors.containsKey(it.sender.uniqueId)) {
                     IdentityFifty.survivors.remove(it.sender.uniqueId)
                 }
-                val abstractHunter = IdentityFifty.huntersData[it.args[1]]!!
+                val abstractHunter = IdentityFifty.huntersData[it.args[1]]!!.clone()
                 val data = createHunterData(it.sender)
                 abstractHunter.parameters(data)
                 IdentityFifty.hunters[it.sender.uniqueId] = data
@@ -83,7 +83,7 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.survivors.containsKey(p.uniqueId)) {
                     IdentityFifty.survivors.remove(p.uniqueId)
                 }
-                val abstractHunter = IdentityFifty.huntersData[it.args[3]]!!
+                val abstractHunter = IdentityFifty.huntersData[it.args[3]]!!.clone()
                 val data = createHunterData(p)
                 abstractHunter.parameters(data)
                 IdentityFifty.hunters[p.uniqueId] = data

@@ -46,7 +46,7 @@ class AreaMan: AbstractHunter("areaman") {
             Bukkit.getScheduler().runTaskAsynchronously(IdentityFifty.plugin, Runnable {
                 for (i in 1..300){
                     Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
-                        loc.getNearbyPlayers(20.0,45.0).forEach {
+                        loc.getNearbyPlayers(20.0,7.0).forEach {
                             val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
                             data.glowManager.glow(players,GlowAPI.Color.RED,2)
                             p.playSound(p.location,Sound.ENTITY_ARROW_HIT_PLAYER,0.2f,2f)

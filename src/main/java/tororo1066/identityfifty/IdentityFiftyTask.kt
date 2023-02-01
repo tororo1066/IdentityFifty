@@ -139,6 +139,20 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             it.removeAll()
         }
 
+        IdentityFifty.survivors.values.forEach {
+            it.survivorClass.tasks.forEach {  task ->
+                task.cancel()
+            }
+            it.survivorClass.tasks.clear()
+        }
+
+        IdentityFifty.hunters.values.forEach {
+            it.hunterClass.tasks.forEach {  task ->
+                task.cancel()
+            }
+            it.hunterClass.tasks.clear()
+        }
+
         IdentityFifty.survivors.clear()
         IdentityFifty.hunters.clear()
 
@@ -386,11 +400,12 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             noOne = true
             var count = 60
-            Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
                 count--
                 if (count <= 0){
                     noOne = false
                     bossBar.progress = 0.0
+                    it.cancel()
                 }
                 bossBar.progress = count.toDouble() / 60.0
             },0,20)
@@ -644,7 +659,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
-
         sEvent.register(PlayerMoveEvent::class.java) { e ->
             if (e.player.gameMode == GameMode.SPECTATOR)return@register
             if (!IdentityFifty.survivors.containsKey(e.player.uniqueId))return@register
@@ -825,6 +839,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                             data.value.inPlayer.add(e.entity.uniqueId)
                             runTask { e.entity.teleport(data.value.spawnLoc) }
                         }
+                        if (IdentityFifty.survivors.filter { it.value.getHealth() <= 1 }.size == IdentityFifty.survivors.size){
+                            end()
+                        }
                     }
                 }
             }
@@ -995,9 +1012,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             Bukkit.getOnlinePlayers().forEach { p ->
                 p.scoreboard = scoreboard
             }
-
-
-
 
         },0,20)
 

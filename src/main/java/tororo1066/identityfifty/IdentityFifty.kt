@@ -79,14 +79,14 @@ class IdentityFifty : SJavaPlugin() {
         register(AreaMan())
         register(DisguisePlayer())
         register(Gambler())
+        register(Mechanic())
     }
 
-    override fun onLoad() {
-        plugin = this
-        sLang = SLang(this, prefix)
-    }
     override fun onStart() {
         saveDefaultConfig()
+
+        plugin = this
+        sLang = SLang(this, prefix)
 
         interactManager = SInteractItemManager(this)
         sConfig = SConfig(this)
@@ -98,8 +98,6 @@ class IdentityFifty : SJavaPlugin() {
             maps[file.nameWithoutExtension] = MapData.loadFromYml(YamlConfiguration.loadConfiguration(file))
         }
         IdentityCommand()
-
-        GlowAPI.TEAM_TAG_VISIBILITY = "never"
     }
 
 

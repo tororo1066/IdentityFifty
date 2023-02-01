@@ -38,7 +38,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
                 }
             },1400)
             return@setInteractEvent true
-        }.setInitialCoolDown(2200)
+        }.setInitialCoolDown(2000)
 
         p.inventory.addItem(passiveItem)
         p.inventory.addItem(disguiseSkillItem)
@@ -54,8 +54,8 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
         val data = IdentityFifty.survivors[p.uniqueId]!!
         if (data.skinModifier.isDisguise()){
             data.skinModifier.unDisguise()
-            damager.addPotionEffect(PotionEffect(PotionEffectType.SLOW,20,4,false,false,true))
-            damager.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,20,100,false,false,true))
+            damager.addPotionEffect(PotionEffect(PotionEffectType.SLOW,50,4,false,false,true))
+            damager.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,50,100,false,false,true))
             p.sendTranslateMsg("disguise_skill_end")
             return Pair(false,0)
         }
@@ -63,6 +63,6 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
     }
 
     override fun onHelp(helpedPlayer: Player, p: Player) {
-        helpedPlayer.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,60,1,true,false))
+        helpedPlayer.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,100,1,true,false))
     }
 }

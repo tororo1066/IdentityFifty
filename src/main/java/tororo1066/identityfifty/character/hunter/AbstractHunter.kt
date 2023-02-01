@@ -2,9 +2,12 @@ package tororo1066.identityfifty.character.hunter
 
 import org.bukkit.Location
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.HunterData
 
-abstract class AbstractHunter(val name: String) {
+abstract class AbstractHunter(val name: String): Cloneable {
+
+    val tasks = ArrayList<BukkitTask>()
 
     open fun onStart(p: Player) {}
 
@@ -22,6 +25,10 @@ abstract class AbstractHunter(val name: String) {
 
     open fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, p: Player): Boolean {
         return true
+    }
+
+    public override fun clone(): AbstractHunter {
+        return super.clone() as AbstractHunter
     }
 
 }

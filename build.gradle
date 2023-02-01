@@ -30,10 +30,10 @@ repositories {
 
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'com.github.InventivetalentDev:GlowAPI:1.5.6-SNAPSHOT'
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compileOnly fileTree(dir: 'libs', include: '*.jar')
     api 'com.github.tororo1066.TororoPluginAPI:TororoPluginAPI:7c85e53f46'
-    compileOnly 'com.github.InventivetalentDev:GlowAPI:1.5.7-SNAPSHOT'
     implementation 'com.elmakers.mine.bukkit:EffectLib:9.4'
     compileOnly 'LibsDisguises:LibsDisguises:10.0.31'
 }
