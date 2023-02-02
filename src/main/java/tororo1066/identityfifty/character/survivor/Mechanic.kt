@@ -17,17 +17,18 @@ class Mechanic: AbstractSurvivor("mechanic") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("mechanic_passive_lore_1"))
             .addLore(translate("mechanic_passive_lore_2"))
-            .addLore(translate("mechanic_passive_lore_2"))
+            .addLore(translate("mechanic_passive_lore_3"))
 
-        val slowSkill = SItem(Material.STICK).setDisplayName(translate("slow_timer")).setCustomModelData(100)
+        val slowSkill = SItem(Material.STICK).setDisplayName(translate("slow_timer")).setCustomModelData(12)
             .addLore(translate("slow_timer_lore_1"))
             .addLore(translate("slow_timer_lore_2"))
 
         val slowSkillItem = IdentityFifty.interactManager.createSInteractItem(slowSkill,true).setInteractEvent { _, _ ->
             p.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
             p.location.getNearbyPlayers(8.0).forEach {
+                if (it == p)return@forEach
                 it.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
-                it.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 80, 1, false))
+                it.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 120, 1, false))
             }
             return@setInteractEvent true
         }.setInitialCoolDown(1200)

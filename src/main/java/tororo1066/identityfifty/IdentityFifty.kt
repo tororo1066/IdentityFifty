@@ -1,14 +1,17 @@
 package tororo1066.identityfifty
 
+import com.sun.net.httpserver.HttpExchange
+import com.sun.net.httpserver.HttpHandler
+import com.sun.net.httpserver.HttpServer
 import de.slikey.effectlib.EffectManager
 import org.bukkit.Bukkit
 import org.bukkit.Particle
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.character.hunter.AbstractHunter
 import tororo1066.identityfifty.character.hunter.AreaMan
 import tororo1066.identityfifty.character.hunter.Dasher
@@ -21,8 +24,10 @@ import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.lang.SLang
+import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SInteractItemManager
 import java.io.File
+import java.net.InetSocketAddress
 import java.util.*
 
 class IdentityFifty : SJavaPlugin() {
@@ -41,6 +46,10 @@ class IdentityFifty : SJavaPlugin() {
         var identityFiftyTask: IdentityFiftyTask? = null
 
         const val prefix = "§b[§cIdentity§eFifty§b]§r"
+
+        var resourceUrl = ""
+        var resourceSha1 = ""
+        var http: HttpServer? = null
 
         fun stunEffect(p: Player){
             stunEffect(p,140,160)
@@ -98,6 +107,37 @@ class IdentityFifty : SJavaPlugin() {
             maps[file.nameWithoutExtension] = MapData.loadFromYml(YamlConfiguration.loadConfiguration(file))
         }
         IdentityCommand()
+
+        val packLines = File(dataFolder.path + "/secrecy/resourcePackUrl.txt").readLines()
+        resourceUrl = packLines[0]
+        resourceSha1 = packLines[1]
+        http = HttpServer.create(InetSocketAddress(8000), 0)
+        saveResource("IdentityFifty.zip",true)
+        http?.createContext("/Resource",FileHandler(File(dataFolder.path + "/IdentityFifty.zip")))
+        http?.start()
+        SEvent(this).register(PlayerJoinEvent::class.java) { e ->
+            if (e.player.name == "tororo_1066"){
+                e.player.setResourcePack("http://localhost:8000/Resource")
+            } else {
+                e.player.setResourcePack(resourceUrl, resourceSha1)
+            }
+        }
+
+    }
+
+    override fun onDisable() {
+        http?.stop(0)
+    }
+
+    class FileHandler(private val file: File): HttpHandler {
+        override fun handle(exchange: HttpExchange) {
+            val bytes = file.readBytes()
+            exchange.sendResponseHeaders(200,bytes.size.toLong())
+            val writer = exchange.responseBody
+            writer.write(bytes)
+            writer.close()
+            exchange.close()
+        }
     }
 
 

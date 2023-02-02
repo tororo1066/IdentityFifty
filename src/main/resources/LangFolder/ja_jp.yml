@@ -83,5 +83,5 @@ mechanic_passive_lore_1: "§f§l機械工作.§e発電機の発電速度が1.2�
 mechanic_passive_lore_2: "§f§l仲間嫌い.§eサバイバーを救助、回復する時間が大幅に延びる"
 mechanic_passive_lore_3: "§f§l孤独好き.§e生きているサバイバーが少ないほど移動速度と発電速度が上がる"
 slow_timer: "§7機械仕掛けの時計"
-slow_timer_lore_1: "§e周囲8マス以内のプレイヤーの足を遅くする"
+slow_timer_lore_1: "§e周囲8マス以内のプレイヤーの足を6秒間遅くする"
 slow_timer_lore_2: "§c§lクールタイム§f：§e§l60§b§l秒"

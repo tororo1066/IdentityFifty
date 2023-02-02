@@ -13,6 +13,7 @@ class SkinModifier(val uuid: UUID) {
         val selfP = Bukkit.getPlayer(uuid)?:return
         pDisguise = PlayerDisguise(p).setEntity(selfP)
         pDisguise?.isNameVisible = false
+        pDisguise?.isSelfDisguiseVisible = false
         pDisguise?.startDisguise()
     }
 
