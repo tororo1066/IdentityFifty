@@ -3,6 +3,8 @@ package tororo1066.identityfifty.character.survivor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -34,6 +36,17 @@ class Nurse : AbstractSurvivor("nurse") {
         data.survivorClass = this
         data.healTick = 100
         return data
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("nurse_passive_lore_1"))
+        val healItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
+            .addLore(translate("syringe_lore"))
+        val healItem2 = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
+            .addLore(translate("syringe_lore")).setCustomData(IdentityFifty.plugin,"aaa", PersistentDataType.INTEGER,1)
+
+        return arrayListOf(passiveItem,healItem,healItem2)
     }
 
 }

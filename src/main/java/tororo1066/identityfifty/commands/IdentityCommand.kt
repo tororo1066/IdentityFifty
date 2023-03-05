@@ -6,7 +6,9 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.*
+import tororo1066.identityfifty.inventory.HunterInfoInv
 import tororo1066.identityfifty.inventory.MapList
+import tororo1066.identityfifty.inventory.SurvivorInfoInv
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sCommand.SCommand
@@ -126,6 +128,18 @@ class IdentityCommand : SCommand("identity") {
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist")).setPlayerExecutor {
             it.sender.sendMessage("§b${translate("survivor")}")
             IdentityFifty.survivors.forEach { data ->
+                it.sender.sendMessage("§e${data.value.name} §d???")
+            }
+
+            it.sender.sendMessage("§c${translate("hunter")}")
+            IdentityFifty.hunters.forEach { data ->
+                it.sender.sendMessage("§e${data.value.name} §d???")
+            }
+        })
+
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist")).addArg(SCommandArg("all")).setPlayerExecutor {
+            it.sender.sendMessage("§b${translate("survivor")}")
+            IdentityFifty.survivors.forEach { data ->
                 it.sender.sendMessage("§e${data.value.name} §d${translate(data.value.survivorClass.name)}")
             }
 
@@ -143,6 +157,16 @@ class IdentityCommand : SCommand("identity") {
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("edit")).setPlayerExecutor {
             MapList().open(it.sender)
         })
+
+        addCommand(SCommandObject().addArg(SCommandArg("info")).addArg(SCommandArg("survivor")).addArg(SCommandArg(IdentityFifty.survivorsData.keys)).setPlayerExecutor {
+            SurvivorInfoInv(IdentityFifty.survivorsData[it.args[2]]!!).open(it.sender)
+        })
+
+        addCommand(SCommandObject().addArg(SCommandArg("info")).addArg(SCommandArg("hunter")).addArg(SCommandArg(IdentityFifty.huntersData.keys)).setPlayerExecutor {
+            HunterInfoInv(IdentityFifty.huntersData[it.args[2]]!!).open(it.sender)
+        })
+
+        registerDebugCommand("identity.op")
 
     }
 

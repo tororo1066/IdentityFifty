@@ -6,6 +6,7 @@ import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -28,7 +29,7 @@ class Helper : AbstractSurvivor("helper") {
             .addLore(translate("helper_protect_lore_3"))
 
         val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { _, _ ->
-            if (p.location.getNearbyPlayers(5.0).findLast { IdentityFifty.survivors.containsKey(it.uniqueId) } == null){
+            if (p.location.getNearbyPlayers(5.0).find { IdentityFifty.survivors.containsKey(it.uniqueId) } == null){
                 p.sendActionBar(Component.text(translate("helper_protect_cant_use")))
                 return@setInteractEvent false
             }
@@ -59,5 +60,17 @@ class Helper : AbstractSurvivor("helper") {
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
         if (noDamage) return Pair(true,0)
         return Pair(true,damage)
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("helper_passive_lore_1"))
+
+        val protectSkill = SItem(Material.STICK).setDisplayName(translate("helper_protect")).setCustomModelData(7)
+            .addLore(translate("helper_protect_lore_1"))
+            .addLore(translate("helper_protect_lore_2"))
+            .addLore(translate("helper_protect_lore_3"))
+
+        return arrayListOf(passiveItem,protectSkill)
     }
 }

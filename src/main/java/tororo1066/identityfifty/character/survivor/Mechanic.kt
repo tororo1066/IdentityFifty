@@ -3,6 +3,7 @@ package tororo1066.identityfifty.character.survivor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
@@ -24,7 +25,9 @@ class Mechanic: AbstractSurvivor("mechanic") {
             .addLore(translate("slow_timer_lore_2"))
 
         val slowSkillItem = IdentityFifty.interactManager.createSInteractItem(slowSkill,true).setInteractEvent { _, _ ->
-            p.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
+            IdentityFifty.util.repeatDelay(3,7) {
+                p.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
+            }
             p.location.getNearbyPlayers(8.0).forEach {
                 if (it == p)return@forEach
                 it.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
@@ -67,5 +70,18 @@ class Mechanic: AbstractSurvivor("mechanic") {
     override fun onDieOtherSurvivor(diePlayer: Player, playerNumber: Int, p: Player) {
         val multiply = 0.04f / playerNumber
         p.walkSpeed = 0.2f + multiply
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("mechanic_passive_lore_1"))
+            .addLore(translate("mechanic_passive_lore_2"))
+            .addLore(translate("mechanic_passive_lore_3"))
+
+        val slowSkill = SItem(Material.STICK).setDisplayName(translate("slow_timer")).setCustomModelData(12)
+            .addLore(translate("slow_timer_lore_1"))
+            .addLore(translate("slow_timer_lore_2"))
+
+        return arrayListOf(passiveItem,slowSkill)
     }
 }

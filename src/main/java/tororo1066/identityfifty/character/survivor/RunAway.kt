@@ -1,8 +1,10 @@
 package tororo1066.identityfifty.character.survivor
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
@@ -18,6 +20,7 @@ class RunAway : AbstractSurvivor("runaway") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("runaway_passive_lore_1"))
             .addLore(translate("runaway_passive_lore_2"))
+            .addLore(translate("runaway_passive_lore_3"))
         val blindSkillItem = SItem(Material.STICK).setDisplayName(translate("camouflage")).setCustomModelData(6)
             .addLore(translate("camouflage_lore_1"))
             .addLore(translate("camouflage_lore_2"))
@@ -29,7 +32,8 @@ class RunAway : AbstractSurvivor("runaway") {
             }
             entities.forEach {
                 if (!IdentityFifty.hunters.containsKey(it.uniqueId))return@forEach
-                it.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,140,1,false,false,true))
+                IdentityFifty.stunEffect(it,0,20)
+                it.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,140,3,false,false,true))
                 it.sendTranslateMsg("camouflage_hit_hunter")
                 p.sendTranslateMsg("camouflage_hit_survivor",it.name)
                 it.playSound(it.location, Sound.ENTITY_COW_DEATH,1f,1f)
@@ -42,6 +46,7 @@ class RunAway : AbstractSurvivor("runaway") {
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
+        data.footprintsTime = 1.5
         return data
     }
 
@@ -52,6 +57,17 @@ class RunAway : AbstractSurvivor("runaway") {
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
         p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
         return Pair(true,damage)
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("runaway_passive_lore_1"))
+            .addLore(translate("runaway_passive_lore_2"))
+            .addLore(translate("runaway_passive_lore_3"))
+        val blindSkillItem = SItem(Material.STICK).setDisplayName(translate("camouflage")).setCustomModelData(6)
+            .addLore(translate("camouflage_lore_1"))
+            .addLore(translate("camouflage_lore_2"))
+        return arrayListOf(passiveItem,blindSkillItem)
     }
 
 }

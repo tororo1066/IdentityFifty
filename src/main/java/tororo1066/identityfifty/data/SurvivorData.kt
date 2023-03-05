@@ -7,10 +7,27 @@ import java.util.UUID
 class SurvivorData : PlayerData() {
 
     lateinit var survivorClass: AbstractSurvivor
+    /**
+     * 体力の数値と状態
+     *
+     * 5: max(緑)
+     *
+     * 4: 1.5(橙色)
+     *
+     * 3: 1(赤)
+     *
+     * 2: 0.5(濃い赤)
+     *
+     * 1: 投獄状態
+     *
+     * 0: 死亡状態
+     *
+     * -1: クリア状態
+     */
     private var health = 5
     var remainingTime = 180
     var footprintsCount = 0
-    var footprintsTime = 2
+    var footprintsTime = 2.0
     var helpTick = 100
     var otherPlayerHelpDelay = 0
     var otherPlayerHelpDelayPercentage = 0.0
@@ -22,7 +39,7 @@ class SurvivorData : PlayerData() {
     var otherPlayerHealDelay = 100
     var otherPlayerHealDelayPercentage = 0.0
     var heartProcess = 0.0
-
+    var heartProcessRules = arrayListOf(Pair(25.0,0.2), Pair(20.0,0.1), Pair(15.0,0.2), Pair(10.0,0.5))
 
     fun setHealth(int: Int){
         if (health == 1){

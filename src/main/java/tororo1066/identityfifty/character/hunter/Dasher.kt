@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
@@ -27,16 +28,18 @@ class Dasher : AbstractHunter("dasher") {
         }.setInitialCoolDown(800)
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
-            val specPlayer = p.getTargetEntity(50)
+            val specPlayer = p.getTargetEntity(100)
             if (specPlayer != null){
                 if (IdentityFifty.survivors.containsKey(specPlayer.uniqueId)){
-                    p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 10, 0, false, false, true))
+                    p.walkSpeed = 0.29f
+                    return@Runnable
                 }
             }
+            p.walkSpeed = 0.28f
         },0,2))
 
-        p.inventory.setItem(0,passiveItem)
-        p.inventory.setItem(1,firstSkill)
+        p.inventory.addItem(passiveItem)
+        p.inventory.addItem(firstSkill)
     }
 
     override fun parameters(data: HunterData): HunterData {
@@ -48,5 +51,15 @@ class Dasher : AbstractHunter("dasher") {
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
         p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1,true,false,true))
         p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
+            .addLore(translate("dasher_passive_lore_1"))
+            .addLore(translate("dasher_passive_lore_2"))
+        val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("hyper_engine")).setCustomModelData(4)
+            .addLore(translate("hyper_engine_lore_1"))
+            .addLore(translate("hyper_engine_lore_2"))
+        return arrayListOf(passiveItem,firstSkillItem)
     }
 }

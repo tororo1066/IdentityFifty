@@ -28,6 +28,10 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
         return Pair(true,damage)
     }
 
+    open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, p: Player): Pair<Int,Int> {
+        return Pair(140,160)
+    }
+
     open fun onHelp(helpedPlayer: Player, p: Player) {}
 
     open fun onGotHelp(helper: Player, p: Player) {}
@@ -43,6 +47,10 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
     open fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
         return damage
     }
+
+    open fun onEnd(p: Player) {}
+
+    abstract fun info(): ArrayList<ItemStack>
 
     public override fun clone(): AbstractSurvivor {
         return super.clone() as AbstractSurvivor

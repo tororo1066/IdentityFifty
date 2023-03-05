@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
@@ -47,5 +48,16 @@ class Searcher : AbstractSurvivor("searcher") {
         data.helpTick = 150
         data.otherPlayerHelpDelayPercentage = 0.25
         return data
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("searcher_passive_lore_1"))
+            .addLore(translate("searcher_passive_lore_2"))
+
+        val searchSkillItem = SItem(Material.STICK).setDisplayName(translate("search_lens")).setCustomModelData(5)
+            .addLore(translate("search_lens_lore_1"))
+            .addLore(translate("search_lens_lore_2"))
+        return arrayListOf(passiveItem,searchSkillItem)
     }
 }

@@ -15,7 +15,7 @@ import tororo1066.identityfifty.data.WoodPlateData
 import tororo1066.tororopluginapi.SInput
 import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
-import tororo1066.tororopluginapi.integer.PlusInt
+import tororo1066.tororopluginapi.otherClass.PlusInt
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
 import tororo1066.tororopluginapi.sItem.SItem
 
@@ -36,10 +36,10 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
     }
 
 
-    override fun renderMenu(): Boolean {
+    override fun renderMenu(p: Player): Boolean {
 
-        setOnClick { e ->
-            (e.whoClicked as Player).playSound(e.whoClicked.location,Sound.UI_BUTTON_CLICK,1f,1f)
+        setOnClick {
+            p.playSound(p.location,Sound.UI_BUTTON_CLICK,1f,1f)
         }
 
         editNow.add(name)
@@ -47,7 +47,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         val items = ArrayList<SInventoryItem>()
 
         val setName = createInputItem(SItem(Material.OAK_SIGN).setDisplayName("§a名前設定").addLore("§a現在の値：§e${mapData.name}"),
-            String::class.java) { string, p ->
+            String::class.java) { string, _ ->
 
             mapData.name = string
             p.sendMessage("§a名前を§d${string}§aにしました")
@@ -56,7 +56,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         items.add(setName)
 
         val setWorld = createInputItem(SItem(Material.GRASS_BLOCK).setDisplayName("§aワールド設定").addLore("§a現在の値：§e${mapData.world.name}"),
-            String::class.java) { string, p ->
+            String::class.java) { string, _ ->
             val world = Bukkit.getWorld(string)
             if (world == null){
                 p.sendMessage("§4ワールドが存在しません")
@@ -69,7 +69,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         items.add(setWorld)
 
         val setSurvivorLimit = createInputItem(SItem(Material.DIAMOND_SWORD).setDisplayName("§aサバイバーの最大値設定").addLore("§a現在の値：§e${mapData.survivorLimit}"),
-            PlusInt::class.java) { int, p ->
+            PlusInt::class.java) { int, _ ->
             mapData.survivorLimit = int.get()
             p.sendMessage("§aサバイバーの最大値を§d${int.get()}§aにしました")
         }
@@ -77,7 +77,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         items.add(setSurvivorLimit)
 
         val setHunterLimit = createInputItem(SItem(Material.NETHERITE_SWORD).setDisplayName("§aハンターの最大値設定").addLore("§a現在の値：§e${mapData.hunterLimit}"),
-            PlusInt::class.java) { int, p ->
+            PlusInt::class.java) { int, _ ->
             mapData.hunterLimit = int.get()
             p.sendMessage("§aハンターの最大値を§d${int.get()}§aにしました")
         }
@@ -85,7 +85,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         items.add(setHunterLimit)
 
         val setGeneratorGoal = createInputItem(SItem(Material.LIME_WOOL).setDisplayName("§aゲートを出現させるために壊す発電機の数設定").addLore("§a現在の値：§e${mapData.generatorGoal}"),
-            PlusInt::class.java) { int, p ->
+            PlusInt::class.java) { int, _ ->
             mapData.generatorGoal = int.get()
             p.sendMessage("§aゲートを出現させるために壊す発電機の数を§d${int.get()}§aにしました")
         }
@@ -93,7 +93,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         items.add(setGeneratorGoal)
 
         val setGeneratorLimit = createInputItem(SItem(Material.WHITE_WOOL).setDisplayName("§a発電機の出る量設定").addLore("§a現在の値：§e${mapData.generatorLimit}"),
-            PlusInt::class.java) { int, p ->
+            PlusInt::class.java) { int, _ ->
             mapData.generatorLimit = int.get()
             p.sendMessage("§a発電機の出る量を§d${int.get()}§aにしました")
         }
@@ -101,7 +101,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         items.add(setGeneratorLimit)
 
         val setEscapeGeneratorLimit = createInputItem(SItem(Material.RED_WOOL).setDisplayName("§aゲート発電機の出る量設定").addLore("§a現在の値：§e${mapData.escapeGeneratorLimit}"),
-            PlusInt::class.java) { int, p ->
+            PlusInt::class.java) { int, _ ->
             mapData.escapeGeneratorLimit = int.get()
             p.sendMessage("§aゲート発電機の出る量を§d${int.get()}§aにしました")
         }

@@ -3,6 +3,7 @@ package tororo1066.identityfifty.character.survivor
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
@@ -55,7 +56,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
         if (data.skinModifier.isDisguise()){
             data.skinModifier.unDisguise()
             damager.addPotionEffect(PotionEffect(PotionEffectType.SLOW,50,4,false,false,true))
-            damager.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,50,100,false,false,true))
+            damager.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,50,3,false,false,true))
             p.sendTranslateMsg("disguise_skill_end")
             return Pair(false,0)
         }
@@ -64,5 +65,18 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
 
     override fun onHelp(helpedPlayer: Player, p: Player) {
         helpedPlayer.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,100,1,true,false))
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
+            .addLore(translate("disguise_passive_lore_1"))
+            .addLore(translate("disguise_passive_lore_2"))
+
+        val disguiseSkill = SItem(Material.STICK).setDisplayName(translate("disguise_skill")).setCustomModelData(10)
+            .addLore(translate("disguise_skill_lore_1"))
+            .addLore(translate("disguise_skill_lore_2"))
+            .addLore(translate("disguise_skill_lore_3"))
+
+        return arrayListOf(passiveItem,disguiseSkill)
     }
 }

@@ -39,14 +39,13 @@ import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.otherPlugin.SWorldGuardAPI
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.toPlayer
 import java.time.Duration
 import java.util.UUID
 import java.util.function.Consumer
 import kotlin.random.Random
 
-class IdentityFiftyTask(val map: MapData) : Thread() {
-
-
+class IdentityFiftyTask(private val map: MapData) : Thread() {
 
     private fun allPlayerAction(action: (UUID)->Unit){
         IdentityFifty.survivors.forEach {
@@ -88,6 +87,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         }
     }
 
+    //板の処理で使用
     private fun changeBlockFace(blockFace: BlockFace): BlockFace {
         return when(blockFace){
             BlockFace.WEST-> BlockFace.EAST
@@ -98,6 +98,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         }
     }
 
+    //終了処理
     fun end(){
         end = true
         sEvent.unregisterAll()
@@ -135,11 +136,14 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
+        //意味ないかも
         Bukkit.getBossBars().forEach {
             it.removeAll()
         }
 
+        //サバイバーハンター両方のパッシブで走らせるタスク終了 現在はDasherが該当
         IdentityFifty.survivors.values.forEach {
+            it.uuid.toPlayer()?.let { p -> it.survivorClass.onEnd(p) }
             it.survivorClass.tasks.forEach {  task ->
                 task.cancel()
             }
@@ -147,6 +151,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         }
 
         IdentityFifty.hunters.values.forEach {
+            it.uuid.toPlayer()?.let { p -> it.hunterClass.onEnd(p) }
             it.hunterClass.tasks.forEach {  task ->
                 task.cancel()
             }
@@ -162,6 +167,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             it.walkSpeed = 0.2f
             it.playSound(it.location,Sound.UI_TOAST_CHALLENGE_COMPLETE,0.8f,1f)
         }
+
+        //人数によって結果を変える
         if (escapedSurvivor.size > survivorSize/2){
 
             onlinePlayersAction {
@@ -181,6 +188,12 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
             }
         }
+
+        //スキルアイテムの処理全て削除
+        IdentityFifty.interactManager.items.clear()
+
+        //タスク削除
+        IdentityFifty.identityFiftyTask = null
     }
 
     private var remainingGenerator = map.generatorGoal
@@ -198,6 +211,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     val escapedSurvivor = ArrayList<UUID>()
     val deadSurvivor = ArrayList<UUID>()
     private var end = false
+    //一撃死 全発電機発電後発動(60s)
     private var noOne = false
 
     val survivorTeam = scoreboard.registerNewTeam("Survivor")
@@ -213,6 +227,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     }
 
     override fun run() {
+        //いらないかも
         onlinePlayersAction { p ->
             Bukkit.getBossBars().forEach {
                 it.removePlayer(p)
@@ -221,6 +236,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
         broadcast("ゲームをスタート中...")
 
+        //新しいリストに入れて初期化+シャッフル
         val survivorSpawnList = ArrayList<Location>(map.survivorSpawnLocations)
         survivorSpawnList.shuffle()
         val hunterSpawnList = ArrayList<Location>(map.hunterSpawnLocations)
@@ -259,6 +275,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             IdentityFifty.stunEffect(p)
         }
 
+        //牢屋の脱出判定のlocationにアマスタを出す この周囲でシフトすることで救助できる
         map.prisons.forEach {
             runTask {
                 it.key.world.spawn(it.key,ArmorStand::class.java) { stand ->
@@ -271,6 +288,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
+        //板のlocationにアマスタを出す この周囲で右クリックすることで板を倒すことができる
         map.woodPlates.forEach {  (_,data) ->
 
             runTask {
@@ -281,6 +299,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
 
                 val loc = data.loc.clone()
+                //アマスタの位置を板中央辺りに置く
                 val centerValue = (data.length / 2.0)
                 when (data.face) {
                     BlockFace.NORTH -> {
@@ -309,6 +328,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     woodPlateUUID.add(stand.uniqueId)
                 }
 
+                //階段の設置処理
                 var upBlock = data.loc.block
                 for (i in 0 until data.length) {
                     upBlock.type = Material.OAK_STAIRS
@@ -324,6 +344,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
+        //羊型発電機のスポーン
         for (i in 1..map.generatorLimit){
             val data = generatorList.removeAt(0)
             runTask {
@@ -332,9 +353,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     it.isSilent = true
                     it.color = DyeColor.WHITE
                     generatorUUID.add(it.uniqueId)
-                    it.customName = "§f§l羊型発電機§5(§e${data.health}§f/§b${data.health}§5)"
                     it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
                     it.health = data.health.toDouble()
+                    it.customName = "§f§l羊型発電機§5(§e${data.health}§f/§b${data.health}§5)"
                     it.noDamageTicks = 0
                     it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER,1)
                 }
@@ -343,6 +364,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
 
 
+        //チーム参加処理 遅くない...?w
         IdentityFifty.survivors.forEach {
             survivorTeam.addEntry(it.value.name)
         }
@@ -351,22 +373,22 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             hunterTeam.addEntry(it.value.name)
         }
 
-
-
-
-
-
+        //残り発電機の視覚化
         bossBar.isVisible = true
         Bukkit.getOnlinePlayers().forEach {
             bossBar.addPlayer(it)
         }
 
+        //以下イベント
+
+        //腹減る必要がないからcancel
         sEvent.register(FoodLevelChangeEvent::class.java) { e ->
             if (IdentityFifty.survivors.containsKey(e.entity.uniqueId) || IdentityFifty.hunters.containsKey(e.entity.uniqueId)){
                 e.isCancelled = true
             }
         }
 
+        //羊型発電機が倒されたときに走る処理
         sEvent.register(EntityDeathEvent::class.java) { e ->
             if (e.entity.type != EntityType.SHEEP)return@register
             if (!e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"),
@@ -392,6 +414,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
             }
             if (remainingGenerator != 0)return@register
+            //残り暗号機が0だったら 一撃死状態にする(60秒)
             bossBar.progress = 1.0
             bossBar.setTitle("§dゲートを開けよう！")
             bossBar.color = BarColor.RED
@@ -414,15 +437,16 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 it.playSound(it.location,Sound.ENTITY_WITHER_SPAWN,1f,1f)
             }
 
+            //牛型発電機のスポーン
             for (i in 1..map.escapeGeneratorLimit){
                 val data = escapeGeneratorList.removeAt(0)
                 runTask {
                     map.world.spawn(data.location,Cow::class.java) {
                         it.setAI(false)
                         it.isSilent = true
-                        it.customName = "§f§l牛型発電機§5(§e${it.health.toInt()}§f/§b${data.health}§5)"
                         it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
                         it.health = data.health.toDouble()
+                        it.customName = "§f§l牛型発電機§5(§e${it.health.toInt()}§f/§b${data.health}§5)"
                         it.noDamageTicks = 0
                         it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER,1)
                         escapeGeneratorUUID.add(it.uniqueId)
@@ -431,6 +455,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
 
 
+            //牛型発電機が倒された時の処理
             sEvent.register(EntityDeathEvent::class.java) second@{ e2 ->
                 if (e2.entity.type != EntityType.COW)return@second
                 if (!e2.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"),
@@ -442,6 +467,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 loc.yaw = 0f
                 loc.pitch = 0f
 
+                //モブのロケーションから発電機、ドアの位置を取得する + ドアを開く
                 val data = map.escapeGenerators.find { it.location == loc }!!
                 val getBlock = map.world.getBlockAt(data.doorLocation)
                 val blockData = getBlock.blockData as Door
@@ -464,7 +490,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             }
 
-
+            //牛型発電機が出たら羊型発電機はもういらないので削除
             generatorUUID.forEach {
                 runTask {
                     Bukkit.getEntity(it)?.remove()
@@ -472,156 +498,174 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
             generatorUUID.clear()
 
-
-
         }
 
+        //スニークをした時の処理
         sEvent.register(PlayerToggleSneakEvent::class.java) { e ->
             if (!IdentityFifty.survivors.containsKey(e.player.uniqueId))return@register
-            if (e.isSneaking){
-                e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0).forEach {
-                    if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PrisonLoc"),
-                            PersistentDataType.INTEGER_ARRAY)){
-                        val intArray = it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"PrisonLoc"), PersistentDataType.INTEGER_ARRAY]!!
-                        val prisonData = map.prisons[Location(map.world,intArray[0].toDouble(),intArray[1].toDouble(),intArray[2].toDouble())]!!
-                        val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
-
-                        if (prisonData.inPlayer.isEmpty())return@forEach
-
-                        if (prisonData.inPlayer.contains(e.player.uniqueId))return@forEach
-
-                        var helpTime = 0
-                        helpTime += helperData.helpTick
-                        for (uuid in prisonData.inPlayer){
-                            val data = IdentityFifty.survivors[uuid]!!
-                            helpTime += data.otherPlayerHelpDelay
-                        }
-
-                        for (uuid in prisonData.inPlayer){
-                            val data = IdentityFifty.survivors[uuid]!!
-                            helpTime += (data.otherPlayerHelpDelayPercentage * helpTime).toInt()
-                        }
-
-                        val helpTimeInitial = helpTime
-
-                        helperData.helpBossBar = Bukkit.createBossBar("§e救助中...",BarColor.BLUE,BarStyle.SOLID)
-                        helperData.helpBossBar.progress = 0.0
-                        helperData.helpBossBar.addPlayer(e.player)
-
-
-                        Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
-                            if (!e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0).contains(it) || !e.player.isSneaking){
-                                helperData.helpBossBar.removeAll()
-                                task.cancel()
-                                return@Consumer
-                            } else {
-                                if (helpTime <= 0) {
-
-                                    prisonData.lastPressUUID = e.player.uniqueId
-                                    val block = map.world.getBlockAt(prisonData.doorLoc)
-                                    val blockData = block.blockData as Door
-                                    blockData.isOpen = true
-                                    block.blockData = blockData
-                                    helperData.helpBossBar.removeAll()
-                                    map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_OPEN,1f,1f)
-                                    Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
-                                        blockData.isOpen = false
-                                        block.blockData = blockData
-                                        map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_CLOSE,1f,1f)
-                                    },60)
-                                    task.cancel()
-                                }
-                                helpTime--
-                                if (1.0 - (helpTime.toDouble() / helpTimeInitial.toDouble()) < 1.0){
-                                    helperData.helpBossBar.progress = 1.0 - (helpTime.toDouble() / helpTimeInitial.toDouble())
-                                }
-                            }
-                        },0,1)
-                        return@register
-                    }
-
-                }
-
-                e.player.location.getNearbyPlayers(3.0).forEach {
-                    if (it == e.player)return@forEach
-                    if (!IdentityFifty.survivors.containsKey(it.uniqueId))return@forEach
-                    if (it.gameMode == GameMode.SPECTATOR)return@forEach
+            if (!e.isSneaking)return@register
+            //牢屋の処理
+            e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0).forEach {
+                if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PrisonLoc"),
+                        PersistentDataType.INTEGER_ARRAY)){
+                    //locationから牢屋のデータ取得
+                    val intArray = it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"PrisonLoc"), PersistentDataType.INTEGER_ARRAY]!!
+                    val prisonData = map.prisons[Location(map.world,intArray[0].toDouble(),intArray[1].toDouble(),intArray[2].toDouble())]!!
                     val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
-                    val playerData = IdentityFifty.survivors[it.uniqueId]!!
 
-                    if (playerData.getHealth() == 5){
-                        return@forEach
+                    //中に誰もいなかったら処理を回す必要がない
+                    if (prisonData.inPlayer.isEmpty())return@forEach
+
+                    //自分で開けられないようにする
+                    if (prisonData.inPlayer.contains(e.player.uniqueId))return@forEach
+
+                    var helpTime = 0 //これが助けるのに必要な時間(tick)
+                    helpTime += helperData.helpTick //助ける側の必要時間をまず入れる(tick)
+
+                    //サバイバーの救助される時間が延長されるパッシブの計算
+                    for (uuid in prisonData.inPlayer){
+                        val data = IdentityFifty.survivors[uuid]!!
+                        helpTime += data.otherPlayerHelpDelay //助けられる側の他のサバイバーからの救助時間の遅延(tick)
                     }
 
-                    if (playerData.healingPlayers.isNotEmpty()){
-                        playerData.healingPlayers[helperData.uuid] = helperData
-                        playerData.healBossBar.addPlayer(e.player)
-                        return@forEach
+                    //サバイバーの救助される時間が延長されるパッシブ(割合)の計算
+                    for (uuid in prisonData.inPlayer){
+                        val data = IdentityFifty.survivors[uuid]!!
+                        helpTime += (data.otherPlayerHelpDelayPercentage * helpTime).toInt() //助けられる側の他のサバイバーからの救助時間の遅延(パーセンテージ:0.00~1.00)
                     }
-                    var healTime = 0
-                    healTime += helperData.healTick
 
-                    healTime += playerData.otherPlayerHealDelay
+                    //helpTimeは数値が変わるので先に動かない値を作る
+                    val helpTimeInitial = helpTime
 
-                    healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt()
-
-                    playerData.healBossBar = Bukkit.createBossBar("§d${playerData.name}§eを回復中...",BarColor.GREEN,BarStyle.SOLID)
-                    playerData.healBossBar.progress = playerData.healProcess
-                    playerData.healBossBar.addPlayer(e.player)
-
-                    playerData.healingPlayers[helperData.uuid] = helperData
+                    //bossbar作成+追加
+                    helperData.helpBossBar = Bukkit.createBossBar("§e救助中...",BarColor.BLUE,BarStyle.SOLID)
+                    helperData.helpBossBar.progress = 0.0
+                    helperData.helpBossBar.addPlayer(e.player)
 
 
                     Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
-                        if (playerData.healProcess >= 1.0){
-                            playerData.healProcess = 0.0
-                            playerData.healingPlayers.clear()
-                            playerData.healBossBar.removeAll()
-                            map.world.playSound(it.location,Sound.ENTITY_PLAYER_LEVELUP,1f,1f)
-                            playerData.setHealth(playerData.getHealth() + 2)
+                        //場を離れたりシフト解除すると救助キャンセル
+                        if (!e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,3.0).contains(it) || !e.player.isSneaking){
+                            helperData.helpBossBar.removeAll()
                             task.cancel()
                             return@Consumer
-                        }
-                        val players = it.location.getNearbyPlayers(3.0)
-                        playerData.healingPlayers.forEach { (key, _)->
-                            val p = Bukkit.getPlayer(key)!!
-                            if (!players.contains(p)){
-                                playerData.healingPlayers.remove(key)
-                                playerData.healBossBar.removePlayer(p)
+                        } else {
+                            if (helpTime <= 0) {
+                                prisonData.lastPressUUID = e.player.uniqueId //最後に扉を開けたプレイヤーの代入(helper)
+                                //ドアを開ける+bossbar削除
+                                val block = map.world.getBlockAt(prisonData.doorLoc)
+                                val blockData = block.blockData as Door
+                                blockData.isOpen = true
+                                block.blockData = blockData
+                                helperData.helpBossBar.removeAll()
+                                map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_OPEN,1f,1f)
+                                //3秒後にはドアを閉じる
+                                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
+                                    blockData.isOpen = false
+                                    block.blockData = blockData
+                                    map.world.playSound(block.location,Sound.BLOCK_IRON_DOOR_CLOSE,1f,1f)
+                                },60)
+                                task.cancel()
+                            }
+                            helpTime--
+                            //1.0 - (残り必要時間[tick] / 救助必要時間[tick])が1.0より小さかったらbossbarを更新する(バグ防ぎ)
+                            if (1.0 - (helpTime.toDouble() / helpTimeInitial.toDouble()) < 1.0){
+                                helperData.helpBossBar.progress = 1.0 - (helpTime.toDouble() / helpTimeInitial.toDouble())
                             }
                         }
-
-                        var allPlayerHealTick = 0
-                        var healPlayers = 0
-                        players.forEach PlayersForEach@ { p ->
-                            if (!playerData.healingPlayers.containsKey(p.uniqueId))return@PlayersForEach
-                            if (!p.isSneaking){
-                                playerData.healingPlayers.remove(p.uniqueId)
-                                playerData.healBossBar.removePlayer(p)
-                                return@PlayersForEach
-                            }
-                            val data = playerData.healingPlayers[p.uniqueId]!!
-                            healPlayers++
-                            allPlayerHealTick += data.healTick
-
-                        }
-
-                        if (healPlayers == 0){
-                            task.cancel()
-                            return@Consumer
-                        }
-
-                        healTime = allPlayerHealTick / healPlayers
-                        healTime = (healTime / (1 + (0.5 * (healPlayers - 1)))).toInt()
-                        healTime += playerData.otherPlayerHealDelay
-                        healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt()
-
-                        playerData.healBossBar.progress = playerData.healProcess
-
-                        playerData.healProcess += 1.0 / healTime
-
                     },0,1)
+                    return@register
                 }
+
+            }
+
+            if (!map.prisons.filter { it.value.inPlayer.contains(e.player.uniqueId) }.none())return@register
+
+            //回復の処理
+            e.player.location.getNearbyPlayers(3.0).forEach {
+                if (it == e.player)return@forEach
+                if (!IdentityFifty.survivors.containsKey(it.uniqueId))return@forEach
+                if (it.gameMode == GameMode.SPECTATOR)return@forEach
+                val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
+                val playerData = IdentityFifty.survivors[it.uniqueId]!!
+
+                //ヘルスがマックスなら処理をしない
+                if (playerData.getHealth() == 5){
+                    return@forEach
+                }
+
+                //既にそのサバイバーを回復しているサバイバーがいるなら回復しているプレイヤー一覧とbossbarに追加するだけ
+                if (playerData.healingPlayers.isNotEmpty()){
+                    playerData.healingPlayers[helperData.uuid] = helperData
+                    playerData.healBossBar.addPlayer(e.player)
+                    return@forEach
+                }
+                var healTime = 0 //これが助けるのに必要な時間(tick)
+                healTime += helperData.healTick //回復する側の必要時間をまず入れる(tick)
+
+                healTime += playerData.otherPlayerHealDelay //回復される側の他のサバイバーからの回復時間の遅延(tick)
+
+                healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt() //回復される側の他のサバイバーからの回復時間の遅延(パーセンテージ:0.00~1.00)
+
+                //bossbar作成+追加
+                playerData.healBossBar = Bukkit.createBossBar("§d${playerData.name}§eを回復中...",BarColor.GREEN,BarStyle.SOLID)
+                playerData.healBossBar.progress = playerData.healProcess
+                playerData.healBossBar.addPlayer(e.player)
+
+                //回復中のプレイヤーに追加
+                playerData.healingPlayers[helperData.uuid] = helperData
+
+                Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
+                    if (playerData.healProcess >= 1.0){
+                        playerData.healProcess = 0.0
+                        playerData.healingPlayers.clear()
+                        playerData.healBossBar.removeAll()
+                        map.world.playSound(it.location,Sound.ENTITY_PLAYER_LEVELUP,1f,1f)
+                        playerData.setHealth(playerData.getHealth() + 2)
+                        task.cancel()
+                        return@Consumer
+                    }
+                    val players = it.location.getNearbyPlayers(3.0)
+                    playerData.healingPlayers.forEach { (key, _)->
+                        val p = Bukkit.getPlayer(key)!!
+                        if (!players.contains(p)){
+                            playerData.healingPlayers.remove(key)
+                            playerData.healBossBar.removePlayer(p)
+                        }
+                    }
+
+                    var allPlayerHealTick = 0 //全ての回復中のプレイヤーの合計時間
+                    var healPlayers = 0 //回復中のプレイヤー数
+                    players.forEach PlayersForEach@ { p ->
+                        if (!playerData.healingPlayers.containsKey(p.uniqueId))return@PlayersForEach
+                        if (!p.isSneaking){
+                            playerData.healingPlayers.remove(p.uniqueId)
+                            playerData.healBossBar.removePlayer(p)
+                            return@PlayersForEach
+                        }
+                        val data = playerData.healingPlayers[p.uniqueId]!!
+                        healPlayers++
+                        allPlayerHealTick += data.healTick
+                    }
+
+                    if (healPlayers == 0){
+                        task.cancel()
+                        return@Consumer
+                    }
+
+
+                    healTime = allPlayerHealTick / healPlayers //回復合計時間 / 回復人数
+                    healTime = (healTime / (1 + (0.5 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.5 * (回復人数 - 1)))
+                    healTime += playerData.otherPlayerHealDelay
+                    healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt()
+
+                    playerData.healProcess += 1.0 / healTime //SurvivorDataに直接代入することで一度回復をやめても途中からできる
+
+                    if (playerData.healProcess <= 1.0){
+                        playerData.healBossBar.progress = playerData.healProcess
+                    }
+
+                },0,1)
             }
         }
 
@@ -649,6 +693,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         return@register
                     }
                 }
+                e.isDropItems = false
             }
         }
 
@@ -679,9 +724,10 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         data.inPlayer.remove(e.player.uniqueId)
                         val playerData = IdentityFifty.survivors[e.player.uniqueId]!!
                         val helperData = IdentityFifty.survivors[data.lastPressUUID]!!
-                        helperData.survivorClass.onHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player)
-                        playerData.survivorClass.onGotHelp(e.player,Bukkit.getPlayer(helperData.uuid)!!)
+                        helperData.survivorClass.onHelp(e.player,Bukkit.getPlayer(helperData.uuid)!!)
+                        playerData.survivorClass.onGotHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player)
                         IdentityFifty.hunters.forEach {
+                            it.key.toPlayer()?.sendMessage(IdentityFifty.prefix + "§c${e.player.name}が救助された！")
                             it.value.hunterClass.onSurvivorHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player,Bukkit.getPlayer(it.key)!!)
                         }
                         playerData.setHealth(3,true)
@@ -757,7 +803,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                             if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
                                             map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
                                             map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
-                                            IdentityFifty.stunEffect(p)
+                                            val modify = data.survivorClass.onHitWoodPlate(p, it.location, e.player)
+                                            IdentityFifty.stunEffect(p,modify.first,modify.second)
                                         }
                                         woodPlateUUID.remove(it.uniqueId)
                                         it.remove()
@@ -767,7 +814,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                     }
 
                             e.player.inventory.setItemInOffHand(item)
-
 
                         }
                     }
@@ -787,6 +833,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             broadcast("§e§l${e.player.name}§a§lは脱出に成功した！")
             if (survivorCount == 0){
                 end()
+                return@register
             }
         }
 
@@ -858,12 +905,18 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             if (e.entity.type == EntityType.SHEEP && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER)){
                 val sheep = e.entity as Sheep
                 e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,sheep.health,p)
+                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    sheep.noDamageTicks = 0
+                }, 0)
                 e.entity.customName = "§f§l羊型発電機§5(§e${sheep.health.toInt()}§f/§b${sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()}§5)"
             }
 
             if (e.entity.type == EntityType.COW && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER)){
                 val cow = e.entity as Cow
                 e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage, cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,cow.health,p)
+                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    cow.noDamageTicks = 0
+                }, 0)
                 e.entity.customName = "§f§l牛型発電機§5(§e${cow.health.toInt()}§f/§b${cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()}§5)"
             }
         }
@@ -873,6 +926,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 if (!e.action.isLeftClick)return@register
                 if (e.hasBlock()){
                     if (e.clickedBlock!!.type == Material.OAK_STAIRS){
+                        return@register
+                    }
+                    if (e.clickedBlock!!.blockData is Door){
                         return@register
                     }
                 }
@@ -909,40 +965,15 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         }
 
         Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
-            IdentityFifty.hunters.forEach {
-                val playerLoc = Bukkit.getPlayer(it.key)!!.location
-
-                playerLoc.getNearbyPlayers(25.0).forEach PlayersForEach@ { p ->
-                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-                    val data = IdentityFifty.survivors[p.uniqueId]!!
-                    data.heartProcess += 0.2
+            IdentityFifty.survivors.forEach { (uuid, data) ->
+                val playerLoc = (uuid.toPlayer()?:return@forEach).location
+                data.heartProcessRules.forEach { pair ->
+                    playerLoc.getNearbyPlayers(pair.first).forEach PlayersForEach@ { p ->
+                        if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@PlayersForEach
+                        data.heartProcess += pair.second
+                    }
                 }
 
-                playerLoc.getNearbyPlayers(20.0).forEach PlayersForEach@ { p ->
-                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-                    val data = IdentityFifty.survivors[p.uniqueId]!!
-                    data.heartProcess += 0.1
-                }
-
-                playerLoc.getNearbyPlayers(15.0).forEach PlayersForEach@ { p ->
-                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-                    val data = IdentityFifty.survivors[p.uniqueId]!!
-                    data.heartProcess += 0.2
-                }
-
-                playerLoc.getNearbyPlayers(10.0).forEach PlayersForEach@ { p ->
-                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-                    val data = IdentityFifty.survivors[p.uniqueId]!!
-                    data.heartProcess += 0.5
-                }
-
-            }
-
-            IdentityFifty.survivors.forEach { (uuid,data) ->
                 if (data.heartProcess >= 1.0){
                     data.heartProcess = 0.0
                     val p = Bukkit.getPlayer(uuid)!!
@@ -950,6 +981,47 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     p.spawnParticle(Particle.SPELL_WITCH,p.location,20,0.0,0.5,0.0)
                 }
             }
+//            IdentityFifty.hunters.forEach {
+//                val playerLoc = Bukkit.getPlayer(it.key)!!.location
+//
+//                playerLoc.getNearbyPlayers(25.0).forEach PlayersForEach@ { p ->
+//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
+//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
+//                    val data = IdentityFifty.survivors[p.uniqueId]!!
+//                    data.heartProcess += 0.2
+//                }
+//
+//                playerLoc.getNearbyPlayers(20.0).forEach PlayersForEach@ { p ->
+//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
+//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
+//                    val data = IdentityFifty.survivors[p.uniqueId]!!
+//                    data.heartProcess += 0.1
+//                }
+//
+//                playerLoc.getNearbyPlayers(15.0).forEach PlayersForEach@ { p ->
+//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
+//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
+//                    val data = IdentityFifty.survivors[p.uniqueId]!!
+//                    data.heartProcess += 0.2
+//                }
+//
+//                playerLoc.getNearbyPlayers(10.0).forEach PlayersForEach@ { p ->
+//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
+//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
+//                    val data = IdentityFifty.survivors[p.uniqueId]!!
+//                    data.heartProcess += 0.5
+//                }
+//
+//            }
+//
+//            IdentityFifty.survivors.forEach { (uuid,data) ->
+//                if (data.heartProcess >= 1.0){
+//                    data.heartProcess = 0.0
+//                    val p = Bukkit.getPlayer(uuid)!!
+//                    p.playSound(p.location,"identity.heart",1f,1f)
+//                    p.spawnParticle(Particle.SPELL_WITCH,p.location,20,0.0,0.5,0.0)
+//                }
+//            }
         },0,10)
 
 

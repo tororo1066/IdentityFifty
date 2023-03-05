@@ -3,6 +3,7 @@ package tororo1066.identityfifty.character.hunter
 import de.slikey.effectlib.effect.CylinderEffect
 import org.bukkit.*
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.inventivetalent.glow.GlowAPI
@@ -84,5 +85,16 @@ class AreaMan: AbstractHunter("areaman") {
             survivor.value.glowManager.glow(players,GlowAPI.Color.DARK_RED,300)
             player.sendTranslateMsg("area_spec_message",p.name)
         }
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
+            .addLore(translate("areaman_passive_lore_1"))
+            .addLore(translate("areaman_passive_lore_2"))
+
+        val areaSkill = SItem(Material.STICK).setDisplayName(translate("area_skill")).setCustomModelData(9)
+            .addLore(translate("area_skill_lore_1"))
+            .addLore(translate("area_skill_lore_2"))
+        return arrayListOf(passiveItem,areaSkill)
     }
 }

@@ -46,6 +46,8 @@ class GlowManager(private val uuid: UUID) {
                 return@Consumer
             }
 
+            GlowAPI.setGlowing(p,false,seeablePlayer)
+
             GlowAPI.setGlowing(p,color,seeablePlayer)
 
             tick--
