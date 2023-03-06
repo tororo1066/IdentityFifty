@@ -30,6 +30,7 @@ class RunAway : AbstractSurvivor("runaway") {
                 p.sendTranslateMsg("camouflage_miss")
                 return@setInteractEvent true
             }
+            p.playSound(p.location, Sound.ENTITY_COW_DEATH,1f,1f)
             entities.forEach {
                 if (!IdentityFifty.hunters.containsKey(it.uniqueId))return@forEach
                 IdentityFifty.stunEffect(it,0,20)

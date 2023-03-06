@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
+import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.potion.PotionEffect
@@ -134,11 +135,6 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             runTask {
                 Bukkit.getEntity(it)?.remove()
             }
-        }
-
-        //意味ないかも
-        Bukkit.getBossBars().forEach {
-            it.removeAll()
         }
 
         //サバイバーハンター両方のパッシブで走らせるタスク終了 現在はDasherが該当
@@ -249,7 +245,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 p.gameMode = GameMode.SURVIVAL
                 p.inventory.clear()
                 p.teleport(survivorSpawnList.removeAt(0))
-                data.survivorClass.onStart(p)
+//                data.survivorClass.onStart(p)
             }
 
             IdentityFifty.stunEffect(p)
@@ -264,7 +260,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 p.gameMode = GameMode.SURVIVAL
                 p.inventory.clear()
                 p.teleport(hunterSpawnList.removeAt(0))
-                data.hunterClass.onStart(p)
+//                data.hunterClass.onStart(p)
             }
             IdentityFifty.stunEffect(p)
         }
@@ -916,6 +912,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
         }
 
         sEvent.register(PlayerInteractEvent::class.java) { e ->
+            if (e.hand == EquipmentSlot.OFF_HAND)return@register
             if (IdentityFifty.hunters.containsKey(e.player.uniqueId)){
                 if (!e.action.isLeftClick)return@register
                 if (e.hasBlock()){
@@ -942,9 +939,8 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
         sleep(3000)
 
-        allPlayerAction {
+        fun titleTask(p: Player, action: ()->Unit){
             Thread {
-                val p = Bukkit.getPlayer(it)!!
                 for (i in 5 downTo 1){
                     p.showTitle(Title.title(Component.text("§e--------§f§l${i}§e--------"), Component.text(""), Title.Times.of(
                         Duration.ZERO,Duration.ofSeconds(1),Duration.ZERO)))
@@ -955,7 +951,22 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 p.showTitle(Title.title(Component.text("§c§lSTART!"), Component.text(""), Title.Times.of(
                     Duration.ZERO,Duration.ofSeconds(2),Duration.ofSeconds(1))))
                 p.playSound(p.location,Sound.ENTITY_WITHER_SPAWN,0.7f,1f)
+                runTask(action)
             }.start()
+        }
+
+        IdentityFifty.survivors.forEach { (uuid, data) ->
+            val p = Bukkit.getPlayer(uuid)!!
+            titleTask(p){
+                data.survivorClass.onStart(p)
+            }
+        }
+
+        IdentityFifty.hunters.forEach { (uuid, data) ->
+            val p = Bukkit.getPlayer(uuid)!!
+            titleTask(p){
+                data.hunterClass.onStart(p)
+            }
         }
 
         Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {

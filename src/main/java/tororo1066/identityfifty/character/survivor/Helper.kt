@@ -35,8 +35,8 @@ class Helper : AbstractSurvivor("helper") {
             }
             noDamage = true
 
-            p.world.playSound(p.location, Sound.ITEM_TOTEM_USE,1f,1f)
-            p.world.spawnParticle(Particle.TOTEM,p.location,5)
+            p.playSound(p.location, Sound.ITEM_TOTEM_USE,1f,1f)
+            p.spawnParticle(Particle.TOTEM,p.location,5)
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
                 noDamage = false

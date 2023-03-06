@@ -27,12 +27,12 @@ class Searcher : AbstractSurvivor("searcher") {
             .addLore(translate("search_lens_lore_2"))
 
         val searchSkill = IdentityFifty.interactManager.createSInteractItem(searchSkillItem,true).setInteractEvent { e, item ->
-            p.playSound(p.location, Sound.ENTITY_ARROW_HIT_PLAYER,1f,0.5f)
             p.sendTranslateMsg("search_lens_used")
             val players = ArrayList<Player>()
             IdentityFifty.survivors.forEach { (uuid, _) ->
                 val player = Bukkit.getPlayer(uuid)?:return@forEach
                 players.add(player)
+                player.playSound(player.location, Sound.ENTITY_ARROW_HIT_PLAYER,1f,0.5f)
                 player.sendTranslateMsg("search_lens_used_other",p.name)
             }
             IdentityFifty.hunters.forEach { (uuid, data) ->

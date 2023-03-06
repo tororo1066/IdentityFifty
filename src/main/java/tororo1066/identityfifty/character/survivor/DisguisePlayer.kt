@@ -2,6 +2,7 @@ package tororo1066.identityfifty.character.survivor
 
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -32,10 +33,12 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             val data = IdentityFifty.survivors[p.uniqueId]!!
             data.skinModifier.disguise(target)
             p.sendTranslateMsg("disguise_skill_start",target.name)
+            p.playSound(p.location, Sound.ENTITY_ENDER_DRAGON_HURT, 1f, 1f)
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 if (data.skinModifier.isDisguise()){
                     data.skinModifier.unDisguise()
                     p.sendTranslateMsg("disguise_skill_end")
+                    p.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
                 }
             },1400)
             return@setInteractEvent true
