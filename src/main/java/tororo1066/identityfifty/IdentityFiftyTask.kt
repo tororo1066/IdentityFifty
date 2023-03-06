@@ -227,12 +227,6 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
     }
 
     override fun run() {
-        //いらないかも
-        onlinePlayersAction { p ->
-            Bukkit.getBossBars().forEach {
-                it.removePlayer(p)
-            }
-        }
 
         broadcast("ゲームをスタート中...")
 
@@ -952,7 +946,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             Thread {
                 val p = Bukkit.getPlayer(it)!!
                 for (i in 5 downTo 1){
-                    p.showTitle(Title.title(Component.text("§e－－－－§f§l${i}§e－－－－"), Component.text(""), Title.Times.of(
+                    p.showTitle(Title.title(Component.text("§e--------§f§l${i}§e--------"), Component.text(""), Title.Times.of(
                         Duration.ZERO,Duration.ofSeconds(1),Duration.ZERO)))
                     p.playSound(p.location, Sound.UI_BUTTON_CLICK,1f,2f)
                     sleep(1000)

@@ -54,70 +54,10 @@ class Offense : AbstractSurvivor("offense") {
                             it.sendTranslateMsg("rugby_ball_hit_hunter")
                             p.playSound(p.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
                             p.sendTranslateMsg("rugby_ball_hit",it.name)
-                            IdentityFifty.util.runTask { _ ->
-                                IdentityFifty.stunEffect(it, (actionTime*5-20), (actionTime*5))
-                            }
+                            IdentityFifty.stunEffect(it, (actionTime*5-20), (actionTime*5))
                         }
                         break
                     }
-
-//                    涙の結晶(不必要)
-//                    val multiply0 = loc.clone()
-//                    val multiply1 = loc.clone().add(loc.clone().direction.normalize().multiply(1)).setYL(loc.y)
-//                    val multiply15 = loc.clone().add(loc.clone().direction.normalize().multiply(1.5)).setYL(loc.y)
-//                    if (!multiply0.block.isPassable || !multiply1.block.isPassable || !multiply15.block.isPassable){
-//                        SDebug.broadcastDebug(1,"すり抜け防止プロトコル 通常")
-//                        SDebug.broadcastDebug(1,"原因ブロック(0) ${multiply0.block.type}")
-//                        SDebug.broadcastDebug(1,"原因ブロック(1) ${multiply1.block.type}")
-//                        SDebug.broadcastDebug(1,"原因ブロック(1.5) ${multiply15.block.type}")
-//                        break
-//                    }
-//                    val normalize0 = multiply0.clone().direction.normalize()
-//
-//                    SDebug.broadcastDebug(1,"すり抜け防止プロトコル debug")
-//                    SDebug.broadcastDebug(1,"原因ブロック(45) ${loc.clone().add(multiply0.clone().direction.rotateAroundY(45.0).multiply(1)).setYL(loc.y).block.type}")
-//                    SDebug.broadcastDebug(1,"原因ブロック(-45) ${loc.clone().add(multiply0.clone().direction.rotateAroundY(-45.0).multiply(1)).setYL(loc.y).block.type}")
-//                    SDebug.broadcastDebug(1,"デバッグLoc ${loc.toLocString(LocType.COMMA)}")
-//                    SDebug.broadcastDebug(1,"原因Loc(45) ${loc.clone().add(normalize0.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//                    SDebug.broadcastDebug(1,"原因Loc(-45) ${loc.clone().add(normalize0.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//
-//                    val normalize1 = multiply1.clone().direction.normalize()
-//                    val normalize15 = multiply15.clone().direction.normalize()
-//                    if (!loc.clone().add(normalize0.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).block.isPassable ||
-//                        !loc.clone().add(normalize0.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).block.isPassable){
-//                        SDebug.broadcastDebug(1,"すり抜け防止プロトコル normalize0")
-//                        SDebug.broadcastDebug(1,"原因ブロック(45) ${loc.clone().add(multiply0.clone().direction.rotateAroundY(45.0).multiply(1)).setYL(loc.y).block.type}")
-//                        SDebug.broadcastDebug(1,"原因ブロック(-45) ${loc.clone().add(multiply0.clone().direction.rotateAroundY(-45.0).multiply(1)).setYL(loc.y).block.type}")
-//                        SDebug.broadcastDebug(1,"デバッグLoc ${loc.toLocString(LocType.COMMA)}")
-//                        SDebug.broadcastDebug(1,"原因Loc(45) ${loc.clone().add(normalize0.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//                        SDebug.broadcastDebug(1,"原因Loc(-45) ${loc.clone().add(normalize0.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//                        break
-//                    } else if (!loc.clone().add(normalize1.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).block.isPassable ||
-//                        !loc.clone().add(normalize1.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).block.isPassable){
-//                        SDebug.broadcastDebug(1,"すり抜け防止プロトコル normalize1")
-//                        SDebug.broadcastDebug(1,"原因ブロック(45) ${loc.clone().add(multiply1.clone().direction.rotateAroundY(45.0).multiply(1)).setYL(loc.y).block.type}")
-//                        SDebug.broadcastDebug(1,"原因ブロック(-45) ${loc.clone().add(multiply1.clone().direction.rotateAroundY(-45.0).multiply(1)).setYL(loc.y).block.type}")
-//                        SDebug.broadcastDebug(1,"デバッグLoc ${loc.toLocString(LocType.COMMA)}")
-//                        SDebug.broadcastDebug(1,"原因Loc(45) ${loc.clone().add(normalize1.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//                        SDebug.broadcastDebug(1,"原因Loc(-45) ${loc.clone().add(normalize1.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//                        break
-//                    } else if (!loc.clone().add(normalize15.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).block.isPassable ||
-//                        !loc.clone().add(normalize15.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).block.isPassable){
-//                        lock = true
-//                        IdentityFifty.util.runTask {
-//                            val vec = p.location.add(p.location.direction.normalize().multiply(0.5))
-//                            p.teleport(getRayLoc(Location(p.world,vec.x, p.location.y, vec.z, p.location.yaw, p.location.pitch)))
-//                            p.playSound(p.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
-//                            lock = false
-//                        }
-//                        SDebug.broadcastDebug(1,"すり抜け防止プロトコル normalize15")
-//                        SDebug.broadcastDebug(1,"原因ブロック(45) ${loc.clone().add(normalize15.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).block.type}")
-//                        SDebug.broadcastDebug(1,"原因ブロック(-45) ${loc.clone().add(normalize15.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).block.type}")
-//                        SDebug.broadcastDebug(1,"デバッグLoc ${loc.toLocString(LocType.COMMA)}")
-//                        SDebug.broadcastDebug(1,"原因Loc(45) ${loc.clone().add(normalize15.clone().rotateAroundY(45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//                        SDebug.broadcastDebug(1,"原因Loc(-45) ${loc.clone().add(normalize15.clone().rotateAroundY(-45.0).multiply(1)).setYL(loc.y).toLocString(LocType.COMMA)}")
-//                        break
-//                    }
 
                     val block1 = p.world.rayTraceBlocks(p.location,p.location.setPitchL(0f).direction,1.5)?.hitBlock
                     val block2 = p.world.rayTraceBlocks(p.location.add(0.0,1.0,0.0),p.location.setPitchL(0f).direction,1.5)?.hitBlock

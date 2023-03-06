@@ -9,6 +9,7 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 
@@ -27,10 +28,12 @@ class Searcher : AbstractSurvivor("searcher") {
 
         val searchSkill = IdentityFifty.interactManager.createSInteractItem(searchSkillItem,true).setInteractEvent { e, item ->
             p.playSound(p.location, Sound.ENTITY_ARROW_HIT_PLAYER,1f,0.5f)
-            p.prefixMsg("§aハンターの位置が表示された！")
+            p.sendTranslateMsg("search_lens_used")
             val players = ArrayList<Player>()
             IdentityFifty.survivors.forEach { (uuid, _) ->
-                players.add(Bukkit.getPlayer(uuid)?:return@forEach)
+                val player = Bukkit.getPlayer(uuid)?:return@forEach
+                players.add(player)
+                player.sendTranslateMsg("search_lens_used_other",p.name)
             }
             IdentityFifty.hunters.forEach { (uuid, data) ->
                 Bukkit.getPlayer(uuid)?:return@forEach

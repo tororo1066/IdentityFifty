@@ -36,7 +36,7 @@ class Fader: AbstractHunter("fader"){
             } else {
                 if (p.getPotionEffect(PotionEffectType.INVISIBILITY) != null){
                     p.world.playSound(p.location,Sound.ENTITY_GHAST_HURT,1f,1f)
-                    p.world.spawnParticle(Particle.SMOKE_LARGE,p.location,10,0.0,1.0,0.0)
+                    p.world.spawnParticle(Particle.SMOKE_LARGE,p.location,50,0.0,1.0,0.0)
                 }
                 p.removePotionEffect(PotionEffectType.INVISIBILITY)
                 val blindness = p.getPotionEffect(PotionEffectType.BLINDNESS)
@@ -55,6 +55,7 @@ class Fader: AbstractHunter("fader"){
                     .addLore(translate("glow_trap_lore_1"))
                     .addLore(translate("glow_trap_lore_2"))
                     .addLore(translate("glow_trap_lore_3"))
+                    .addLore(translate("glow_trap_lore_4"))
                     .setCustomData(IdentityFifty.plugin,"glow_trap", PersistentDataType.INTEGER, 1)
                 val trapSkillItem = IdentityFifty.interactManager.createSInteractItem(trap, true).setInteractEvent { e, item ->
                     e.item!!.amount -= 1
@@ -139,6 +140,7 @@ class Fader: AbstractHunter("fader"){
             .addLore(translate("glow_trap_lore_1"))
             .addLore(translate("glow_trap_lore_2"))
             .addLore(translate("glow_trap_lore_3"))
+            .addLore(translate("glow_trap_lore_4"))
         return arrayListOf(passiveItem,trap)
     }
 }
