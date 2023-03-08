@@ -236,7 +236,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
         val escapeGeneratorList = ArrayList<GeneratorData>(map.escapeGenerators)
         escapeGeneratorList.shuffle()
 
-        IdentityFifty.survivors.forEach { (uuid, data) ->
+        IdentityFifty.survivors.forEach { (uuid, _) ->
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {
@@ -251,7 +251,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             IdentityFifty.stunEffect(p)
         }
 
-        IdentityFifty.hunters.forEach { (uuid, data) ->
+        IdentityFifty.hunters.forEach { (uuid, _) ->
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {

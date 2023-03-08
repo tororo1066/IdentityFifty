@@ -151,7 +151,7 @@ class IdentityCommand : SCommand("identity") {
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("stop")).setPlayerExecutor {
             IdentityFifty.identityFiftyTask?.end()
-            it.sender.prefixMsg("§c停止しました")
+            it.sender.sendTranslateMsg("stopped_game")
         })
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("edit")).setPlayerExecutor {

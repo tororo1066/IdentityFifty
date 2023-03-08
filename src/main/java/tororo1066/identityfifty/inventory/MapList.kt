@@ -11,7 +11,7 @@ import tororo1066.tororopluginapi.sItem.SItem
 
 class MapList : LargeSInventory(IdentityFifty.plugin,"§e§lマップ一覧") {
 
-    override fun renderMenu(): Boolean {
+    override fun renderMenu(p: Player): Boolean {
         setOnClick { e ->
             (e.whoClicked as Player).playSound(e.whoClicked.location,Sound.UI_BUTTON_CLICK,1f,1f)
         }

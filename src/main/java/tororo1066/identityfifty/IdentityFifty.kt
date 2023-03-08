@@ -69,7 +69,7 @@ class IdentityFifty : SJavaPlugin() {
 
         /** スタンのエフェクト(時間指定) **/
         fun stunEffect(p: Player, blindTime: Int, slowTime: Int){
-            p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),20)
+            p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),50)
             Bukkit.getScheduler().runTask(plugin, Runnable {
                 p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,blindTime,3,true,false,false))
                 p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,slowTime,200,true,false,false))
@@ -95,21 +95,20 @@ class IdentityFifty : SJavaPlugin() {
         huntersData[abstractHunter.name] = abstractHunter
     }
 
-    /** クラスのデータを全て登録する **/
-    private fun registerAll(){
-        register(Nurse())
-        register(Dasher())
-        register(RunAway())
-        register(Searcher())
-        register(Helper())
-        register(AreaMan())
-        register(DisguisePlayer())
-        register(Gambler())
-        register(Mechanic())
-        register(Fader())
-        register(Offense())
+    private fun register(vararg abstractClass: Any){
+        for (clazz in abstractClass){
+            if (clazz is AbstractSurvivor){
+                register(clazz)
+            }else if (clazz is AbstractHunter){
+                register(clazz)
+            }
+        }
     }
 
+    /** クラスのデータを全て登録する **/
+    private fun registerAll(){
+        register(Nurse(),Dasher(),RunAway(),Searcher(),Helper(),AreaMan(),DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense())
+    }
     override fun onStart() {
         saveDefaultConfig()
         
