@@ -1,4 +1,4 @@
-package tororo1066.identityfifty.talent.clazz
+package tororo1066.identityfifty.talent.survivor
 
 import tororo1066.identityfifty.data.SurvivorData
 

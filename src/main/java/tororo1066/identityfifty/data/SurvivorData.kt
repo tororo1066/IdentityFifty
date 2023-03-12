@@ -2,7 +2,7 @@ package tororo1066.identityfifty.data
 
 import org.bukkit.boss.BossBar
 import tororo1066.identityfifty.character.survivor.AbstractSurvivor
-import tororo1066.identityfifty.talent.clazz.AbstractSurvivorTalent
+import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
 import java.util.UUID
 
 class SurvivorData : PlayerData() {
