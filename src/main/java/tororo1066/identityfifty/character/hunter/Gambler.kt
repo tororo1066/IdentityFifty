@@ -95,8 +95,8 @@ class Gambler: AbstractHunter("gambler") {
         return data
     }
 
-    override fun onAttack(attackPlayer: Player, p: Player, isFinishedGenerator: Boolean): Int {
-        if (isFinishedGenerator){
+    override fun onAttack(attackPlayer: Player, p: Player, noOne: Boolean): Int {
+        if (noOne){
             return 4
         } else {
             when(Random.nextInt(1..100)){

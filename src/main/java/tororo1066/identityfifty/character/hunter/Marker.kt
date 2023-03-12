@@ -1,6 +1,5 @@
 package tororo1066.identityfifty.character.hunter
 
-import net.minecraft.core.particles.DustColorTransitionOptions
 import org.bukkit.*
 import org.bukkit.Particle.DustTransition
 import org.bukkit.boss.BarColor
@@ -9,7 +8,6 @@ import org.bukkit.boss.BossBar
 import org.bukkit.entity.Arrow
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
@@ -104,8 +102,8 @@ class Marker: AbstractHunter("marker") {
         sEvent.unregisterAll()
     }
 
-    override fun onAttack(attackPlayer: Player, p: Player, isFinishedGenerator: Boolean): Int {
-        if (isFinishedGenerator) return 4
+    override fun onAttack(attackPlayer: Player, p: Player, noOne: Boolean): Int {
+        if (noOne) return 4
 
         val mark = marks[attackPlayer.uniqueId]?:return 2
         remove(attackPlayer.uniqueId)

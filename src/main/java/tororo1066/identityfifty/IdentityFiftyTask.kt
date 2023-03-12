@@ -142,7 +142,9 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
         //サバイバーハンター両方のパッシブで走らせるタスク終了 現在はDasherが該当
         IdentityFifty.survivors.values.forEach {
-            it.uuid.toPlayer()?.let { p -> it.survivorClass.onEnd(p) }
+            val p = it.uuid.toPlayer()
+            p?.let { player -> it.survivorClass.onEnd(player) }
+
             it.survivorClass.tasks.forEach {  task ->
                 task.cancel()
             }
@@ -150,7 +152,12 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
         }
 
         IdentityFifty.hunters.values.forEach {
-            it.uuid.toPlayer()?.let { p -> it.hunterClass.onEnd(p) }
+            val p = it.uuid.toPlayer()
+            p?.let { player -> it.hunterClass.onEnd(player) }
+
+            it.talentClasses.forEach { clazz ->
+                p?.let { player -> clazz.onEnd(player) }
+            }
             it.hunterClass.tasks.forEach {  task ->
                 task.cancel()
             }
@@ -407,14 +414,13 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             bossBar.setTitle("§d残り暗号機§f：§c§l${remainingGenerator}§f個")
             bossBar.progress = remainingGenerator.toDouble() / map.generatorLimit.toDouble()
             IdentityFifty.hunters.forEach {
-                runTask {
-                    it.value.hunterClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
+                it.value.hunterClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
+                it.value.talentClasses.forEach { clazz ->
+                    clazz.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
                 }
             }
             taskLivingSurvivor {
-                runTask {
-                    it.value.survivorClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
-                }
+                it.value.survivorClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
             }
             if (remainingGenerator != 0)return@register
             //残り暗号機が0だったら 一撃死状態にする(60秒)
@@ -480,14 +486,13 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 map.world.playSound(getBlock.location,Sound.BLOCK_IRON_DOOR_OPEN,1f,1f)
 
                 taskLivingSurvivor {
-                    runTask {
-                        it.value.survivorClass.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
-                    }
+                    it.value.survivorClass.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
                 }
 
                 IdentityFifty.hunters.forEach {
-                    runTask {
-                        it.value.hunterClass.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
+                    it.value.hunterClass.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
+                    it.value.talentClasses.forEach { clazz ->
+                        clazz.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
                     }
                 }
 
@@ -732,6 +737,9 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         IdentityFifty.hunters.forEach {
                             it.key.toPlayer()?.sendTranslateMsg("helped_survivor",e.player.name)
                             it.value.hunterClass.onSurvivorHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player,Bukkit.getPlayer(it.key)!!)
+                            it.value.talentClasses.forEach { clazz ->
+                                clazz.onSurvivorHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player,Bukkit.getPlayer(it.key)!!)
+                            }
                         }
                         playerData.setHealth(3,true)
                     }
@@ -804,6 +812,9 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                                             if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
                                             val hunterData = IdentityFifty.hunters[p.uniqueId]!!
                                             if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
+                                            hunterData.talentClasses.forEach { clazz ->
+                                                if (!clazz.onDamagedWoodPlate(e.player, it.location, p))return@second
+                                            }
                                             map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
                                             map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
                                             var modify = data.survivorClass.onHitWoodPlate(p, it.location, e.player)
@@ -871,6 +882,9 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                     if (survivorData.getHealth() <= 1)return@register
                     var damage = hunterData.hunterClass.onAttack(e.entity as Player, e.damager as Player,noOne)
                     if (damage <= 0)return@register
+                    hunterData.talentClasses.forEach {
+                        it.onAttack(e.entity as Player, e.damager as Player,noOne)
+                    }
                     if (survivorData.getHealth() < damage) damage = survivorData.getHealth()
                     e.entity.world.playSound(e.entity.location,Sound.ENTITY_ELDER_GUARDIAN_CURSE,1f,2f)
                     val onDamage = survivorData.survivorClass.onDamage(damage,survivorData.getHealth()-damage,e.damager as Player, e.entity as Player)
@@ -886,11 +900,17 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         if (prisons.isNotEmpty()){
                             val data = prisons[0]
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
+                            hunterData.talentClasses.forEach {
+                                it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
+                            }
                             data.value.inPlayer.add(e.entity.uniqueId)
                             e.entity.teleport(data.value.spawnLoc)
                         } else {
                             val data = map.prisons.entries.shuffled()[0]
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
+                            hunterData.talentClasses.forEach {
+                                it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
+                            }
                             data.value.inPlayer.add(e.entity.uniqueId)
                             e.entity.teleport(data.value.spawnLoc)
                         }

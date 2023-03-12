@@ -19,8 +19,8 @@ abstract class AbstractHunter(val name: String): Cloneable {
 
     open fun onFinishedEscapeGenerator(dieLocation: Location, p: Player) {}
 
-    open fun onAttack(attackPlayer: Player, p: Player, isFinishedGenerator: Boolean): Int {
-        return if (isFinishedGenerator) 4 else 2
+    open fun onAttack(attackPlayer: Player, p: Player, noOne: Boolean): Int {
+        return if (noOne) 4 else 2
     }
 
     open fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {}
