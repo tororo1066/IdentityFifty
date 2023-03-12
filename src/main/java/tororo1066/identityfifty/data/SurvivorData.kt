@@ -2,6 +2,7 @@ package tororo1066.identityfifty.data
 
 import org.bukkit.boss.BossBar
 import tororo1066.identityfifty.character.survivor.AbstractSurvivor
+import tororo1066.identityfifty.talent.clazz.AbstractSurvivorTalent
 import java.util.UUID
 
 class SurvivorData : PlayerData() {
@@ -36,10 +37,11 @@ class SurvivorData : PlayerData() {
     lateinit var helpBossBar: BossBar
     var healingPlayers = HashMap<UUID,SurvivorData>()
     var healTick = 200
-    var otherPlayerHealDelay = 100
+    var otherPlayerHealDelay = 0
     var otherPlayerHealDelayPercentage = 0.0
     var heartProcess = 0.0
     var heartProcessRules = arrayListOf(Pair(25.0,0.2), Pair(20.0,0.1), Pair(15.0,0.2), Pair(10.0,0.5))
+    val talentClasses = arrayListOf<AbstractSurvivorTalent>()
 
     fun setHealth(int: Int){
         if (health == 1){

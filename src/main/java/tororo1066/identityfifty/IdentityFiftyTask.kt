@@ -976,6 +976,9 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             val p = Bukkit.getPlayer(uuid)!!
             titleTask(p){
                 data.survivorClass.onStart(p)
+                data.talentClasses.forEach {
+                    it.onStart(p)
+                }
             }
         }
 
