@@ -13,6 +13,7 @@ import org.bukkit.block.data.type.Stairs.Shape
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.Arrow
 import org.bukkit.entity.Cow
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -37,6 +38,8 @@ import org.bukkit.scoreboard.Team
 import tororo1066.identityfifty.data.GeneratorData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
+import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.otherPlugin.SWorldGuardAPI
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
@@ -212,6 +215,10 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
     val survivorTeam = scoreboard.registerNewTeam("Survivor")
     val hunterTeam = scoreboard.registerNewTeam("Hunter")
+
+    fun aliveSurvivors(): List<UUID>{
+        return IdentityFifty.survivors.filter { !escapedSurvivor.contains(it.key) && !deadSurvivor.contains(it.key) }.map { it.key }
+    }
 
 
     init {
@@ -717,7 +724,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         helperData.survivorClass.onHelp(e.player,Bukkit.getPlayer(helperData.uuid)!!)
                         playerData.survivorClass.onGotHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player)
                         IdentityFifty.hunters.forEach {
-                            it.key.toPlayer()?.sendMessage(IdentityFifty.prefix + "§c${e.player.name}が救助された！")
+                            it.key.toPlayer()?.sendTranslateMsg("helped_survivor",e.player.name)
                             it.value.hunterClass.onSurvivorHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player,Bukkit.getPlayer(it.key)!!)
                         }
                         playerData.setHealth(3,true)
@@ -820,7 +827,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             onlinePlayersAction {
                 it.playSound(it.location,Sound.ENTITY_FIREWORK_ROCKET_BLAST,1f,1f)
             }
-            broadcast("§e§l${e.player.name}§a§lは脱出に成功した！")
+            broadcast(IdentityFifty.prefix + translate("success_escape",e.player.name))
             if (survivorCount == 0){
                 end()
                 return@register
@@ -852,7 +859,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 if (IdentityFifty.hunters.containsKey(e.damager.uniqueId)){
                     val survivorData = IdentityFifty.survivors[e.entity.uniqueId]!!
                     val hunterData = IdentityFifty.hunters[e.damager.uniqueId]!!
-                    if (survivorData.getHealth() == 0)return@register
+                    if (survivorData.getHealth() <= 1)return@register
                     var damage = hunterData.hunterClass.onAttack(e.entity as Player, e.damager as Player,noOne)
                     if (damage <= 0)return@register
                     if (survivorData.getHealth() < damage) damage = survivorData.getHealth()
@@ -864,22 +871,26 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                     map.world.spawnParticle(Particle.ELECTRIC_SPARK,e.entity.location,30)
                     survivorData.setHealth(survivorData.getHealth() - onDamage.second)
                     if (survivorData.getHealth() == 1){
-                        broadcast("${survivorData.name}が捕まった！")
+                        broadcast(IdentityFifty.prefix + translate("send_jail",e.entity.name))
                         val prisons = map.prisons.filter { it.value.inPlayer.size == 0 }.entries.shuffled()
                         if (prisons.isNotEmpty()){
                             val data = prisons[0]
+                            hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             data.value.inPlayer.add(e.entity.uniqueId)
-                            runTask { e.entity.teleport(data.value.spawnLoc) }
-
+                            e.entity.teleport(data.value.spawnLoc)
                         } else {
                             val data = map.prisons.entries.shuffled()[0]
+                            hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             data.value.inPlayer.add(e.entity.uniqueId)
-                            runTask { e.entity.teleport(data.value.spawnLoc) }
+                            e.entity.teleport(data.value.spawnLoc)
                         }
                         if (IdentityFifty.survivors.filter { it.value.getHealth() <= 1 }.size == IdentityFifty.survivors.size){
                             end()
                         }
                     }
+                } else {
+                    if (e.damager is Arrow)return@register
+                    e.isCancelled = true
                 }
             }
 
@@ -894,7 +905,10 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
             if (e.entity.type == EntityType.SHEEP && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER)){
                 val sheep = e.entity as Sheep
-                e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,sheep.health,p)
+                val survivors = sheep.location.getNearbyPlayers(4.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
+                var multiply = 1 - (survivors * 0.15)
+                if (multiply < 0.3) multiply = 0.3
+                e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,sheep.health,p) * multiply
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     sheep.noDamageTicks = 0
                 }, 0)
@@ -903,7 +917,10 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
             if (e.entity.type == EntityType.COW && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER)){
                 val cow = e.entity as Cow
-                e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage, cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,cow.health,p)
+                val survivors = cow.location.getNearbyPlayers(4.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
+                var multiply = 1 - (survivors * 0.15)
+                if (multiply < 0.3) multiply = 0.3
+                e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage, cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,cow.health,p) * multiply
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     cow.noDamageTicks = 0
                 }, 0)

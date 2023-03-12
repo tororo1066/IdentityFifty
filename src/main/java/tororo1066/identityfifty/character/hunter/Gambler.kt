@@ -36,7 +36,7 @@ class Gambler: AbstractHunter("gambler") {
                         p.sendTranslateMsg("gamble_dice_action_1")
                         val players = IdentityFifty.hunters.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList()
                         IdentityFifty.survivors.values.forEach {
-                            it.glowManager.glow(players, GlowAPI.Color.RED, 200)
+                            it.glowManager.glow(players, GlowAPI.Color.RED, 300)
                         }
                     }
                     in 21..35->{
@@ -51,13 +51,13 @@ class Gambler: AbstractHunter("gambler") {
                     }
                     in 36..50->{
                         p.sendTranslateMsg("gamble_dice_action_3")
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 300, 0, false, false))
+                        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 300, 1, false, false))
                     }
                     in 51..65->{
                         p.sendTranslateMsg("gamble_dice_action_4")
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 300, 0, false, false))
                     }
-                    in 66..80->{
+                    in 66..84->{
                         p.sendTranslateMsg("gamble_dice_action_5")
                         p.world.getEntitiesByClass(Sheep::class.java).filter { it.persistentDataContainer.has(
                             NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) }.forEach {
@@ -69,14 +69,14 @@ class Gambler: AbstractHunter("gambler") {
                             it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                         }
                     }
-                    in 80..100->{
+                    in 85..100->{
                         p.sendTranslateMsg("gamble_dice_action_6")
                         p.world.getEntitiesByClass(Sheep::class.java).filter { it.persistentDataContainer.has(
                             NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) }.forEach {
-                            if (it.health - 300 < 1){
+                            if (it.health - 100 < 1){
                                 it.health = 1.0
                             } else {
-                                it.health -= 300
+                                it.health -= 100
                             }
                             it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                         }
@@ -84,7 +84,7 @@ class Gambler: AbstractHunter("gambler") {
                 }
             })
             return@setInteractEvent true
-        }.setInitialCoolDown(1200)
+        }.setInitialCoolDown(800)
 
         p.inventory.addItem(passiveItem)
         p.inventory.addItem(firstSkill)

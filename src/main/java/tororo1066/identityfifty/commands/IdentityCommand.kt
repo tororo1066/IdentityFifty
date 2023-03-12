@@ -18,15 +18,15 @@ import tororo1066.tororopluginapi.sCommand.SCommandObject
 
 class IdentityCommand : SCommand("identity") {
 
-    fun createSurvivorData(p: Player): SurvivorData {
+    private fun createSurvivorData(p: Player): SurvivorData {
         return createPData(SurvivorData(),p)
     }
 
-    fun createHunterData(p: Player): HunterData {
+    private fun createHunterData(p: Player): HunterData {
         return createPData(HunterData(),p)
     }
 
-    fun <V: PlayerData>createPData(data: V, p: Player): V {
+    private fun <V: PlayerData>createPData(data: V, p: Player): V {
         data.uuid = p.uniqueId
         data.name = p.name
         data.glowManager = GlowManager(p.uniqueId)

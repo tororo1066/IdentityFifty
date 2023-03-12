@@ -107,7 +107,8 @@ class IdentityFifty : SJavaPlugin() {
 
     /** クラスのデータを全て登録する **/
     private fun registerAll(){
-        register(Nurse(),Dasher(),RunAway(),Searcher(),Helper(),AreaMan(),DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense())
+        register(Nurse(),Dasher(),RunAway(),Searcher(),Helper(),AreaMan(),
+            DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense(),Marker())
     }
     override fun onStart() {
         saveDefaultConfig()

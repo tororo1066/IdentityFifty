@@ -28,7 +28,7 @@ class Fader: AbstractHunter("fader"){
             .addLore(translate("fader_passive_lore_3"))
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
-            val radiusPlayer = p.location.getNearbyPlayers(20.0).filter { IdentityFifty.survivors.containsKey(it.uniqueId) }
+            val radiusPlayer = p.location.getNearbyPlayers(20.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
             if (radiusPlayer.isEmpty()){
                 p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,200,0,true,false,true))
                 p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,200,0,true,false,true))
@@ -80,7 +80,7 @@ class Fader: AbstractHunter("fader"){
                         val task = object : BukkitRunnable(){
 
                             override fun run() {
-                                val players = it.location.getNearbyPlayers(2.0).filter { fil-> IdentityFifty.survivors.containsKey(fil.uniqueId) }
+                                val players = it.location.getNearbyPlayers(2.0).filter { fil-> IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(fil.uniqueId) == true }
                                 if (players.isEmpty())return
                                 players.forEach { surP ->
                                     val data = IdentityFifty.survivors[surP.uniqueId]?:return@forEach

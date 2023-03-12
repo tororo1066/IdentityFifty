@@ -28,10 +28,10 @@ class Mechanic: AbstractSurvivor("mechanic") {
             IdentityFifty.util.repeatDelay(3,7) {
                 p.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
             }
-            p.location.getNearbyPlayers(8.0).forEach {
+            p.location.getNearbyPlayers(9.0).forEach {
                 if (it == p)return@forEach
                 it.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
-                it.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 120, 1, false))
+                it.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 100, 2, false))
             }
             return@setInteractEvent true
         }.setInitialCoolDown(1200)

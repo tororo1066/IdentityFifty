@@ -5,6 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.data.PrisonData
 
 abstract class AbstractHunter(val name: String): Cloneable {
 
@@ -21,6 +22,8 @@ abstract class AbstractHunter(val name: String): Cloneable {
     open fun onAttack(attackPlayer: Player, p: Player, isFinishedGenerator: Boolean): Int {
         return if (isFinishedGenerator) 4 else 2
     }
+
+    open fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {}
 
     open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}
 
