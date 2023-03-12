@@ -10,8 +10,8 @@ abstract class AbstractSurvivorTalent(val name: String,var parent :AbstractSurvi
 
 
     open fun onStart(p: Player) {}
-    open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, p: Player): Pair<Int,Int> {
-        return Pair(140,160)
+    open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
+        return Pair(blindTime,slowTime)
     }
 
     open fun parameters(data: SurvivorData): SurvivorData {

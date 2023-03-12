@@ -243,7 +243,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
         val escapeGeneratorList = ArrayList<GeneratorData>(map.escapeGenerators)
         escapeGeneratorList.shuffle()
 
-        IdentityFifty.survivors.forEach { (uuid, _) ->
+        IdentityFifty.survivors.forEach { (uuid, data) ->
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {
@@ -252,13 +252,16 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 p.gameMode = GameMode.SURVIVAL
                 p.inventory.clear()
                 p.teleport(survivorSpawnList.removeAt(0))
+                data.talentClasses.forEach { clazz ->
+                    clazz.parameters(data)
+                }
 //                data.survivorClass.onStart(p)
             }
 
             IdentityFifty.stunEffect(p)
         }
 
-        IdentityFifty.hunters.forEach { (uuid, _) ->
+        IdentityFifty.hunters.forEach { (uuid, data) ->
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {
@@ -267,6 +270,9 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 p.gameMode = GameMode.SURVIVAL
                 p.inventory.clear()
                 p.teleport(hunterSpawnList.removeAt(0))
+                data.talentClasses.forEach { clazz ->
+                    clazz.parameters(data)
+                }
 //                data.hunterClass.onStart(p)
             }
             IdentityFifty.stunEffect(p)
@@ -800,7 +806,10 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                                             if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
                                             map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
                                             map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
-                                            val modify = data.survivorClass.onHitWoodPlate(p, it.location, e.player)
+                                            var modify = data.survivorClass.onHitWoodPlate(p, it.location, e.player)
+                                            data.talentClasses.forEach { clazz ->
+                                                modify = clazz.onHitWoodPlate(p, it.location,modify.first,modify.second,e.player)
+                                            }
                                             IdentityFifty.stunEffect(p,modify.first,modify.second)
                                         }
                                         woodPlateUUID.remove(it.uniqueId)
@@ -872,6 +881,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                     survivorData.setHealth(survivorData.getHealth() - onDamage.second)
                     if (survivorData.getHealth() == 1){
                         broadcast(IdentityFifty.prefix + translate("send_jail",e.entity.name))
+                        survivorData.healProcess = 0.0
                         val prisons = map.prisons.filter { it.value.inPlayer.size == 0 }.entries.shuffled()
                         if (prisons.isNotEmpty()){
                             val data = prisons[0]

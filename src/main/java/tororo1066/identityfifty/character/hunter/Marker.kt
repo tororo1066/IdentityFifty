@@ -38,7 +38,7 @@ class Marker: AbstractHunter("marker") {
             .addLore(translate("marker_passive_lore_2"))
             .addLore(translate("marker_passive_lore_3"))
 
-        val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow"))
+        val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow")).setCustomModelData(15)
             .addLore(translate("mark_crossbow_lore_1"))
             .addLore(translate("mark_crossbow_lore_2"))
 
@@ -123,7 +123,7 @@ class Marker: AbstractHunter("marker") {
             .addLore(translate("marker_passive_lore_2"))
             .addLore(translate("marker_passive_lore_3"))
 
-        val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow"))
+        val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow")).setCustomModelData(15)
             .addLore(translate("mark_crossbow_lore_1"))
             .addLore(translate("mark_crossbow_lore_2"))
 
