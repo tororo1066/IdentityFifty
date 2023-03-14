@@ -6,6 +6,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.*
+import tororo1066.identityfifty.inventory.BannerItems
 import tororo1066.identityfifty.inventory.HunterInfoInv
 import tororo1066.identityfifty.inventory.MapList
 import tororo1066.identityfifty.inventory.SurvivorInfoInv
@@ -35,6 +36,11 @@ class IdentityCommand : SCommand("identity") {
     }
 
     init {
+
+        addCommand(SCommandObject().addArg(SCommandArg("test"))
+            .setPlayerExecutor {
+                BannerItems.test().open(it.sender)
+            })
         registerSLangCommand(IdentityFifty.plugin,"identity.op")
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))

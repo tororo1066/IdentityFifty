@@ -845,6 +845,10 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                                         }
 
                                         map.world.playSound(it.location,Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,1f,0.8f)
+
+                                        data.talentClasses.forEach { clazz ->
+                                            clazz.onWoodPlate(it.location,data.uuid.toPlayer()!!)
+                                        }
                                         it.location.getNearbyPlayers(3.0).forEach second@ { p ->
                                             if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
                                             val hunterData = IdentityFifty.hunters[p.uniqueId]!!

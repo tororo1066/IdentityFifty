@@ -19,6 +19,7 @@ abstract class AbstractSurvivorTalent(val name: String,var parent :AbstractSurvi
 
     open fun onFinishedEscapeGenerator(dieLocation: Location, p: Player) {}
 
+    open fun onWoodPlate(loc: Location, p: Player) {}
 
     open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
         return Pair(blindTime,slowTime)
