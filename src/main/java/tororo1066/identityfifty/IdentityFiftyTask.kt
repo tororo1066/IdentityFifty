@@ -143,7 +143,16 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
         //サバイバーハンター両方のパッシブで走らせるタスク終了 現在はDasherが該当
         IdentityFifty.survivors.values.forEach {
             val p = it.uuid.toPlayer()
-            p?.let { player -> it.survivorClass.onEnd(player) }
+            if (p != null){
+                it.survivorClass.onEnd(p)
+                it.talentClasses.forEach { clazz ->
+                    clazz.onEnd(p)
+                    clazz.tasks.forEach { task ->
+                        task.cancel()
+                    }
+                    clazz.tasks.clear()
+                }
+            }
 
             it.survivorClass.tasks.forEach {  task ->
                 task.cancel()
@@ -153,12 +162,19 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
         IdentityFifty.hunters.values.forEach {
             val p = it.uuid.toPlayer()
-            p?.let { player -> it.hunterClass.onEnd(player) }
 
-            it.talentClasses.forEach { clazz ->
-                p?.let { player -> clazz.onEnd(player) }
+            if (p != null){
+                it.hunterClass.onEnd(p)
+                it.talentClasses.forEach { clazz ->
+                    clazz.onEnd(p)
+                    clazz.tasks.forEach { task ->
+                        task.cancel()
+                    }
+                    clazz.tasks.clear()
+                }
             }
-            it.hunterClass.tasks.forEach {  task ->
+
+            it.hunterClass.tasks.forEach { task ->
                 task.cancel()
             }
             it.hunterClass.tasks.clear()
@@ -418,9 +434,14 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 it.value.talentClasses.forEach { clazz ->
                     clazz.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
                 }
+
             }
             taskLivingSurvivor {
-                it.value.survivorClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
+                val p = Bukkit.getPlayer(it.key)!!
+                it.value.survivorClass.onFinishedGenerator(e.entity.location,remainingGenerator,p)
+                it.value.talentClasses.forEach { clazz ->
+                    clazz.onFinishedGenerator(e.entity.location,remainingGenerator,p)
+                }
             }
             if (remainingGenerator != 0)return@register
             //残り暗号機が0だったら 一撃死状態にする(60秒)
@@ -486,13 +507,18 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 map.world.playSound(getBlock.location,Sound.BLOCK_IRON_DOOR_OPEN,1f,1f)
 
                 taskLivingSurvivor {
-                    it.value.survivorClass.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
+                    val p = Bukkit.getPlayer(it.key)!!
+                    it.value.survivorClass.onFinishedEscapeGenerator(loc,p)
+                    it.value.talentClasses.forEach { clazz ->
+                        clazz.onFinishedEscapeGenerator(loc,p)
+                    }
                 }
 
                 IdentityFifty.hunters.forEach {
-                    it.value.hunterClass.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
+                    val p = Bukkit.getPlayer(it.key)!!
+                    it.value.hunterClass.onFinishedEscapeGenerator(loc,p)
                     it.value.talentClasses.forEach { clazz ->
-                        clazz.onFinishedEscapeGenerator(loc,Bukkit.getPlayer(it.key)!!)
+                        clazz.onFinishedEscapeGenerator(loc,p)
                     }
                 }
 
@@ -732,15 +758,27 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         data.inPlayer.remove(e.player.uniqueId)
                         val playerData = IdentityFifty.survivors[e.player.uniqueId]!!
                         val helperData = IdentityFifty.survivors[data.lastPressUUID]!!
-                        helperData.survivorClass.onHelp(e.player,Bukkit.getPlayer(helperData.uuid)!!)
-                        playerData.survivorClass.onGotHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player)
+                        val helperPlayer = Bukkit.getPlayer(helperData.uuid)!!
+
+                        helperData.survivorClass.onHelp(e.player,helperPlayer)
+                        helperData.talentClasses.forEach { clazz ->
+                            clazz.onHelp(e.player,helperPlayer)
+                        }
+                        playerData.survivorClass.onGotHelp(helperPlayer,e.player)
+                        playerData.talentClasses.forEach { clazz ->
+                            clazz.onGotHelp(helperPlayer,e.player)
+                        }
+
                         IdentityFifty.hunters.forEach {
                             it.key.toPlayer()?.sendTranslateMsg("helped_survivor",e.player.name)
-                            it.value.hunterClass.onSurvivorHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player,Bukkit.getPlayer(it.key)!!)
+
+                            val p = Bukkit.getPlayer(it.key)!!
+                            it.value.hunterClass.onSurvivorHelp(helperPlayer,e.player,p)
                             it.value.talentClasses.forEach { clazz ->
-                                clazz.onSurvivorHelp(Bukkit.getPlayer(helperData.uuid)!!,e.player,Bukkit.getPlayer(it.key)!!)
+                                clazz.onSurvivorHelp(helperPlayer,e.player,p)
                             }
                         }
+
                         playerData.setHealth(3,true)
                     }
                 }
@@ -758,12 +796,11 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
                     if (!e.player.isSneaking){
                         IdentityFifty.hunters.forEach { (uuid,_) ->
-                            Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
-                                Random.nextDouble(-0.2,0.2),0.2,
-                                Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.RED,Color.WHITE,1.2f))
-                            Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
-                                Random.nextDouble(-0.2,0.2),0.2,
-                                Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.BLACK,Color.WHITE,1.2f))
+                            (1..2).forEach {
+                                Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
+                                    Random.nextDouble(-0.2,0.2),0.2,
+                                    Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.RED,Color.WHITE,1.2f))
+                            }
                         }
                     }
                     footprints--
@@ -938,11 +975,15 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 val survivors = sheep.location.getNearbyPlayers(4.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
                 var multiply = 1 - (survivors * 0.15)
                 if (multiply < 0.3) multiply = 0.3
-                e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,sheep.health,p) * multiply
+                val maxHealth = sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
+                survivorData.talentClasses.forEach { clazz ->
+                    e.damage = clazz.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
+                }
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     sheep.noDamageTicks = 0
                 }, 0)
-                e.entity.customName = "§f§l羊型発電機§5(§e${sheep.health.toInt()}§f/§b${sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()}§5)"
+                e.entity.customName = "§f§l羊型発電機§5(§e${sheep.health.toInt()}§f/§b${maxHealth.toInt()}§5)"
             }
 
             if (e.entity.type == EntityType.COW && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER)){
@@ -950,7 +991,11 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 val survivors = cow.location.getNearbyPlayers(4.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
                 var multiply = 1 - (survivors * 0.15)
                 if (multiply < 0.3) multiply = 0.3
-                e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage, cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value,cow.health,p) * multiply
+                val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
+                survivorData.talentClasses.forEach { clazz ->
+                    e.damage = clazz.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
+                }
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     cow.noDamageTicks = 0
                 }, 0)
@@ -1102,10 +1147,24 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                             return@Consumer
                         }
 
-                        taskLivingSurvivor { data ->
-                            if (data.key != p.uniqueId) runTask { data.value.survivorClass.onDieOtherSurvivor(p,survivorCount,Bukkit.getPlayer(data.key)!!) }
+                        runTask {
+                            taskLivingSurvivor { data ->
+                                if (data.key != p.uniqueId){
+                                    val livingPlayer = Bukkit.getPlayer(data.key)!!
+                                    data.value.survivorClass.onDieOtherSurvivor(p,survivorCount,livingPlayer)
+                                    data.value.talentClasses.forEach { clazz ->
+                                        clazz.onDieOtherSurvivor(p,survivorCount,livingPlayer)
+                                    }
+                                }
+
+                            }
+
+                            survivor.survivorClass.onDie(p)
+                            survivor.talentClasses.forEach { clazz ->
+                                clazz.onDie(p)
+                            }
                         }
-                        runTask { survivor.survivorClass.onDie(p) }
+
 
                         continue
                     }
