@@ -75,7 +75,7 @@ class AreaMan: AbstractHunter("areaman") {
 
         dieLocation.getNearbyPlayers(3.0).forEach {
             val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
-            data.glowManager.glow(players,GlowAPI.Color.PURPLE,80)
+            data.glowManager.glow(players,GlowAPI.Color.PURPLE,140)
         }
 
         if (remainingGenerator == 0){

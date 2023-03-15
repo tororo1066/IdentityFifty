@@ -29,7 +29,8 @@ class Helper : AbstractSurvivor("helper") {
             .addLore(translate("helper_protect_lore_3"))
 
         val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { _, _ ->
-            if (p.location.getNearbyPlayers(5.0).find { IdentityFifty.survivors.containsKey(it.uniqueId) } == null){
+            val nearPlayer = p.location.getNearbyPlayers(8.0).find { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true && it.uniqueId != p.uniqueId }
+            if (nearPlayer == null){
                 p.sendActionBar(Component.text(translate("helper_protect_cant_use")))
                 return@setInteractEvent false
             }
@@ -37,6 +38,15 @@ class Helper : AbstractSurvivor("helper") {
 
             p.playSound(p.location, Sound.ITEM_TOTEM_USE,1f,1f)
             p.spawnParticle(Particle.TOTEM,p.location,5)
+
+            val nearData = IdentityFifty.survivors[nearPlayer.uniqueId]!!
+            val pData = IdentityFifty.survivors[p.uniqueId]!!
+
+            val nearPlayerHealth = nearData.getHealth()
+            val pPlayerHealth = pData.getHealth()
+
+            nearData.setHealth(pPlayerHealth)
+            pData.setHealth(nearPlayerHealth)
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
                 noDamage = false

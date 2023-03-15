@@ -61,10 +61,10 @@ class Gambler: AbstractHunter("gambler") {
                         p.sendTranslateMsg("gamble_dice_action_5")
                         p.world.getEntitiesByClass(Sheep::class.java).filter { it.persistentDataContainer.has(
                             NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) }.forEach {
-                            if (it.health + 300 > it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
+                            if (it.health + 200 > it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
                                 it.health = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue
                             } else {
-                                it.health += 300
+                                it.health += 200
                             }
                             it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                         }
@@ -84,7 +84,7 @@ class Gambler: AbstractHunter("gambler") {
                 }
             })
             return@setInteractEvent true
-        }.setInitialCoolDown(800)
+        }.setInitialCoolDown(600)
 
         p.inventory.addItem(passiveItem)
         p.inventory.addItem(firstSkill)
@@ -106,10 +106,10 @@ class Gambler: AbstractHunter("gambler") {
                 in 31..70->{
                     return 2
                 }
-                in 71..90->{
+                in 71..85->{
                     return 3
                 }
-                in 91..100->{
+                in 86..100->{
                     return 4
                 }
             }

@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
+import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
@@ -35,6 +36,7 @@ class Marker: AbstractHunter("marker") {
             .addLore(translate("marker_passive_lore_1"))
             .addLore(translate("marker_passive_lore_2"))
             .addLore(translate("marker_passive_lore_3"))
+            .addLore(translate("marker_passive_lore_4"))
 
         val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow")).setCustomModelData(15)
             .addLore(translate("mark_crossbow_lore_1"))
@@ -111,6 +113,16 @@ class Marker: AbstractHunter("marker") {
         return 2 + mark.first / 5
     }
 
+    override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
+        val data = IdentityFifty.survivors[healPlayer.uniqueId]?:return
+        val players = ArrayList<Player>()
+        players.add(p)
+        data.glowManager.glow(players,GlowAPI.Color.RED,140)
+        p.sendTranslateMsg("healed_survivor")
+        p.playSound(p.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
+    }
+
+
     override fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {
         remove(survivor.uniqueId)
     }
@@ -120,6 +132,7 @@ class Marker: AbstractHunter("marker") {
             .addLore(translate("marker_passive_lore_1"))
             .addLore(translate("marker_passive_lore_2"))
             .addLore(translate("marker_passive_lore_3"))
+            .addLore(translate("marker_passive_lore_4"))
 
         val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow")).setCustomModelData(15)
             .addLore(translate("mark_crossbow_lore_1"))

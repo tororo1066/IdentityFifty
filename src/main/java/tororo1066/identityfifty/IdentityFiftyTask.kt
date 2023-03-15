@@ -656,6 +656,11 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         playerData.healBossBar.removeAll()
                         map.world.playSound(it.location,Sound.ENTITY_PLAYER_LEVELUP,1f,1f)
                         playerData.setHealth(playerData.getHealth() + 2)
+                        runTask {
+                            IdentityFifty.hunters.forEach { clazz ->
+                                clazz.value.hunterClass.onSurvivorHeal(it.player!!, e.player, clazz.key.toPlayer()!!)
+                            }
+                        }
                         task.cancel()
                         return@Consumer
                     }
