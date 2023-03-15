@@ -29,7 +29,7 @@ class Helper : AbstractSurvivor("helper") {
             .addLore(translate("helper_protect_lore_3"))
 
         val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { _, _ ->
-            val nearPlayer = p.location.getNearbyPlayers(8.0).find { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true && it.uniqueId != p.uniqueId }
+            val nearPlayer = p.location.getNearbyPlayers(8.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true && it.uniqueId != p.uniqueId }.firstOrNull()
             if (nearPlayer == null){
                 p.sendActionBar(Component.text(translate("helper_protect_cant_use")))
                 return@setInteractEvent false
