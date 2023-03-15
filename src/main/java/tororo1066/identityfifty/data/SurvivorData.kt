@@ -41,7 +41,9 @@ class SurvivorData : PlayerData() {
     var otherPlayerHealDelayPercentage = 0.0
     var heartProcess = 0.0
     var heartProcessRules = arrayListOf(Pair(25.0,0.2), Pair(20.0,0.1), Pair(15.0,0.2), Pair(10.0,0.5))
-    val talentClasses = arrayListOf<AbstractSurvivorTalent>()
+
+    val talentClasses = HashMap<Class<out AbstractSurvivorTalent>,AbstractSurvivorTalent>()
+    var talentCost = 10
 
     fun setHealth(int: Int){
         if (health == 1){

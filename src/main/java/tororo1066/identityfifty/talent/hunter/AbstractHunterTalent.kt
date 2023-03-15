@@ -6,9 +6,11 @@ import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
 
-abstract class AbstractHunterTalent(val name: String, val parent: AbstractHunterTalent? = null) {
+abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val parent: Class<out AbstractHunterTalent>? = null) {
 
     val tasks = ArrayList<BukkitTask>()
+
+    abstract fun lore(): List<String>
 
     open fun onStart(p: Player){}
 

@@ -5,5 +5,6 @@ import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
 
 class HunterData : PlayerData() {
     lateinit var hunterClass: AbstractHunter
-    val talentClasses = arrayListOf<AbstractHunterTalent>()
+    val talentClasses = HashMap<Class<out AbstractHunterTalent>,AbstractHunterTalent>()
+    var talentCost = 10
 }

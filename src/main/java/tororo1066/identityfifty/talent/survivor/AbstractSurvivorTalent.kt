@@ -5,9 +5,11 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.SurvivorData
 
-abstract class AbstractSurvivorTalent(val name: String,var parent :AbstractSurvivorTalent? = null) {
+abstract class AbstractSurvivorTalent(val name: String, val unlockCost: Int, var parent :Class<out AbstractSurvivorTalent>? = null) {
 
     val tasks = ArrayList<BukkitTask>()
+
+    abstract fun lore(): List<String>
 
     open fun onStart(p: Player) {}
 

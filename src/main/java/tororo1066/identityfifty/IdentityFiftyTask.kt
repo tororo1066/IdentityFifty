@@ -145,7 +145,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             val p = it.uuid.toPlayer()
             if (p != null){
                 it.survivorClass.onEnd(p)
-                it.talentClasses.forEach { clazz ->
+                it.talentClasses.values.forEach { clazz ->
                     clazz.onEnd(p)
                     clazz.tasks.forEach { task ->
                         task.cancel()
@@ -165,7 +165,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
             if (p != null){
                 it.hunterClass.onEnd(p)
-                it.talentClasses.forEach { clazz ->
+                it.talentClasses.values.forEach { clazz ->
                     clazz.onEnd(p)
                     clazz.tasks.forEach { task ->
                         task.cancel()
@@ -275,7 +275,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 p.gameMode = GameMode.SURVIVAL
                 p.inventory.clear()
                 p.teleport(survivorSpawnList.removeAt(0))
-                data.talentClasses.forEach { clazz ->
+                data.talentClasses.values.forEach { clazz ->
                     clazz.parameters(data)
                 }
 //                data.survivorClass.onStart(p)
@@ -293,7 +293,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 p.gameMode = GameMode.SURVIVAL
                 p.inventory.clear()
                 p.teleport(hunterSpawnList.removeAt(0))
-                data.talentClasses.forEach { clazz ->
+                data.talentClasses.values.forEach { clazz ->
                     clazz.parameters(data)
                 }
 //                data.hunterClass.onStart(p)
@@ -431,7 +431,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             bossBar.progress = remainingGenerator.toDouble() / map.generatorLimit.toDouble()
             IdentityFifty.hunters.forEach {
                 it.value.hunterClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
-                it.value.talentClasses.forEach { clazz ->
+                it.value.talentClasses.values.forEach { clazz ->
                     clazz.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
                 }
 
@@ -439,7 +439,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             taskLivingSurvivor {
                 val p = Bukkit.getPlayer(it.key)!!
                 it.value.survivorClass.onFinishedGenerator(e.entity.location,remainingGenerator,p)
-                it.value.talentClasses.forEach { clazz ->
+                it.value.talentClasses.values.forEach { clazz ->
                     clazz.onFinishedGenerator(e.entity.location,remainingGenerator,p)
                 }
             }
@@ -509,7 +509,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 taskLivingSurvivor {
                     val p = Bukkit.getPlayer(it.key)!!
                     it.value.survivorClass.onFinishedEscapeGenerator(loc,p)
-                    it.value.talentClasses.forEach { clazz ->
+                    it.value.talentClasses.values.forEach { clazz ->
                         clazz.onFinishedEscapeGenerator(loc,p)
                     }
                 }
@@ -517,7 +517,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 IdentityFifty.hunters.forEach {
                     val p = Bukkit.getPlayer(it.key)!!
                     it.value.hunterClass.onFinishedEscapeGenerator(loc,p)
-                    it.value.talentClasses.forEach { clazz ->
+                    it.value.talentClasses.values.forEach { clazz ->
                         clazz.onFinishedEscapeGenerator(loc,p)
                     }
                 }
@@ -766,11 +766,11 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         val helperPlayer = Bukkit.getPlayer(helperData.uuid)!!
 
                         helperData.survivorClass.onHelp(e.player,helperPlayer)
-                        helperData.talentClasses.forEach { clazz ->
+                        helperData.talentClasses.values.forEach { clazz ->
                             clazz.onHelp(e.player,helperPlayer)
                         }
                         playerData.survivorClass.onGotHelp(helperPlayer,e.player)
-                        playerData.talentClasses.forEach { clazz ->
+                        playerData.talentClasses.values.forEach { clazz ->
                             clazz.onGotHelp(helperPlayer,e.player)
                         }
 
@@ -779,7 +779,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
                             val p = Bukkit.getPlayer(it.key)!!
                             it.value.hunterClass.onSurvivorHelp(helperPlayer,e.player,p)
-                            it.value.talentClasses.forEach { clazz ->
+                            it.value.talentClasses.values.forEach { clazz ->
                                 clazz.onSurvivorHelp(helperPlayer,e.player,p)
                             }
                         }
@@ -851,20 +851,20 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
                                         map.world.playSound(it.location,Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,1f,0.8f)
 
-                                        data.talentClasses.forEach { clazz ->
+                                        data.talentClasses.values.forEach { clazz ->
                                             clazz.onWoodPlate(it.location,data.uuid.toPlayer()!!)
                                         }
                                         it.location.getNearbyPlayers(3.0).forEach second@ { p ->
                                             if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
                                             val hunterData = IdentityFifty.hunters[p.uniqueId]!!
                                             if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
-                                            hunterData.talentClasses.forEach { clazz ->
+                                            hunterData.talentClasses.values.forEach { clazz ->
                                                 if (!clazz.onDamagedWoodPlate(e.player, it.location, p))return@second
                                             }
                                             map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
                                             map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
                                             var modify = data.survivorClass.onHitWoodPlate(p, it.location, e.player)
-                                            data.talentClasses.forEach { clazz ->
+                                            data.talentClasses.values.forEach { clazz ->
                                                 modify = clazz.onHitWoodPlate(p, it.location,modify.first,modify.second,e.player)
                                             }
                                             IdentityFifty.stunEffect(p,modify.first,modify.second)
@@ -928,7 +928,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                     if (survivorData.getHealth() <= 1)return@register
                     var damage = hunterData.hunterClass.onAttack(e.entity as Player, e.damager as Player,noOne)
                     if (damage <= 0)return@register
-                    hunterData.talentClasses.forEach {
+                    hunterData.talentClasses.values.forEach {
                         it.onAttack(e.entity as Player, e.damager as Player,noOne)
                     }
                     if (survivorData.getHealth() < damage) damage = survivorData.getHealth()
@@ -946,7 +946,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         if (prisons.isNotEmpty()){
                             val data = prisons[0]
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
-                            hunterData.talentClasses.forEach {
+                            hunterData.talentClasses.values.forEach {
                                 it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             }
                             data.value.inPlayer.add(e.entity.uniqueId)
@@ -954,7 +954,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         } else {
                             val data = map.prisons.entries.shuffled()[0]
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
-                            hunterData.talentClasses.forEach {
+                            hunterData.talentClasses.values.forEach {
                                 it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             }
                             data.value.inPlayer.add(e.entity.uniqueId)
@@ -986,7 +986,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 if (multiply < 0.3) multiply = 0.3
                 val maxHealth = sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
-                survivorData.talentClasses.forEach { clazz ->
+                survivorData.talentClasses.values.forEach { clazz ->
                     e.damage = clazz.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
                 }
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
@@ -1002,7 +1002,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                 if (multiply < 0.3) multiply = 0.3
                 val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
-                survivorData.talentClasses.forEach { clazz ->
+                survivorData.talentClasses.values.forEach { clazz ->
                     e.damage = clazz.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
                 }
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
@@ -1060,7 +1060,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
             val p = Bukkit.getPlayer(uuid)!!
             titleTask(p){
                 data.survivorClass.onStart(p)
-                data.talentClasses.forEach {
+                data.talentClasses.values.forEach {
                     it.onStart(p)
                 }
             }
@@ -1161,7 +1161,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                                 if (data.key != p.uniqueId){
                                     val livingPlayer = Bukkit.getPlayer(data.key)!!
                                     data.value.survivorClass.onDieOtherSurvivor(p,survivorCount,livingPlayer)
-                                    data.value.talentClasses.forEach { clazz ->
+                                    data.value.talentClasses.values.forEach { clazz ->
                                         clazz.onDieOtherSurvivor(p,survivorCount,livingPlayer)
                                     }
                                 }
@@ -1169,7 +1169,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                             }
 
                             survivor.survivorClass.onDie(p)
-                            survivor.talentClasses.forEach { clazz ->
+                            survivor.talentClasses.values.forEach { clazz ->
                                 clazz.onDie(p)
                             }
                         }

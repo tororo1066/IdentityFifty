@@ -6,10 +6,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.*
-import tororo1066.identityfifty.inventory.BannerItems
-import tororo1066.identityfifty.inventory.HunterInfoInv
-import tororo1066.identityfifty.inventory.MapList
-import tororo1066.identityfifty.inventory.SurvivorInfoInv
+import tororo1066.identityfifty.inventory.*
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sCommand.SCommand
@@ -39,7 +36,7 @@ class IdentityCommand : SCommand("identity") {
 
         addCommand(SCommandObject().addArg(SCommandArg("test"))
             .setPlayerExecutor {
-                BannerItems.test().open(it.sender)
+                SurvivorTalentInv(IdentityFifty.survivors[it.sender.uniqueId]!!).Center().open(it.sender)
             })
         registerSLangCommand(IdentityFifty.plugin,"identity.op")
 
@@ -170,6 +167,18 @@ class IdentityCommand : SCommand("identity") {
 
         addCommand(SCommandObject().addArg(SCommandArg("info")).addArg(SCommandArg("hunter")).addArg(SCommandArg(IdentityFifty.huntersData.keys)).setPlayerExecutor {
             HunterInfoInv(IdentityFifty.huntersData[it.args[2]]!!).open(it.sender)
+        })
+
+        addCommand(SCommandObject().addArg(SCommandArg("talent")).setPlayerExecutor {
+            if (IdentityFifty.survivors.containsKey(it.sender.uniqueId)){
+                val data = IdentityFifty.survivors[it.sender.uniqueId]!!
+                SurvivorTalentInv(data).Center().open(it.sender)
+            } else if (IdentityFifty.hunters.containsKey(it.sender.uniqueId)){
+                val data = IdentityFifty.hunters[it.sender.uniqueId]!!
+                HunterTalentInv(data).Center().open(it.sender)
+            } else {
+                it.sender.sendTranslateMsg("not_registered")
+            }
         })
 
         registerDebugCommand("identity.op")
