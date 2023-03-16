@@ -18,6 +18,7 @@ import tororo1066.identityfifty.commands.IdentityCommand
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.talent.TalentSQL
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.lang.SLang
@@ -51,7 +52,10 @@ class IdentityFifty : SJavaPlugin() {
         lateinit var sConfig: SConfig
         /** 言語マネージャー **/
         lateinit var sLang: SLang
+        /** 便利なユーティリティ **/
         lateinit var util: UsefulUtility
+        /** データベース **/
+        lateinit var talentSQL: TalentSQL
         /** 稼働中のゲームの変数 **/
         var identityFiftyTask: IdentityFiftyTask? = null
 
@@ -119,6 +123,7 @@ class IdentityFifty : SJavaPlugin() {
 
         interactManager = SInteractItemManager(this)
         sConfig = SConfig(this)
+        talentSQL = TalentSQL()
 
         effectManager = EffectManager(this)
         registerAll()

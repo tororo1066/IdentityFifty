@@ -19,7 +19,7 @@ class GlowManager(private val uuid: UUID) {
             otherGlow = true
         }
 
-        val p = Bukkit.getPlayer(uuid)!!
+        val p = Bukkit.getPlayer(uuid)?:return
 
         tick = duration
 

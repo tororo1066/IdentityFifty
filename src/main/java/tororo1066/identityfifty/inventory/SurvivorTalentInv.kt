@@ -3,30 +3,86 @@ package tororo1066.identityfifty.inventory
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
 import tororo1066.identityfifty.talent.survivor.HealSpeedUp
 import tororo1066.identityfifty.talent.survivor.TalentPlane
+import tororo1066.tororopluginapi.SInput
+import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sInventory.SInventory
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
+import tororo1066.tororopluginapi.sItem.SItem
 
 class SurvivorTalentInv(val data: SurvivorData) {
 
     abstract inner class AbstractSurvivorTalentInv: SInventory(IdentityFifty.plugin, translate("survivor_talent"),6) {
         fun glass() = SInventoryItem(Material.ORANGE_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
         fun roadGlass() = SInventoryItem(Material.BLACK_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
-        fun costHead(p: Player) = SInventoryItem(Material.PLAYER_HEAD).setDisplayName(translate("cost_head",p.name))
-
+        private fun costHead(p: Player) = createInputItem(SItem(Material.PLAYER_HEAD).setDisplayName(translate("cost_head",p.name))
             .addLore(translate("cost_head_point_lore",data.talentCost.toString()))
-            .setSkullOwner(p.uniqueId).setCanClick(false)
+            .addLore(translate("cost_head_preset_lore"))
+            .addLore(translate("cost_head_create_preset_lore"))
+            .setSkullOwner(p.uniqueId),String::class.java,"/<保存名>", ClickType.SHIFT_LEFT) { str, _ ->
+            if (str.length > 50){
+                p.sendTranslateMsg("too_long_name")
+                return@createInputItem
+            }
+
+            if (IdentityFifty.talentSQL.dumpTalentName(p.uniqueId,"survivor",str)){
+                p.sendTranslateMsg("dump_name")
+                return@createInputItem
+            }
+
+            IdentityFifty.talentSQL.insertSurvivorTalent(p,str,data.talentClasses.values.toList())
+            p.sendTranslateMsg("saved_talent")
+        }.setClickEvent {
+            if (it.click != ClickType.LEFT)return@setClickEvent
+            val inv = object : LargeSInventory(IdentityFifty.plugin,translate("talent_presets")) {
+                override fun renderMenu(p: Player): Boolean {
+                    val presets = IdentityFifty.talentSQL.getSurvivorTalents(p.uniqueId)
+                    val items = arrayListOf<SInventoryItem>()
+                    presets.forEach { pair ->
+                        items.add(SInventoryItem(Material.DIAMOND_BLOCK)
+                            .setDisplayName(pair.first)
+                            .addLore(translate("talent_remove")).setCanClick(false).setClickEvent second@ { e ->
+                                if (e.click == ClickType.LEFT){
+                                    val costs = pair.second.sumOf { sum -> sum.unlockCost }
+                                    val defaultCosts = SurvivorData().talentCost
+                                    if (defaultCosts < costs){
+                                        p.sendTranslateMsg("not_enough_talent_point")
+                                        return@second
+                                    }
+
+                                    data.talentClasses.clear()
+                                    data.talentCost = defaultCosts - costs
+                                    pair.second.forEach { talent ->
+                                        data.talentClasses[talent.javaClass] = talent
+                                    }
+                                    p.closeInventory()
+                                }
+
+                                if (e.click == ClickType.SHIFT_LEFT){
+                                    IdentityFifty.talentSQL.removeTalent(p.uniqueId,"survivor",pair.first)
+                                    renderMenu(p)
+                                }
+                            })
+                    }
+                    setResourceItems(items)
+                    return true
+                }
+            }
+
+            this.moveChildInventory(inv,p)
+        }
 
         fun talentItem(talent: AbstractSurvivorTalent): SInventoryItem {
             return SInventoryItem(if (data.talentClasses.containsKey(talent.javaClass)) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE)
                 .setDisplayName(translate(talent.name))
-                .setLore(listOf("§f§l${talent.lore().map { translate(it) }}"))
+                .setLore(talent.lore().map { translate(it) })
                 .addLore(" ", if (data.talentClasses.containsKey(talent.javaClass)) translate("unlocked") else translate("locked"),
                     translate("need_point",talent.unlockCost.toString()))
                 .setCanClick(false)

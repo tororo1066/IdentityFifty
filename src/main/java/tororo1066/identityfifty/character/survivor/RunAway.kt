@@ -25,7 +25,7 @@ class RunAway : AbstractSurvivor("runaway") {
             .addLore(translate("camouflage_lore_1"))
             .addLore(translate("camouflage_lore_2"))
         val blindSkill = IdentityFifty.interactManager.createSInteractItem(blindSkillItem,true).setInteractEvent { _, _ ->
-            val entities = p.location.getNearbyPlayers(15.0)
+            val entities = p.location.getNearbyPlayers(12.0)
             if (entities.isEmpty()){
                 p.sendTranslateMsg("camouflage_miss")
                 return@setInteractEvent true

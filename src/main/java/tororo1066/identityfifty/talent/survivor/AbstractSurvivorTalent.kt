@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.tororopluginapi.otherUtils.UsefulUtility
 
 abstract class AbstractSurvivorTalent(val name: String, val unlockCost: Int, var parent :Class<out AbstractSurvivorTalent>? = null) {
 
@@ -44,4 +45,14 @@ abstract class AbstractSurvivorTalent(val name: String, val unlockCost: Int, var
     }
 
     open fun onEnd(p: Player) {}
+
+    companion object{
+        fun getTalent(name: String): AbstractSurvivorTalent? {
+            val classStr = name.split("_").joinToString("") { it.replaceFirstChar(Char::titlecase) }
+            return UsefulUtility.sTry({
+                val clazz = Class.forName("tororo1066.identityfifty.talent.survivor.${classStr}")
+                clazz.getConstructor().newInstance() as AbstractSurvivorTalent
+            },{null})
+        }
+    }
 }

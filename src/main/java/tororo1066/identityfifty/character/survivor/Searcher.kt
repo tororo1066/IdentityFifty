@@ -37,10 +37,10 @@ class Searcher : AbstractSurvivor("searcher") {
             }
             IdentityFifty.hunters.forEach { (uuid, data) ->
                 Bukkit.getPlayer(uuid)?:return@forEach
-                data.glowManager.glow(players, GlowAPI.Color.RED,200)
+                data.glowManager.glow(players, GlowAPI.Color.RED,240)
             }
             return@setInteractEvent true
-        }.setInitialCoolDown(1200)
+        }.setInitialCoolDown(1100)
 
         p.inventory.addItem(searchSkill)
 

@@ -2,9 +2,9 @@ package tororo1066.identityfifty.talent.survivor
 
 import tororo1066.identityfifty.data.SurvivorData
 
-class RemainTimeUp : AbstractSurvivorTalent("RemainTimeUp",1,HelpSpeedUp::class.java) {
+class RemainTimeUp : AbstractSurvivorTalent("remain_time_up",1,HelpSpeedUp::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("remain_time_up_lore_1")
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {

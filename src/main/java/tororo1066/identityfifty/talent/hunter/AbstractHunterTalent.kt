@@ -5,6 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
+import tororo1066.tororopluginapi.otherUtils.UsefulUtility
 
 abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val parent: Class<out AbstractHunterTalent>? = null) {
 
@@ -33,4 +34,14 @@ abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val p
     }
 
     open fun onEnd(p: Player) {}
+
+    companion object{
+        fun getTalent(name: String): AbstractHunterTalent? {
+            val classStr = name.split("_").joinToString("") { it.replaceFirstChar(Char::titlecase) }
+            return UsefulUtility.sTry({
+                val clazz = Class.forName("tororo1066.identityfifty.talent.hunter.${classStr}")
+                clazz.getConstructor().newInstance() as AbstractHunterTalent
+            },{null})
+        }
+    }
 }

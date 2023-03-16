@@ -981,7 +981,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
             if (e.entity.type == EntityType.SHEEP && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER)){
                 val sheep = e.entity as Sheep
-                val survivors = sheep.location.getNearbyPlayers(4.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
+                val survivors = sheep.location.getNearbyPlayers(5.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
                 var multiply = 1 - (survivors * 0.15)
                 if (multiply < 0.3) multiply = 0.3
                 val maxHealth = sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
@@ -997,7 +997,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
 
             if (e.entity.type == EntityType.COW && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER)){
                 val cow = e.entity as Cow
-                val survivors = cow.location.getNearbyPlayers(4.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
+                val survivors = cow.location.getNearbyPlayers(5.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
                 var multiply = 1 - (survivors * 0.15)
                 if (multiply < 0.3) multiply = 0.3
                 val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value

@@ -33,11 +33,6 @@ class IdentityCommand : SCommand("identity") {
     }
 
     init {
-
-        addCommand(SCommandObject().addArg(SCommandArg("test"))
-            .setPlayerExecutor {
-                SurvivorTalentInv(IdentityFifty.survivors[it.sender.uniqueId]!!).Center().open(it.sender)
-            })
         registerSLangCommand(IdentityFifty.plugin,"identity.op")
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
@@ -100,7 +95,7 @@ class IdentityCommand : SCommand("identity") {
             IdentityFifty.hunters.remove(it.sender.uniqueId)
             IdentityFifty.survivors.remove(it.sender.uniqueId)
 
-            it.sender.prefixMsg("登録解除しました")
+            it.sender.sendTranslateMsg("unregistered")
         })
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("unregister")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).setNormalExecutor {
@@ -108,7 +103,7 @@ class IdentityCommand : SCommand("identity") {
             IdentityFifty.hunters.remove(p.uniqueId)
             IdentityFifty.survivors.remove(p.uniqueId)
 
-            it.sender.prefixMsg("登録解除させました")
+            it.sender.sendTranslateMsg("unregistered_other", p.name)
         })
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("start")).addArg(SCommandArg().addAllowString(IdentityFifty.maps.keys.toTypedArray()))

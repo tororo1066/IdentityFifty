@@ -53,7 +53,7 @@ class Helper : AbstractSurvivor("helper") {
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
                 noDamage = false
-            },60)
+            },140)
 
             return@setInteractEvent true
 

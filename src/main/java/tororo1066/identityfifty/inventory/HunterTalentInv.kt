@@ -3,23 +3,80 @@ package tororo1066.identityfifty.inventory
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
+import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sInventory.SInventory
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
+import tororo1066.tororopluginapi.sItem.SItem
 
 class HunterTalentInv(val data: HunterData) {
 
     abstract inner class AbstractHunterTalentInv: SInventory(IdentityFifty.plugin,translate("hunter_talent"),6) {
         fun glass() = SInventoryItem(Material.ORANGE_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
         fun roadGlass() = SInventoryItem(Material.BLACK_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
-        fun costHead(p: Player) = SInventoryItem(Material.PLAYER_HEAD).setDisplayName(translate("cost_head",p.name))
-            .addLore(translate("cost_head_role_lore", translate(data.hunterClass.name)))
+        private fun costHead(p: Player) = createInputItem(
+            SItem(Material.PLAYER_HEAD).setDisplayName(translate("cost_head",p.name))
             .addLore(translate("cost_head_point_lore",data.talentCost.toString()))
-            .setSkullOwner(p.uniqueId).setCanClick(false)
+            .addLore(translate("cost_head_preset_lore"))
+            .addLore(translate("cost_head_create_preset_lore"))
+            .setSkullOwner(p.uniqueId),String::class.java,"/<保存名>", ClickType.SHIFT_LEFT) { str, _ ->
+            if (str.length > 50){
+                p.sendTranslateMsg("too_long_name")
+                return@createInputItem
+            }
+
+            if (IdentityFifty.talentSQL.dumpTalentName(p.uniqueId,"hunter",str)){
+                p.sendTranslateMsg("dump_name")
+                return@createInputItem
+            }
+
+            IdentityFifty.talentSQL.insertHunterTalent(p,str,data.talentClasses.values.toList())
+            p.sendTranslateMsg("saved_talent")
+        }.setClickEvent {
+            if (it.click != ClickType.LEFT)return@setClickEvent
+            val inv = object : LargeSInventory(IdentityFifty.plugin,translate("talent_presets")) {
+                override fun renderMenu(p: Player): Boolean {
+                    val presets = IdentityFifty.talentSQL.getHunterTalents(p.uniqueId)
+                    val items = arrayListOf<SInventoryItem>()
+                    presets.forEach { pair ->
+                        items.add(SInventoryItem(Material.REDSTONE_BLOCK)
+                            .setDisplayName(pair.first)
+                            .addLore(translate("talent_remove")).setCanClick(false).setClickEvent second@ { e ->
+                                if (e.click == ClickType.LEFT){
+                                    val costs = pair.second.sumOf { sum -> sum.unlockCost }
+                                    val defaultCosts = SurvivorData().talentCost
+                                    if (defaultCosts < costs){
+                                        p.sendTranslateMsg("not_enough_talent_point")
+                                        return@second
+                                    }
+
+                                    data.talentClasses.clear()
+                                    data.talentCost = defaultCosts - costs
+                                    pair.second.forEach { talent ->
+                                        data.talentClasses[talent.javaClass] = talent
+                                    }
+                                    p.closeInventory()
+                                }
+
+                                if (e.click == ClickType.SHIFT_LEFT){
+                                    IdentityFifty.talentSQL.removeTalent(p.uniqueId,"hunter",pair.first)
+                                    renderMenu(p)
+                                }
+                            })
+                    }
+                    setResourceItems(items)
+                    return true
+                }
+            }
+
+            this.moveChildInventory(inv,p)
+        }
 
         fun talentItem(talent: AbstractHunterTalent): SInventoryItem {
             return SInventoryItem(if (data.talentClasses.containsKey(talent.javaClass)) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE)

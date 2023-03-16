@@ -10,7 +10,7 @@ import java.util.function.Consumer
 
 class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",1,LowFootPrints::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("plate_speed_up_lore_1","plate_speed_up_lore_2")
     }
 
     var boost = true

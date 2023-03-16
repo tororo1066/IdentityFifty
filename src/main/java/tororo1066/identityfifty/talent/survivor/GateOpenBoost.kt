@@ -11,7 +11,7 @@ class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 1,WoundedPowerUp
     }
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
-        if (remainingGenerator == 0) run {
+        if (remainingGenerator == 0){
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 80, 2))
         }
     }
