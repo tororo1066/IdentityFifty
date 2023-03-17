@@ -6,7 +6,7 @@ import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.configuration.file.YamlConfiguration
 
-class MapData {
+class MapData: Cloneable {
 
     companion object{
         fun loadFromYml(config: YamlConfiguration): MapData {
@@ -80,4 +80,8 @@ class MapData {
     val goalRegions = ArrayList<String>()
     val prisons = HashMap<Location,PrisonData>()
     var woodPlates = HashMap<Location,WoodPlateData>()
+
+    public override fun clone(): MapData {
+        return super.clone() as MapData
+    }
 }

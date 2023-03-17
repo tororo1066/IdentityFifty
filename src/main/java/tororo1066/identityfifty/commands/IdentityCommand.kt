@@ -108,7 +108,7 @@ class IdentityCommand : SCommand("identity") {
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("start")).addArg(SCommandArg().addAllowString(IdentityFifty.maps.keys.toTypedArray()))
             .setPlayerExecutor {
-                val map = IdentityFifty.maps[it.args[1]]!!
+                val map = IdentityFifty.maps[it.args[1]]!!.clone()
                 if (map.survivorLimit < IdentityFifty.survivors.size) {
                     it.sender.prefixMsg("§cサバイバーは${map.survivorLimit}人までです！")
                     return@setPlayerExecutor

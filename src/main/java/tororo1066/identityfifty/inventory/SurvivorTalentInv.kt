@@ -67,7 +67,7 @@ class SurvivorTalentInv(val data: SurvivorData) {
 
                                 if (e.click == ClickType.SHIFT_LEFT){
                                     IdentityFifty.talentSQL.removeTalent(p.uniqueId,"survivor",pair.first)
-                                    renderMenu(p)
+                                    allRenderMenu(p)
                                 }
                             })
                     }

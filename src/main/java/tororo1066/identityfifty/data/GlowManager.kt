@@ -13,7 +13,7 @@ class GlowManager(private val uuid: UUID) {
     var tick = 0
     fun glow(seeablePlayer: MutableCollection<Player>, color: GlowAPI.Color, duration: Int){
         if (isGlowing){
-            if (duration < tick){
+            if (duration < tick || GlowAPI.isGlowing(Bukkit.getPlayer(uuid), seeablePlayer.toMutableList(),false)){
                 return
             }
             otherGlow = true

@@ -22,7 +22,7 @@ class TalentSQL: USQLTable("talent", SMySQL(IdentityFifty.plugin)){
     }
 
     init {
-        debug = true
+        debug = false
         println(preset_name.name)
         println(preset_name.type.name)
     }
@@ -38,11 +38,6 @@ class TalentSQL: USQLTable("talent", SMySQL(IdentityFifty.plugin)){
                     talentDataList.add(talent)
                 }
             }
-            println(preset_name.type.getVal(it))
-            println(type.type.getVal(it))
-            println(preset_name.name)
-            println(preset_name.type.name)
-            println(it.getString("type"))
             talents.add(Pair(preset_name.type.getVal(it),talentDataList))
         }
         return talents

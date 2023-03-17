@@ -5,6 +5,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitTask
+import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.sItem.SItem
 
@@ -27,6 +28,8 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
     open fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean,Int> {
         return Pair(true,damage)
     }
+
+    open fun onJail(prisonData: PrisonData, p: Player) {}
 
     open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, p: Player): Pair<Int,Int> {
         return Pair(140,160)

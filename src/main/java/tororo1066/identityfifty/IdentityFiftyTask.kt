@@ -49,7 +49,7 @@ import java.util.UUID
 import java.util.function.Consumer
 import kotlin.random.Random
 
-class IdentityFiftyTask(private val map: MapData) : Thread() {
+class IdentityFiftyTask(val map: MapData) : Thread() {
 
     private fun allPlayerAction(action: (UUID)->Unit){
         IdentityFifty.survivors.forEach {
@@ -945,6 +945,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                         val prisons = map.prisons.filter { it.value.inPlayer.size == 0 }.entries.shuffled()
                         if (prisons.isNotEmpty()){
                             val data = prisons[0]
+                            survivorData.survivorClass.onJail(data.value,e.entity as Player)
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             hunterData.talentClasses.values.forEach {
                                 it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
@@ -953,6 +954,7 @@ class IdentityFiftyTask(private val map: MapData) : Thread() {
                             e.entity.teleport(data.value.spawnLoc)
                         } else {
                             val data = map.prisons.entries.shuffled()[0]
+                            survivorData.survivorClass.onJail(data.value,e.entity as Player)
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             hunterData.talentClasses.values.forEach {
                                 it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)

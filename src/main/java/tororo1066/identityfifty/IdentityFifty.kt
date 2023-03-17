@@ -112,7 +112,8 @@ class IdentityFifty : SJavaPlugin() {
     /** クラスのデータを全て登録する **/
     private fun registerAll(){
         register(Nurse(),Dasher(),RunAway(),Searcher(),Helper(),AreaMan(),
-            DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense(),Marker())
+            DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense(),Marker(),
+            Coffin())
     }
     override fun onStart() {
         saveDefaultConfig()
@@ -139,13 +140,13 @@ class IdentityFifty : SJavaPlugin() {
         saveResource("IdentityFifty.zip",true)
         http?.createContext("/Resource",FileHandler(File(dataFolder.path + "/IdentityFifty.zip")))
         http?.start()
-        SEvent(this).register(PlayerJoinEvent::class.java) { e ->
-            if (e.player.name == "tororo_1066"){
-                e.player.setResourcePack("http://localhost:8000/Resource")
-            } else {
-                e.player.setResourcePack(resourceUrl)
-            }
-        }
+//        SEvent(this).register(PlayerJoinEvent::class.java) { e ->
+//            if (e.player.name == "tororo_1066"){
+//                e.player.setResourcePack("http://localhost:8000/Resource")
+//            } else {
+//                e.player.setResourcePack(resourceUrl)
+//            }
+//        }
 
     }
 

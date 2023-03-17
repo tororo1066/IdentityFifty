@@ -66,7 +66,7 @@ class HunterTalentInv(val data: HunterData) {
 
                                 if (e.click == ClickType.SHIFT_LEFT){
                                     IdentityFifty.talentSQL.removeTalent(p.uniqueId,"hunter",pair.first)
-                                    renderMenu(p)
+                                    allRenderMenu(p)
                                 }
                             })
                     }
