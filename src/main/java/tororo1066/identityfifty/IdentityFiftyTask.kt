@@ -854,7 +854,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                         data.talentClasses.values.forEach { clazz ->
                                             clazz.onWoodPlate(it.location,data.uuid.toPlayer()!!)
                                         }
-                                        it.location.getNearbyPlayers(3.0).forEach second@ { p ->
+                                        it.location.getNearbyPlayers(2.5).forEach second@ { p ->
                                             if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
                                             val hunterData = IdentityFifty.hunters[p.uniqueId]!!
                                             if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
@@ -984,7 +984,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             if (e.entity.type == EntityType.SHEEP && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER)){
                 val sheep = e.entity as Sheep
                 val survivors = sheep.location.getNearbyPlayers(5.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
-                var multiply = 1 - (survivors * 0.15)
+                var multiply = 1 - (survivors * 0.2)
                 if (multiply < 0.3) multiply = 0.3
                 val maxHealth = sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
@@ -1000,7 +1000,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             if (e.entity.type == EntityType.COW && e.entity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER)){
                 val cow = e.entity as Cow
                 val survivors = cow.location.getNearbyPlayers(5.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
-                var multiply = 1 - (survivors * 0.15)
+                var multiply = 1 - (survivors * 0.2)
                 if (multiply < 0.3) multiply = 0.3
                 val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply

@@ -40,8 +40,13 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_2"))
             .addLore(translate("coffin_skill_lore_3"))
             .addLore(translate("coffin_skill_lore_4"))
+            .addLore(translate("coffin_skill_lore_5"))
 
-        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, _ ->
+        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, item ->
+            if (IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == true){
+                return@setInteractEvent false
+            }
+
             if (coffin != null){
                 coffinTask?.cancel()
                 coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
@@ -92,7 +97,7 @@ class Coffin: AbstractSurvivor("coffin") {
 
             }
             return@setInteractEvent true
-        }.setDropEvent { e, _ ->
+        }.setDropEvent { e, item ->
             e.isCancelled = true
             if (coffin == null){
                 return@setDropEvent
@@ -119,6 +124,8 @@ class Coffin: AbstractSurvivor("coffin") {
                 it.key.toPlayer()?.sendTranslateMsg("coffin_helped")
             }
 
+            item.setInteractCoolDown(2000)
+
         }.setInitialCoolDown(2000)
 
         p.inventory.addItem(passiveItem,coffinSkillItem)
@@ -126,12 +133,22 @@ class Coffin: AbstractSurvivor("coffin") {
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
+        data.healTick = 160
         return data
     }
 
     override fun onJail(prisonData: PrisonData, p: Player) {
         val data = IdentityFifty.survivors[p.uniqueId]!!
-        data.remainingTime -= 15
+        data.remainingTime -= 25
+    }
+
+    override fun onEnd(p: Player) {
+        coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
+        coffin = null
+        coffinUUID = null
+        coffinTask?.cancel()
+        coffinTask = null
+        sEvent.unregisterAll()
     }
 
     override fun info(): ArrayList<ItemStack> {
@@ -144,6 +161,7 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_2"))
             .addLore(translate("coffin_skill_lore_3"))
             .addLore(translate("coffin_skill_lore_4"))
+            .addLore(translate("coffin_skill_lore_5"))
         return arrayListOf(passiveItem, coffinSkill)
     }
 }

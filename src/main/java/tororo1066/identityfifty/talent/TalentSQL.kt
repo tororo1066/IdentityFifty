@@ -23,8 +23,6 @@ class TalentSQL: USQLTable("talent", SMySQL(IdentityFifty.plugin)){
 
     init {
         debug = false
-        println(preset_name.name)
-        println(preset_name.type.name)
     }
 
     fun getSurvivorTalents(searchUUID: UUID): List<Pair<String,List<AbstractSurvivorTalent>>>{

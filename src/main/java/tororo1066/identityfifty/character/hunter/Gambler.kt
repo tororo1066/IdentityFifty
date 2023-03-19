@@ -82,6 +82,7 @@ class Gambler: AbstractHunter("gambler") {
     override fun onStart(p: Player) {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("gambler_passive_lore_1"))
+            .addLore(translate("gambler_passive_lore_2"))
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice")).setCustomModelData(11)
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))
@@ -127,6 +128,7 @@ class Gambler: AbstractHunter("gambler") {
     override fun info(): ArrayList<ItemStack> {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("gambler_passive_lore_1"))
+            .addLore(translate("gambler_passive_lore_2"))
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice")).setCustomModelData(11)
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))

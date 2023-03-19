@@ -39,7 +39,9 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
 
     open fun onGotHelp(helper: Player, p: Player) {}
 
-    open fun onDie(p: Player) {}
+    open fun onDie(p: Player) {
+        p.inventory.clear()
+    }
 
     open fun onDieOtherSurvivor(diePlayer: Player, playerNumber: Int,p: Player) {}
 
