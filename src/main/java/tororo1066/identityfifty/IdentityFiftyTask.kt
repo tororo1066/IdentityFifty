@@ -946,6 +946,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         if (prisons.isNotEmpty()){
                             val data = prisons[0]
                             survivorData.survivorClass.onJail(data.value,e.entity as Player)
+                            survivorData.talentClasses.values.forEach {
+                                it.onJail(data.value,e.entity as Player)
+                            }
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             hunterData.talentClasses.values.forEach {
                                 it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
@@ -955,6 +958,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         } else {
                             val data = map.prisons.entries.shuffled()[0]
                             survivorData.survivorClass.onJail(data.value,e.entity as Player)
+                            survivorData.talentClasses.values.forEach {
+                                it.onJail(data.value,e.entity as Player)
+                            }
                             hunterData.hunterClass.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)
                             hunterData.talentClasses.values.forEach {
                                 it.onSurvivorJail(e.entity as Player, data.value, e.damager as Player)

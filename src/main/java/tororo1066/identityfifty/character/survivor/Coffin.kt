@@ -35,14 +35,14 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_passive_lore_1"))
             .addLore(translate("coffin_passive_lore_2"))
 
-        val coffinSkill = SItem(Material.STICK).setDisplayName(translate("coffin_skill")).setCustomModelData(16)
+        val coffinSkill = SItem(Material.STICK).setDisplayName(translate("coffin_skill")).setCustomModelData(17)
             .addLore(translate("coffin_skill_lore_1"))
             .addLore(translate("coffin_skill_lore_2"))
             .addLore(translate("coffin_skill_lore_3"))
             .addLore(translate("coffin_skill_lore_4"))
             .addLore(translate("coffin_skill_lore_5"))
 
-        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, item ->
+        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, _ ->
             if (IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == true){
                 return@setInteractEvent false
             }

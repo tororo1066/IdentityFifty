@@ -3,6 +3,7 @@ package tororo1066.identityfifty.talent.survivor
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
+import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
 
@@ -31,6 +32,8 @@ abstract class AbstractSurvivorTalent(val name: String, val unlockCost: Int, var
     open fun onHelp(helpedPlayer: Player, p: Player) {}
 
     open fun onGotHelp(helper: Player, p: Player) {}
+
+    open fun onJail(prisonData: PrisonData, p: Player) {}
 
     open fun onDie(p: Player) {}
 
