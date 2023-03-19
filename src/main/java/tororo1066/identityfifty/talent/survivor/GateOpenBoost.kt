@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 1,WoundedPowerUp::class.java) {
+class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 1,WoundedGeneratorUp::class.java) {
     override fun lore(): List<String> {
         return listOf()
     }

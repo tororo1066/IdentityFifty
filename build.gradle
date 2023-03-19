@@ -48,7 +48,7 @@ processResources {
     }
 }
 buildscript {
-    ext.kotlin_version = '1.7.20'
+    ext.kotlin_version = '1.6.0'
     repositories {
         mavenCentral()
     }
@@ -66,6 +66,9 @@ compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+repositories {
+    maven { url 'https://jitpack.io' }
 }
 dependencies {
     compileOnly "com.github.MilkBowl:VaultAPI:1.7"
