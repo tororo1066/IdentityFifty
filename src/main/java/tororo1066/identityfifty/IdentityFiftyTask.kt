@@ -33,6 +33,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitTask
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Team
 import tororo1066.identityfifty.data.GeneratorData
@@ -77,13 +78,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         })
     }
 
-    fun allPlayerSound(loc: Location, sound: Sound, volume: Float, pitch: Float){
-        allPlayerAction {
-            val p = Bukkit.getPlayer(it)!!
-            p.playSound(loc,sound, volume, pitch)
-        }
-    }
-
     private fun taskLivingSurvivor(task: (Map.Entry<UUID,SurvivorData>)->Unit){
         IdentityFifty.survivors.forEach {
             if (it.value.getHealth() < 1)return@forEach
@@ -125,6 +119,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             runTask {
                 Bukkit.getEntity(it)?.remove()
             }
+            map.prisons.forEach {
+                it.value.inPlayer.clear()
+            }
         }
 
         map.escapeGenerators.forEach {
@@ -138,6 +135,11 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             runTask {
                 Bukkit.getEntity(it)?.remove()
             }
+        }
+
+        runTask {
+            hatchUUID?.let { Bukkit.getEntity(it)?.remove() }
+            hatchUUID = null
         }
 
         //サバイバーハンター両方のパッシブで走らせるタスク終了 現在はDasherが該当
@@ -235,6 +237,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     private var end = false
     //一撃死 全発電機発電後発動(60s)
     private var noOne = false
+
+    private var hatchUUID: UUID? = null
 
     val survivorTeam = scoreboard.registerNewTeam("Survivor")
     val hunterTeam = scoreboard.registerNewTeam("Hunter")
@@ -428,7 +432,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             generatorUUID.remove(e.entity.uniqueId)
             remainingGenerator--
             bossBar.setTitle("§d残り暗号機§f：§c§l${remainingGenerator}§f個")
-            bossBar.progress = remainingGenerator.toDouble() / map.generatorLimit.toDouble()
+            bossBar.progress = remainingGenerator.toDouble() / map.generatorGoal.toDouble()
             IdentityFifty.hunters.forEach {
                 it.value.hunterClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
                 it.value.talentClasses.values.forEach { clazz ->
@@ -441,6 +445,20 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 it.value.survivorClass.onFinishedGenerator(e.entity.location,remainingGenerator,p)
                 it.value.talentClasses.values.forEach { clazz ->
                     clazz.onFinishedGenerator(e.entity.location,remainingGenerator,p)
+                }
+            }
+            if (map.generatorGoal-remainingGenerator >= map.needSummonHatchGenerator && hatchUUID == null){
+                val random = map.hatches.entries.random()
+                map.world.spawn(random.value.location,ArmorStand::class.java) {
+                    hatchUUID = it.uniqueId
+                    it.isInvulnerable = true
+                    it.isInvisible = true
+                    it.setDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HEAD,EquipmentSlot.LEGS)
+                    it.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(18))
+                    if (survivorCount == 1){
+                        it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER,1)
+                        it.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19))
+                    }
                 }
             }
             if (remainingGenerator != 0)return@register
@@ -706,6 +724,44 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
                 },0,1)
             }
+
+            e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,1.5).forEach {
+                if (!it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER))return@forEach
+
+                val data = IdentityFifty.survivors[e.player.uniqueId]!!
+                data.hatchBossBar = Bukkit.createBossBar("§d逃走中...",BarColor.PURPLE,BarStyle.SOLID)
+                data.hatchBossBar.progress = 0.0
+                data.hatchBossBar.addPlayer(e.player)
+                var hatchProgress = data.hatchTick
+                val hatchTimeInitial = data.hatchTick
+
+                Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
+                    //場を離れたりシフト解除すると救助キャンセル
+                    if (!e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,1.5).contains(it) || !e.player.isSneaking){
+                        data.hatchBossBar.removeAll()
+                        task.cancel()
+                        return@Consumer
+                    } else {
+                        if (hatchProgress <= 0) {
+                            escapedSurvivor.add(e.player.uniqueId)
+                            survivorCount--
+                            data.setHealth(-1,true)
+                            e.player.gameMode = GameMode.SPECTATOR
+                            onlinePlayersAction { online ->
+                                online.playSound(online.location,Sound.ENTITY_FIREWORK_ROCKET_BLAST,1f,1f)
+                            }
+                            broadcast(IdentityFifty.prefix + translate("success_escape",e.player.name))
+                            end()
+                            task.cancel()
+                        }
+                        hatchProgress--
+                        //1.0 - (残り必要時間[tick] / 救助必要時間[tick])が1.0より小さかったらbossbarを更新する(バグ防ぎ)
+                        if (1.0 - (hatchProgress.toDouble() / hatchTimeInitial.toDouble()) < 1.0){
+                            data.hatchBossBar.progress = 1.0 - (hatchProgress.toDouble() / hatchTimeInitial.toDouble())
+                        }
+                    }
+                },0,1)
+            }
         }
 
         sEvent.register(PlayerJumpEvent::class.java) { e ->
@@ -801,7 +857,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
                     if (!e.player.isSneaking){
                         IdentityFifty.hunters.forEach { (uuid,_) ->
-                            (1..2).forEach {
+                            (1..2).forEach { _ ->
                                 Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
                                     Random.nextDouble(-0.2,0.2),0.2,
                                     Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.RED,Color.WHITE,1.2f))
@@ -1162,6 +1218,12 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                             end()
                             it.cancel()
                             return@Consumer
+                        }
+
+                        if (survivorCount == 1 && hatchUUID != null){
+                            val armorStand = Bukkit.getEntity(hatchUUID!!) as ArmorStand
+                            armorStand.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19))
+                            armorStand.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER,1)
                         }
 
                         runTask {

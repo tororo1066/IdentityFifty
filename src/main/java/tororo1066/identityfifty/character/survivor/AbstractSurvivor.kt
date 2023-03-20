@@ -5,6 +5,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitTask
+import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.sItem.SItem
@@ -59,5 +60,9 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
 
     public override fun clone(): AbstractSurvivor {
         return super.clone() as AbstractSurvivor
+    }
+
+    protected fun inPrison(p: Player): Boolean {
+        return IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == true
     }
 }

@@ -62,6 +62,13 @@ class MapData: Cloneable {
                 data.woodPlates[woodPlateData.loc] = woodPlateData
             }
 
+            config.getStringList("hatches").forEach {
+                val split = it.split(",")
+                val hatchData = HatchData()
+                hatchData.location = Location(data.world,split[0].toDouble(),split[1].toDouble(),split[2].toDouble())
+                data.hatches[hatchData.location] = hatchData
+            }
+
             return data
         }
     }
@@ -73,6 +80,7 @@ class MapData: Cloneable {
     var generatorLimit = 0
     var escapeGeneratorLimit = 0
     var generatorGoal = 0
+    var needSummonHatchGenerator = 0
     val survivorSpawnLocations = ArrayList<Location>()
     val hunterSpawnLocations = ArrayList<Location>()
     val generators = ArrayList<GeneratorData>()
@@ -80,6 +88,8 @@ class MapData: Cloneable {
     val goalRegions = ArrayList<String>()
     val prisons = HashMap<Location,PrisonData>()
     var woodPlates = HashMap<Location,WoodPlateData>()
+
+    var hatches = HashMap<Location,HatchData>()
 
     public override fun clone(): MapData {
         return super.clone() as MapData

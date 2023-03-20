@@ -2,8 +2,6 @@ package tororo1066.identityfifty.data
 
 import org.bukkit.Location
 
-class GeneratorData {
+class HatchData {
     lateinit var location: Location
-    lateinit var doorLocation: Location
-    var health = 0
 }

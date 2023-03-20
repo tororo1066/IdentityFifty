@@ -43,12 +43,11 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_5"))
 
         val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, _ ->
-            if (IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == true){
+            if (inPrison(p)){
                 return@setInteractEvent false
             }
 
             if (coffin != null){
-                coffinTask?.cancel()
                 coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
                 coffin = null
                 coffinUUID = null
@@ -110,6 +109,12 @@ class Coffin: AbstractSurvivor("coffin") {
             prisonData.value.inPlayer.remove(p.uniqueId)
             val playerData = IdentityFifty.survivors[p.uniqueId]!!
             playerData.setHealth(3, true)
+            playerData.survivorClass.onHelp(p,p)
+            playerData.survivorClass.onGotHelp(p,p)
+            playerData.talentClasses.values.forEach {
+                it.onHelp(p,p)
+                it.onGotHelp(p,p)
+            }
             p.teleport(coffin!!)
             p.playSound(p.location, Sound.BLOCK_ENDER_CHEST_OPEN, 2f, 0.5f)
 
@@ -156,7 +161,7 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_passive_lore_1"))
             .addLore(translate("coffin_passive_lore_2"))
 
-        val coffinSkill = SItem(Material.STICK).setDisplayName(translate("coffin_skill")).setCustomModelData(16)
+        val coffinSkill = SItem(Material.STICK).setDisplayName(translate("coffin_skill")).setCustomModelData(17)
             .addLore(translate("coffin_skill_lore_1"))
             .addLore(translate("coffin_skill_lore_2"))
             .addLore(translate("coffin_skill_lore_3"))

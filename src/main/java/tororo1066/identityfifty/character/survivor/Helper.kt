@@ -9,6 +9,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 import java.util.function.Consumer
@@ -29,12 +30,13 @@ class Helper : AbstractSurvivor("helper") {
             .addLore(translate("helper_protect_lore_3"))
 
         val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { _, _ ->
+            if (inPrison(p))return@setInteractEvent false
             val nearPlayer = p.location.getNearbyPlayers(8.0).firstOrNull {
                 IdentityFifty.identityFiftyTask?.aliveSurvivors()
                     ?.contains(it.uniqueId) == true && it.uniqueId != p.uniqueId
             }
             if (nearPlayer == null){
-                p.sendActionBar(Component.text(translate("helper_protect_cant_use")))
+                p.sendTranslateMsg("helper_protect_cant_use")
                 return@setInteractEvent false
             }
             noDamage = true

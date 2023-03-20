@@ -8,10 +8,7 @@ import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import tororo1066.identityfifty.IdentityFifty
-import tororo1066.identityfifty.data.GeneratorData
-import tororo1066.identityfifty.data.MapData
-import tororo1066.identityfifty.data.PrisonData
-import tororo1066.identityfifty.data.WoodPlateData
+import tororo1066.identityfifty.data.*
 import tororo1066.tororopluginapi.SInput
 import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
@@ -30,6 +27,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
     private val goalRegionsInv = LargeSInventory(IdentityFifty.plugin,"§a§lゴールエリアの設定")
     private val prisonsInv = LargeSInventory(IdentityFifty.plugin,"§a§l牢屋の設定")
     private val woodPlatesInv = LargeSInventory(IdentityFifty.plugin,"§a§l板の設定")
+    private val hatchesInv = LargeSInventory(IdentityFifty.plugin,"§a§lハッチの設定")
 
     companion object{
         val editNow = ArrayList<String>()
@@ -108,6 +106,14 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
 
         items.add(setEscapeGeneratorLimit)
 
+        val spawnHatchGenerator = createInputItem(SItem(Material.OAK_TRAPDOOR).setDisplayName("§aハッチを出現させるために壊す発電機の数設定").addLore("§a現在の値：§e${mapData.needSummonHatchGenerator}"),
+            PlusInt::class.java) { int, _ ->
+            mapData.needSummonHatchGenerator = int.get()
+            p.sendMessage("§aハッチを出現させるために壊す発電機の数を§d${int.get()}§aにしました")
+        }
+
+        items.add(spawnHatchGenerator)
+
         val setSurvivorSpawnLocations = SItem(Material.DIAMOND_BLOCK).setDisplayName("§aサバイバーのスポーン地点").toSInventoryItem().setCanClick(false).setClickEvent { e ->
             loadSurvivorSpawnLocations()
             moveChildInventory(survivorSpawnLocationsInv, e.whoClicked as Player)
@@ -156,6 +162,13 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         }
 
         items.add(setWoodPlates)
+
+        val setHatches = SItem(Material.IRON_TRAPDOOR).setDisplayName("§aハッチの設定").toSInventoryItem().setCanClick(false).setClickEvent { e ->
+            loadHatches()
+            moveChildInventory(hatchesInv, e.whoClicked as Player)
+        }
+
+        items.add(setHatches)
 
         val save = SItem(Material.LIME_STAINED_GLASS).setDisplayName("§a保存").toSInventoryItem().setCanClick(false).setClickEvent { e ->
             e.whoClicked.closeInventory()
@@ -401,6 +414,34 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         woodPlatesInv.renderInventory(woodPlatesInv.nowPage)
     }
 
+    private fun loadHatches(){
+
+        val items = ArrayList<SInventoryItem>()
+
+        mapData.hatches.forEach { data ->
+            val item = SItem(Material.REDSTONE_BLOCK).setDisplayName("§a情報")
+                .addLore("§b位置：${locToString(data.key)}")
+                .addLore("§cシフト左クリックで削除").toSInventoryItem().setCanClick(false).setClickEvent shift@{
+                if (it.click != ClickType.SHIFT_LEFT)return@shift
+                mapData.hatches.remove(data.key)
+                it.whoClicked.sendMessage("§a削除しました")
+                loadHatches()
+            }
+            items.add(item)
+        }
+        val item = SItem(Material.EMERALD_BLOCK).setDisplayName("§a§l+追加する")
+        val inputItem = createInputItem(item,Location::class.java,"§bハッチの位置を入力してください") { loc, p ->
+            val data = HatchData()
+            data.location = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
+            p.sendMessage("§a${loc.blockX} ${loc.blockY} ${loc.blockZ}を追加しました")
+            mapData.hatches[data.location] = data
+            loadHatches()
+        }
+        items.add(inputItem)
+        hatchesInv.setResourceItems(items)
+        hatchesInv.renderInventory(hatchesInv.nowPage)
+    }
+
     private fun save(): Boolean{
         val sConfig = SConfig(IdentityFifty.plugin)
         val config = sConfig.getConfig("map/${name}")?:return false
@@ -418,6 +459,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         config.set("goalRegionId",mapData.goalRegions)
         config.set("prisonLocations",mapData.prisons.values.stream().map { "${it.spawnLoc.blockX},${it.spawnLoc.blockY},${it.spawnLoc.blockZ},${it.escapeLoc.blockX},${it.escapeLoc.blockY},${it.escapeLoc.blockZ},${it.doorLoc.blockX},${it.doorLoc.blockY},${it.doorLoc.blockZ}" }.toList())
         config.set("woodPlates",mapData.woodPlates.values.stream().map { "${it.loc.blockX},${it.loc.blockY},${it.loc.blockZ},${it.length},${it.face.name}" }.toList())
+        config.set("hatches",mapData.hatches.values.stream().map { "${it.location.blockX},${it.location.blockY},${it.location.blockZ}" }.toList())
         sConfig.saveConfig(config,"map/${name}")
         IdentityFifty.maps[name] = mapData
         return true

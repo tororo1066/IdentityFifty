@@ -176,6 +176,8 @@ class IdentityCommand : SCommand("identity") {
             }
         })
 
+        addCommand(command().addArg(SCommandArg()))
+
         registerDebugCommand("identity.op")
 
     }
