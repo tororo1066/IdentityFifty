@@ -47,6 +47,10 @@ abstract class AbstractSurvivorTalent(val name: String, val unlockCost: Int, var
         return damage
     }
 
+    open fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean,Int> {
+        return Pair(true,damage)
+    }
+
     open fun onEnd(p: Player) {}
 
     companion object{
