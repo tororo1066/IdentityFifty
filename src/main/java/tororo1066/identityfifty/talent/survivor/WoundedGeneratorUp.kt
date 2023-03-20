@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.survivor
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 
-class WoundedGeneratorUp : AbstractSurvivorTalent("wounded_generator_up",1,RemainTimeUp::class.java) {
+class WoundedGeneratorUp : AbstractSurvivorTalent("wounded_generator_up",1,HelpSpeedUp::class.java) {
     override fun lore(): List<String> {
         return listOf()
     }

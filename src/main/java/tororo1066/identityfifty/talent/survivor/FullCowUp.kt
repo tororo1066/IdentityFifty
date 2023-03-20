@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.survivor
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 
-class FullCowUp : AbstractSurvivorTalent("full_cow_up",1,TalentPlane::class.java) {
+class FullCowUp : AbstractSurvivorTalent("full_cow_up",1,HatchLow::class.java) {
     override fun lore(): List<String> {
         return listOf()
     }

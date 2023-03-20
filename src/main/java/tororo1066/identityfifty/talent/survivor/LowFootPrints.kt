@@ -2,7 +2,7 @@ package tororo1066.identityfifty.talent.survivor
 
 import tororo1066.identityfifty.data.SurvivorData
 
-class LowFootPrints : AbstractSurvivorTalent("low_foot_prints",1,HealSpeedUp::class.java) {
+class LowFootPrints : AbstractSurvivorTalent("low_foot_prints",2,HatchLow::class.java) {
 
     override fun lore(): List<String> {
         return listOf("low_foot_prints_lore_1")

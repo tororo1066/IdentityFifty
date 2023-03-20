@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.survivor
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 
-class FullSheepUp :AbstractSurvivorTalent("full_sheep_up",1,TalentPlane::class.java) {
+class FullSheepUp :AbstractSurvivorTalent("full_sheep_up",1,HealSpeedUp::class.java) {
     override fun lore(): List<String> {
         return listOf()
     }

@@ -8,7 +8,7 @@ import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import java.util.function.Consumer
 
-class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",1,LowFootPrints::class.java) {
+class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",5,WoundedCowUp::class.java,) {
     override fun lore(): List<String> {
         return listOf("plate_speed_up_lore_1","plate_speed_up_lore_2")
     }

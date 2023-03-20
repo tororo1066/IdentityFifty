@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.survivor
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
-class HighHitPlate : AbstractSurvivorTalent("high_hit_plate",1,LowFootPrints::class.java) {
+class HighHitPlate : AbstractSurvivorTalent("high_hit_plate",2,GotHelpedSpeedUp::class.java) {
     override fun lore(): List<String> {
         return listOf("high_hit_plate_lore_1")
     }
