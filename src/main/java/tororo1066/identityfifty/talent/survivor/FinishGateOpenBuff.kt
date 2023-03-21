@@ -4,7 +4,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 
-class FinishGateOpenBuff :AbstractSurvivorTalent("finish_gate_open_buff",2,HelpSpeedUp::class.java) {
+class FinishGateOpenBuff :AbstractSurvivorTalent("finish_gate_open_buff",2,HatchLow::class.java) {
     override fun lore(): List<String> {
         return listOf("finish_gate_open_buff_lore_1")
     }
