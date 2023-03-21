@@ -12,14 +12,13 @@ import tororo1066.tororopluginapi.sItem.SItem
 class SkillTeleport: AbstractHunterTalent("skill_teleport",5,TalentPlane::class.java) {
 
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("skill_teleport_lore_1","skill_teleport_lore_2")
     }
 
     override fun onStart(p: Player) {
         val teleportSkill = SItem(Material.STICK).setDisplayName(translate("skill_teleport")).setCustomModelData(999)
             .addLore(translate("skill_teleport_lore_1"))
             .addLore(translate("skill_teleport_lore_2"))
-            .addLore(translate("skill_teleport_lore_3"))
 
         val teleportSkillItem = IdentityFifty.interactManager.createSInteractItem(teleportSkill,true).setInteractEvent { _, _ ->
             val task = IdentityFifty.identityFiftyTask?:return@setInteractEvent false

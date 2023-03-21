@@ -57,16 +57,16 @@ class TalentSQL: USQLTable("talent", SMySQL(IdentityFifty.plugin)){
         return talents
     }
 
-    fun insertSurvivorTalent(p: Player, presetName: String, talentList: List<AbstractSurvivorTalent>){
+    fun insertSurvivorTalent(p: Player, presetName: String, talentList: List<AbstractSurvivorTalent>): Boolean {
         val talentNameList = arrayListOf<String>()
         talentList.forEach { talentNameList.add(it.name) }
-        insert(p.uniqueId,p.name,presetName,"survivor",talentNameList.joinToString(","))
+        return insert(p.uniqueId,p.name,presetName,"survivor",talentNameList.joinToString(","))
     }
 
-    fun insertHunterTalent(p: Player, presetName: String, talentList: List<AbstractHunterTalent>){
+    fun insertHunterTalent(p: Player, presetName: String, talentList: List<AbstractHunterTalent>): Boolean {
         val talentNameList = arrayListOf<String>()
         talentList.forEach { talentNameList.add(it.name) }
-        insert(p.uniqueId,p.name,presetName,"hunter",talentNameList.joinToString(","))
+        return insert(p.uniqueId,p.name,presetName,"hunter",talentNameList.joinToString(","))
     }
 
     fun dumpTalentName(searchUUID: UUID, clazzType: String, presetName: String): Boolean {
@@ -77,8 +77,8 @@ class TalentSQL: USQLTable("talent", SMySQL(IdentityFifty.plugin)){
         return false
     }
 
-    fun removeTalent(searchUUID: UUID, clazzType: String, presetName: String){
-        delete(uuid.equal(searchUUID).and().equal(type,clazzType).and().equal(preset_name,presetName))
+    fun removeTalent(searchUUID: UUID, clazzType: String, presetName: String): Boolean {
+        return delete(uuid.equal(searchUUID).and().equal(type,clazzType).and().equal(preset_name,presetName))
     }
 
 }

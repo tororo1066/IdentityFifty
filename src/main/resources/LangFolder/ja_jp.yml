@@ -34,6 +34,8 @@ talent_remove: "§cシフト左で削除"
 
 # talent
 
+# survivor start
+
 talent_plane: "§f基盤"
 talent_plane_lore_1: "§7効果なし"
 heal_speed_up: "§f模索技法"
@@ -79,6 +81,18 @@ got_helped_speed_up_lore_1: "§7救助された時に2秒間移動速度が§540
 hit_plate_effect: "§f命の妨害"
 hit_plate_effect_lore_1: "§7板を当てたときにハンターを§55秒§7光らせ(全員から見れる)、§51秒間§7盲目を延ばす"
 
+# survivor end
+
+# hunter start
+
+skill_teleport: "§f細胞移動"
+skill_teleport_lore_1: "§7一番遠い暗号機にテレポートする"
+skill_teleport_lore_2: "§c§lクールタイム§f: §e§l80§b§l秒"
+skill_delay_generator: "§f破壊衝動"
+skill_delay_generator_lore_1: "§7発電機の体力を§5500§7増やす"
+skill_delay_generator_lore_2: "§c§lクールタイム§f: §e§l70§b§l秒"
+
+# hunter end
 
 # end
 
