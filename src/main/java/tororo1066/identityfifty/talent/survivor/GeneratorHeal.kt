@@ -8,7 +8,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class GeneratorHeal : AbstractSurvivorTalent("generator_heal",5,FullSheepUp::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("generator_heal_lore_1","generator_heal_lore_2")
     }
 
     var generator = true

@@ -5,7 +5,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class FullCowUp : AbstractSurvivorTalent("full_cow_up",1,HatchLow::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("full_cow_up_lore_1")
     }
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {

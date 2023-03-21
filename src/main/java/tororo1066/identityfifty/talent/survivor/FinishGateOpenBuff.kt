@@ -6,7 +6,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class FinishGateOpenBuff :AbstractSurvivorTalent("finish_gate_open_buff",2,HelpSpeedUp::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("finish_gate_open_buff_lore_1")
     }
 
     override fun onFinishedEscapeGenerator(dieLocation: Location, p: Player) {

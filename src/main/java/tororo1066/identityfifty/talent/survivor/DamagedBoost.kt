@@ -6,7 +6,7 @@ import org.bukkit.potion.PotionEffectType
 
 class DamagedBoost : AbstractSurvivorTalent("damaged_boost",2,LowFootPrints::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("damaged_boost_lore_1")
     }
 
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {

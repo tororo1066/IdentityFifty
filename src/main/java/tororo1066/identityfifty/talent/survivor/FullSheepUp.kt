@@ -5,7 +5,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class FullSheepUp :AbstractSurvivorTalent("full_sheep_up",1,HealSpeedUp::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("full_sheep_up_lore_1")
     }
 
     override fun sheepGeneratorModify(damage: Double, remainingGenerator: Int, maxHealth: Double, nowHealth: Double, p: Player): Double {

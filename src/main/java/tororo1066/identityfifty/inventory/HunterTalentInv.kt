@@ -159,7 +159,7 @@ class HunterTalentInv(val data: HunterData) {
                 Center().open(p)
             })
             setItems(listOf(45,46,47,48,50,51), glass())
-            setItems(listOf(24,26),roadGlass())
+            setItems(listOf(26),roadGlass())
 
             return true
         }
@@ -173,7 +173,7 @@ class HunterTalentInv(val data: HunterData) {
                 Center().open(p)
             })
             setItems(listOf(47,48,50,51,52,53), glass())
-            setItems(listOf(18,20),roadGlass())
+            setItems(listOf(18),roadGlass())
 
             return true
         }
@@ -183,27 +183,11 @@ class HunterTalentInv(val data: HunterData) {
         override fun renderMenu(p: Player): Boolean {
             super.renderMenu(p)
 
-            setItem(48,BannerItems.up().setClickEvent {
-                Up2().open(p)
-            })
             setItem(50,BannerItems.down().setClickEvent {
                 Center().open(p)
             })
             setItems(listOf(45,46,47,51,52,53), glass())
-            setItems(listOf(4,22,40),roadGlass())
-
-            return true
-        }
-    }
-
-    inner class Up2: AbstractHunterTalentInv() {
-        override fun renderMenu(p: Player): Boolean {
-            super.renderMenu(p)
-
-            setItem(50,BannerItems.down().setClickEvent {
-                Up().open(p)
-            })
-            setItems(listOf(45,46,47,48,51,52,53), glass())
+            setItems(listOf(22,40),roadGlass())
 
             return true
         }
@@ -216,24 +200,8 @@ class HunterTalentInv(val data: HunterData) {
             setItem(48,BannerItems.up().setClickEvent {
                 Center().open(p)
             })
-            setItem(50,BannerItems.down().setClickEvent {
-                Down2().open(p)
-            })
             setItems(listOf(45,46,47,51,52,53), glass())
-            setItems(listOf(4,22,40),roadGlass())
-
-            return true
-        }
-    }
-
-    inner class Down2: AbstractHunterTalentInv() {
-        override fun renderMenu(p: Player): Boolean {
-            super.renderMenu(p)
-
-            setItem(48,BannerItems.up().setClickEvent {
-                Down().open(p)
-            })
-            setItems(listOf(45,46,47,50,51,52,53), glass())
+            setItems(listOf(4,22),roadGlass())
 
             return true
         }

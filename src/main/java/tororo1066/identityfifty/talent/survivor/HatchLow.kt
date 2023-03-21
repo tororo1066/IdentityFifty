@@ -4,7 +4,7 @@ import tororo1066.identityfifty.data.SurvivorData
 
 class HatchLow : AbstractSurvivorTalent("hatch_low",1,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("hatch_low_lore_1")
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {

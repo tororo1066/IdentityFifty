@@ -10,7 +10,7 @@ import tororo1066.identityfifty.data.PrisonData
 
 class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glow",2,RemainTimeUp::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("jailed_other_survivor_glow_lore_1")
     }
 
     var glowtask:BukkitTask? = null

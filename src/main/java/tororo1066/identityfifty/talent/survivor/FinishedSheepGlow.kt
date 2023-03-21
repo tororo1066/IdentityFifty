@@ -9,7 +9,7 @@ import java.util.UUID
 
 class FinishedSheepGlow :AbstractSurvivorTalent("finished_sheep_glow",2,FinishGateOpenBuff::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("finished_sheep_glow_lore_1")
     }
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {

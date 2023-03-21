@@ -5,7 +5,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("help_heal_lore_1")
     }
 
     var healprivilege = true

@@ -8,7 +8,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class HitPlateEffect : AbstractSurvivorTalent("hit_plate_effect",2,HighHitPlate::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("hit_plate_effect_lore_1")
     }
 
     override fun onHitWoodPlate(hittedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int, Int> {
