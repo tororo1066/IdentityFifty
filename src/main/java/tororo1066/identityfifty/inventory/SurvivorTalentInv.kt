@@ -6,9 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
-import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
-import tororo1066.identityfifty.talent.survivor.HealSpeedUp
-import tororo1066.identityfifty.talent.survivor.TalentPlane
+import tororo1066.identityfifty.talent.survivor.*
 import tororo1066.tororopluginapi.SInput
 import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
@@ -145,11 +143,19 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(47,51), glass())
 
-            setItems(listOf(13,19,21,23,25,31),roadGlass())
+            setItems(listOf(5,7,8,11,13,19,21,23,25,31,33,36,37,39),roadGlass())
 
+            setItem(4,talentItem(HealSpeedUp()))
+            setItem(6,talentItem(LowFootPrints()))
             setItem(22,talentItem(TalentPlane()))
-            setItem(20,talentItem(HealSpeedUp()))
-
+            setItem(18,talentItem(WoundedCowUp()))
+            setItem(2,talentItem(RemainTimeUp()))
+            setItem(20,talentItem(GotHelpedSpeedUp()))
+            setItem(24,talentItem(HatchLow()))
+            setItem(42,talentItem(FinishGateOpenBuff()))
+            setItem(26,talentItem(FullCowUp()))
+            setItem(40,talentItem(HelpSpeedUp()))
+            setItem(38,talentItem(HighHitPlate()))
             return true
         }
     }
@@ -162,7 +168,9 @@ class SurvivorTalentInv(val data: SurvivorData) {
                 Center().open(p)
             })
             setItems(listOf(45,46,47,48,50,51), glass())
-            setItems(listOf(24,26),roadGlass())
+            setItems(listOf(26),roadGlass())
+            setItem(25,talentItem(PlateSpeedUp()))
+            setItem(44,talentItem(HitPlateEffect()))
 
             return true
         }
@@ -176,7 +184,9 @@ class SurvivorTalentInv(val data: SurvivorData) {
                 Center().open(p)
             })
             setItems(listOf(47,48,50,51,52,53), glass())
-            setItems(listOf(18,20),roadGlass())
+            setItems(listOf(18),roadGlass())
+            setItem(19,talentItem(GateOpenBoost()))
+            setItem(0,talentItem(DamagedBoost()))
 
             return true
         }
@@ -186,27 +196,14 @@ class SurvivorTalentInv(val data: SurvivorData) {
         override fun renderMenu(p: Player): Boolean {
             super.renderMenu(p)
 
-            setItem(48,BannerItems.up().setClickEvent {
-                Up2().open(p)
-            })
             setItem(50,BannerItems.down().setClickEvent {
                 Center().open(p)
             })
-            setItems(listOf(45,46,47,51,52,53), glass())
-            setItems(listOf(4,22,40),roadGlass())
-
-            return true
-        }
-    }
-
-    inner class Up2: AbstractSurvivorTalentInv() {
-        override fun renderMenu(p: Player): Boolean {
-            super.renderMenu(p)
-
-            setItem(50,BannerItems.down().setClickEvent {
-                Up().open(p)
-            })
             setItems(listOf(45,46,47,48,51,52,53), glass())
+            setItems(listOf(22,29,38,40),roadGlass())
+            setItem(20,talentItem(JailedOtherSurvivorGlow()))
+            setItem(31,talentItem(FullSheepUp()))
+            setItem(13,talentItem(GeneratorHeal()))
 
             return true
         }
@@ -219,24 +216,11 @@ class SurvivorTalentInv(val data: SurvivorData) {
             setItem(48,BannerItems.up().setClickEvent {
                 Center().open(p)
             })
-            setItem(50,BannerItems.down().setClickEvent {
-                Down2().open(p)
-            })
-            setItems(listOf(45,46,47,51,52,53), glass())
-            setItems(listOf(4,22,40),roadGlass())
-
-            return true
-        }
-    }
-
-    inner class Down2: AbstractSurvivorTalentInv() {
-        override fun renderMenu(p: Player): Boolean {
-            super.renderMenu(p)
-
-            setItem(48,BannerItems.up().setClickEvent {
-                Down().open(p)
-            })
             setItems(listOf(45,46,47,50,51,52,53), glass())
+            setItems(listOf(4,6,15,22),roadGlass())
+            setItem(24,talentItem(FinishedSheepGlow()))
+            setItem(13,talentItem(WoundedGeneratorUp()))
+            setItem(31,talentItem(HelpHeal()))
 
             return true
         }

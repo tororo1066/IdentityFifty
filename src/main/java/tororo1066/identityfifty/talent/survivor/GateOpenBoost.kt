@@ -7,7 +7,7 @@ import org.bukkit.potion.PotionEffectType
 
 class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5,FullCowUp::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("gate_open_boost_lore_1")
     }
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {

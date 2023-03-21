@@ -18,6 +18,7 @@ class MapData: Cloneable {
             data.generatorLimit = config.getInt("generatorLimit")
             data.generatorGoal = config.getInt("generatorGoal")
             data.escapeGeneratorLimit = config.getInt("escapeGeneratorLimit")
+            data.needSummonHatchGenerator = config.getInt("needSummonHatchGenerator")
             config.getStringList("survivorSpawnLocations").forEach {
                 val split = it.split(",")
                 data.survivorSpawnLocations.add(Location(data.world,split[0].toDouble(),split[1].toDouble(),split[2].toDouble()))

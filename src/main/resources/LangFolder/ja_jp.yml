@@ -77,7 +77,7 @@ hatch_low_lore_1: "§7ハッチからのの脱出時間が§50.9倍§7になる"
 got_helped_speed_up: "§f仇返し"
 got_helped_speed_up_lore_1: "§7救助された時に2秒間移動速度が§540%§7上がる"
 hit_plate_effect: "§f命の妨害"
-hit_plate_effect_lore_1: "§7板を当てたときにハンターを§55秒§7光らせ、§51秒間§7盲目を延ばす"
+hit_plate_effect_lore_1: "§7板を当てたときにハンターを§55秒§7光らせ(全員から見れる)、§51秒間§7盲目を延ばす"
 
 
 # end

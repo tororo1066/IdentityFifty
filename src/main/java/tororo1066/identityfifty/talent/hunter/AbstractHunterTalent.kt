@@ -25,6 +25,8 @@ abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val p
 
     open fun onFinishedEscapeGenerator(dieLocation: Location, p: Player) {}
 
+    open fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {}
+
     open fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {}
 
     open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}

@@ -452,6 +452,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         config.set("generatorGoal",mapData.generatorGoal)
         config.set("generatorLimit",mapData.generatorLimit)
         config.set("escapeGeneratorLimit",mapData.escapeGeneratorLimit)
+        config.set("needSummonHatchGenerator",mapData.needSummonHatchGenerator)
         config.set("survivorSpawnLocations",mapData.survivorSpawnLocations.stream().map { "${it.blockX},${it.blockY},${it.blockZ}" }.toList())
         config.set("hunterSpawnLocations",mapData.hunterSpawnLocations.stream().map { "${it.blockX},${it.blockY},${it.blockZ}" }.toList())
         config.set("generatorLocations",mapData.generators.stream().map { "${it.location.blockX},${it.location.blockY},${it.location.blockZ},${it.health}" }.toList())

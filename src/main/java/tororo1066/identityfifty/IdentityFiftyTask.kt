@@ -220,7 +220,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         IdentityFifty.identityFiftyTask = null
     }
 
-    private var remainingGenerator = map.generatorGoal
+    var remainingGenerator = map.generatorGoal
     private var worldGuard = SWorldGuardAPI()
     private val sbManager = Bukkit.getScoreboardManager()
     private val scoreboard = sbManager.newScoreboard
@@ -743,6 +743,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         return@Consumer
                     } else {
                         if (hatchProgress <= 0) {
+                            data.hatchBossBar.removeAll()
                             escapedSurvivor.add(e.player.uniqueId)
                             survivorCount--
                             data.setHealth(-1,true)
@@ -755,7 +756,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                             task.cancel()
                         }
                         hatchProgress--
-                        //1.0 - (残り必要時間[tick] / 救助必要時間[tick])が1.0より小さかったらbossbarを更新する(バグ防ぎ)
+                        //1.0 - (残り必要時間[tick] / 脱出必要時間[tick])が1.0より小さかったらbossbarを更新する(バグ防ぎ)
                         if (1.0 - (hatchProgress.toDouble() / hatchTimeInitial.toDouble()) < 1.0){
                             data.hatchBossBar.progress = 1.0 - (hatchProgress.toDouble() / hatchTimeInitial.toDouble())
                         }
@@ -910,7 +911,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                         data.talentClasses.values.forEach { clazz ->
                                             clazz.onWoodPlate(it.location,data.uuid.toPlayer()!!)
                                         }
-                                        it.location.getNearbyPlayers(2.5).forEach second@ { p ->
+                                        it.location.getNearbyPlayers(if (plateData.length * 0.5 > 2.0) 2.0 else plateData.length * 0.5).forEach second@ { p ->
                                             if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
                                             val hunterData = IdentityFifty.hunters[p.uniqueId]!!
                                             if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
@@ -989,7 +990,10 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     }
                     if (survivorData.getHealth() < damage) damage = survivorData.getHealth()
                     e.entity.world.playSound(e.entity.location,Sound.ENTITY_ELDER_GUARDIAN_CURSE,1f,2f)
-                    val onDamage = survivorData.survivorClass.onDamage(damage,survivorData.getHealth()-damage,e.damager as Player, e.entity as Player)
+                    var onDamage = survivorData.survivorClass.onDamage(damage,survivorData.getHealth()-damage,e.damager as Player, e.entity as Player)
+                    survivorData.talentClasses.values.forEach { clazz ->
+                        onDamage = clazz.onDamage(onDamage.second,survivorData.getHealth()-onDamage.second,e.damager as Player, e.entity as Player)
+                    }
                     if (onDamage.first){
                         IdentityFifty.stunEffect(e.damager as Player)
                     }

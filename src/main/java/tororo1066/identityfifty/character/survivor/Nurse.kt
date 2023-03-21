@@ -9,6 +9,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.toPlayer
 
 class Nurse : AbstractSurvivor("nurse") {
 
@@ -25,6 +26,13 @@ class Nurse : AbstractSurvivor("nurse") {
                 item.delete()
                 val data = IdentityFifty.survivors[p.uniqueId]!!
                 data.setHealth(data.getHealth() + 2)
+                IdentityFifty.hunters.values.forEach {
+                    val hunterP = it.uuid.toPlayer()?:return@forEach
+                    it.hunterClass.onSurvivorHeal(p,p,hunterP)
+                    it.talentClasses.values.forEach { clazz ->
+                        clazz.onSurvivorHeal(p,p,hunterP)
+                    }
+                }
                 p.world.playSound(p.location,Sound.ENTITY_PLAYER_LEVELUP,1f,1f)
                 return@setInteractEvent true
             }

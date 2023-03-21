@@ -115,6 +115,13 @@ class Coffin: AbstractSurvivor("coffin") {
                 it.onHelp(p,p)
                 it.onGotHelp(p,p)
             }
+            IdentityFifty.hunters.values.forEach {
+                val hunterP = it.uuid.toPlayer()?:return@forEach
+                it.hunterClass.onSurvivorHelp(p,p,hunterP)
+                it.talentClasses.values.forEach { clazz ->
+                    clazz.onSurvivorHelp(p,p,hunterP)
+                }
+            }
             p.teleport(coffin!!)
             p.playSound(p.location, Sound.BLOCK_ENDER_CHEST_OPEN, 2f, 0.5f)
 

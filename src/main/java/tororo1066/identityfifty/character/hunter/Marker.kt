@@ -97,6 +97,7 @@ class Marker: AbstractHunter("marker") {
     override fun onEnd(p: Player) {
         arrowTask?.cancel()
         arrowTask = null
+        bossbar?.removeAll()
         marks.forEach {
             it.value.second.cancel()
         }
