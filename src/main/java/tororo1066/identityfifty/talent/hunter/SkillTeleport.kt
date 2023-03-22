@@ -1,6 +1,8 @@
 package tororo1066.identityfifty.talent.hunter
 
 import org.bukkit.*
+import org.bukkit.Particle.DustOptions
+import org.bukkit.Particle.DustTransition
 import org.bukkit.entity.Cow
 import org.bukkit.entity.Player
 import org.bukkit.entity.Sheep
@@ -16,7 +18,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,TalentPlane::class.
     }
 
     override fun onStart(p: Player) {
-        val teleportSkill = SItem(Material.STICK).setDisplayName(translate("skill_teleport")).setCustomModelData(999)
+        val teleportSkill = SItem(Material.STICK).setDisplayName(translate("skill_teleport")).setCustomModelData(21)
             .addLore(translate("skill_teleport_lore_1"))
             .addLore(translate("skill_teleport_lore_2"))
 
@@ -39,7 +41,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,TalentPlane::class.
 
             if (distances.isEmpty()) return@setInteractEvent false
             val max = distances.maxByOrNull { it.first }?:return@setInteractEvent false
-            p.world.spawnParticle(Particle.REDSTONE,max.second,100,0.5,3.0,0.5)
+            p.world.spawnParticle(Particle.DUST_COLOR_TRANSITION,max.second,100,0.5,3.0,0.5,DustTransition(Color.RED,Color.RED,1f))
             p.world.playSound(max.second, Sound.ENTITY_ENDER_DRAGON_GROWL,1.2f,1f)
             p.playSound(p.location,Sound.ENTITY_ENDER_DRAGON_GROWL,1.2f,1f)
 

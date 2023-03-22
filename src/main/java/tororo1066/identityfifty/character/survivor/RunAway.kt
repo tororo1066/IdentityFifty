@@ -11,6 +11,8 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.talent.survivor.DamagedBoost
+import tororo1066.identityfifty.talent.survivor.GotHelpedSpeedUp
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -53,11 +55,21 @@ class RunAway : AbstractSurvivor("runaway") {
     }
 
     override fun onGotHelp(helper: Player, p: Player) {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
+        val data = IdentityFifty.survivors[p.uniqueId]!!
+        if (data.talentClasses.containsKey(GotHelpedSpeedUp::class.java)){
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,120,1))
+        } else {
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
+        }
     }
 
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
+        val data = IdentityFifty.survivors[p.uniqueId]!!
+        if (data.talentClasses.containsKey(DamagedBoost::class.java)){
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,140,1))
+        } else {
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
+        }
         return Pair(true,damage)
     }
 

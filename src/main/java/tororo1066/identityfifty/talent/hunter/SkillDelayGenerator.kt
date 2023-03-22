@@ -18,7 +18,7 @@ class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, Tale
     }
 
     override fun onStart(p: Player) {
-        val delayGeneratorSkill = SItem(Material.STICK).setDisplayName(translate("skill_delay_generator")).setCustomModelData(999)
+        val delayGeneratorSkill = SItem(Material.STICK).setDisplayName(translate("skill_delay_generator")).setCustomModelData(20)
             .addLore(translate("skill_delay_generator_lore_1"))
             .addLore(translate("skill_delay_generator_lore_2"))
 
@@ -28,7 +28,7 @@ class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, Tale
             if (!targetEntity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"),
                     PersistentDataType.INTEGER))return@setInteractEvent false
 
-            p.playSound(p.location, Sound.BLOCK_ANVIL_USE,1f,2f)
+            p.playSound(p.location, Sound.BLOCK_ANVIL_USE,0.8f,2f)
             targetEntity as Sheep
             if (targetEntity.health + 500 > targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
                 targetEntity.health = targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue

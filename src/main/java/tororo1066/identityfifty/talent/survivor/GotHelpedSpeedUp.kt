@@ -10,6 +10,6 @@ class GotHelpedSpeedUp : AbstractSurvivorTalent("got_helped_speed_up",1,TalentPl
     }
 
     override fun onGotHelp(helper: Player, p: Player) {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,40,1))
+        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,40,0))
     }
 }
