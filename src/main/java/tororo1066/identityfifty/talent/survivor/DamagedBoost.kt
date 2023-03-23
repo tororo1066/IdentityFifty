@@ -10,7 +10,7 @@ class DamagedBoost : AbstractSurvivorTalent("damaged_boost",2,LowFootPrints::cla
     }
 
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,40,1))
+        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,30,1))
         return Pair(true,damage)
     }
 }
