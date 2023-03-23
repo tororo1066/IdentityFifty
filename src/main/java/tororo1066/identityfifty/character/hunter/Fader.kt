@@ -108,6 +108,12 @@ class Fader: AbstractHunter("fader"){
         p.inventory.addItem(passiveItem)
 
         IdentityFifty.survivors.values.forEach {
+//            保留
+//            val cloneRules = it.heartProcessRules.toMutableList()
+//            cloneRules.forEachIndexed { index, pair ->
+//                it.heartProcessRules[index] = Pair(pair.first-2,pair.second*0.8)
+//
+//            }
             it.heartProcessRules = arrayListOf(Pair(23.0,0.1), Pair(17.0,0.2), Pair(12.0,0.3), Pair(8.0,0.4))
         }
     }

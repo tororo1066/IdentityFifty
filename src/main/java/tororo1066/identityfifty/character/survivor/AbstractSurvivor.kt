@@ -32,8 +32,8 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
 
     open fun onJail(prisonData: PrisonData, p: Player) {}
 
-    open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, p: Player): Pair<Int,Int> {
-        return Pair(140,160)
+    open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
+        return Pair(blindTime,slowTime)
     }
 
     open fun onHelp(helpedPlayer: Player, p: Player) {}

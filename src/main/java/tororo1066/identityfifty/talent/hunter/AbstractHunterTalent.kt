@@ -31,8 +31,8 @@ abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val p
 
     open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}
 
-    open fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, p: Player): Boolean {
-        return true
+    open fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
+        return Pair(blindTime, slowTime)
     }
 
     open fun onEnd(p: Player) {}

@@ -914,13 +914,14 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                         it.location.getNearbyPlayers(if (plateData.length * 0.5 > 2.0) 2.0 else plateData.length * 0.5).forEach second@ { p ->
                                             if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
                                             val hunterData = IdentityFifty.hunters[p.uniqueId]!!
-                                            if (!hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location, p))return@second
+                                            var hunterModify = hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location,140,160, p)
+                                            if (hunterModify.first <= 0 && hunterModify.second <= 0)return@second
                                             hunterData.talentClasses.values.forEach { clazz ->
-                                                if (!clazz.onDamagedWoodPlate(e.player, it.location, p))return@second
+                                                hunterModify = clazz.onDamagedWoodPlate(e.player, it.location, hunterModify.first, hunterModify.second, p)
                                             }
                                             map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
                                             map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
-                                            var modify = data.survivorClass.onHitWoodPlate(p, it.location, e.player)
+                                            var modify = data.survivorClass.onHitWoodPlate(p, it.location,hunterModify.first,hunterModify.second, e.player)
                                             data.talentClasses.values.forEach { clazz ->
                                                 modify = clazz.onHitWoodPlate(p, it.location,modify.first,modify.second,e.player)
                                             }

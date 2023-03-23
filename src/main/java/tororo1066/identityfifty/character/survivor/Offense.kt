@@ -100,8 +100,14 @@ class Offense : AbstractSurvivor("offense") {
         return data
     }
 
-    override fun onHitWoodPlate(hittedPlayer: Player, loc: Location, p: Player): Pair<Int, Int> {
-        return Pair(180,200)
+    override fun onHitWoodPlate(
+        hittedPlayer: Player,
+        loc: Location,
+        blindTime: Int,
+        slowTime: Int,
+        p: Player
+    ): Pair<Int, Int> {
+        return Pair(blindTime+20,slowTime+20)
     }
 
     override fun info(): ArrayList<ItemStack> {

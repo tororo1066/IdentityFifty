@@ -18,7 +18,7 @@ import tororo1066.tororopluginapi.sItem.SItem
 class SurvivorTalentInv(val data: SurvivorData) {
 
     abstract inner class AbstractSurvivorTalentInv: SInventory(IdentityFifty.plugin, translate("survivor_talent"),6) {
-        fun glass() = SInventoryItem(Material.ORANGE_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
+        fun glass() = SInventoryItem(Material.LIGHT_BLUE_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
         fun roadGlass() = SInventoryItem(Material.BLACK_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
         private fun costHead(p: Player) = createInputItem(SItem(Material.PLAYER_HEAD).setDisplayName(translate("cost_head",p.name))
             .addLore(translate("cost_head_point_lore",data.talentCost.toString()))

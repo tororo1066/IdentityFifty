@@ -1,6 +1,7 @@
 package tororo1066.identityfifty.commands
 
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
@@ -13,6 +14,8 @@ import tororo1066.tororopluginapi.sCommand.SCommand
 import tororo1066.tororopluginapi.sCommand.SCommandArg
 import tororo1066.tororopluginapi.sCommand.SCommandArgType
 import tororo1066.tororopluginapi.sCommand.SCommandObject
+import tororo1066.tororopluginapi.utils.toPlayer
+import java.util.UUID
 
 class IdentityCommand : SCommand("identity") {
 
@@ -176,10 +179,295 @@ class IdentityCommand : SCommand("identity") {
             }
         })
 
-        addCommand(command().addArg(SCommandArg()))
+        //debug
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("remainingTime"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_remaining_time", data.name, data.remainingTime.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("remainingTime"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.remainingTime = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_remaining_time", data.name, data.remainingTime.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("health"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_health", data.name, data.getHealth().toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("health"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                if (it.args[4].toInt() !in -1..5){
+                    it.sender.sendTranslateMsg("health_range_error")
+                    return@setNormalExecutor
+                }
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.setHealth(it.args[4].toInt(),true)
+                it.sender.sendTranslateMsg("set_health", data.name, data.getHealth().toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("helpTick"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_help_tick", data.name, data.helpTick.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("helpTick"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.helpTick = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_help_tick", data.name, data.helpTick.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("healTick"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_heal_tick", data.name, data.healTick.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("healTick"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.healTick = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_heal_tick", data.name, data.healTick.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("healProcess"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_heal_process", data.name, data.healProcess.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("healProcess"))
+            .addArg(SCommandArg(SCommandArgType.DOUBLE).addAlias("double"))
+            .setNormalExecutor {
+                if (it.args[4].toDouble() !in 0.0..1.0){
+                    it.sender.sendTranslateMsg("heal_process_range_error")
+                    return@setNormalExecutor
+                }
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.healProcess = it.args[4].toDouble()
+                it.sender.sendTranslateMsg("set_heal_process", data.name, data.healProcess.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHealDelay"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_other_player_heal_delay", data.name, data.otherPlayerHealDelay.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHealDelay"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.otherPlayerHealDelay = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_other_player_heal_delay", data.name, data.otherPlayerHealDelay.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHealDelayPercentage"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_other_player_heal_delay_percentage", data.name, data.otherPlayerHealDelayPercentage.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHealDelayPercentage"))
+            .addArg(SCommandArg(SCommandArgType.DOUBLE).addAlias("double"))
+            .setNormalExecutor {
+                if (it.args[4].toDouble() !in 0.0..1.0){
+                    it.sender.sendTranslateMsg("other_player_heal_delay_percentage_range_error")
+                    return@setNormalExecutor
+                }
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.otherPlayerHealDelayPercentage = it.args[4].toDouble()
+                it.sender.sendTranslateMsg("set_other_player_heal_delay_percentage", data.name, data.otherPlayerHealDelayPercentage.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHelpDelay"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_other_player_help_delay", data.name, data.otherPlayerHelpDelay.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHelpDelay"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.otherPlayerHelpDelay = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_other_player_help_delay", data.name, data.otherPlayerHelpDelay.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHelpDelayPercentage"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_other_player_help_delay_percentage", data.name, data.otherPlayerHelpDelayPercentage.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("otherPlayerHelpDelayPercentage"))
+            .addArg(SCommandArg(SCommandArgType.DOUBLE).addAlias("double"))
+            .setNormalExecutor {
+                if (it.args[4].toDouble() !in 0.0..1.0){
+                    it.sender.sendTranslateMsg("other_player_help_delay_percentage_range_error")
+                    return@setNormalExecutor
+                }
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.otherPlayerHelpDelayPercentage = it.args[4].toDouble()
+                it.sender.sendTranslateMsg("set_other_player_help_delay_percentage", data.name, data.otherPlayerHelpDelayPercentage.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("hatchTick"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_hatch_tick", data.name, data.hatchTick.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("hatchTick"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.hatchTick = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_hatch_tick", data.name, data.hatchTick.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("footprintsTime"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_footprints_time", data.name, data.footprintsTime.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("footprintsTime"))
+            .addArg(SCommandArg(SCommandArgType.DOUBLE).addAlias("double"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.footprintsTime = it.args[4].toPlusDouble(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_footprints_time", data.name, data.footprintsTime.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("survivorTalentCost"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_talent_cost", data.name, data.talentCost.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("survivorTalentCost"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.survivorDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.talentCost = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_talent_cost", data.name, data.talentCost.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("hunterTalentCost"))
+            .setNormalExecutor {
+                val data = it.sender.hunterDataCheck(it.args[2])?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("now_talent_cost", data.name, data.talentCost.toString())
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("hunterTalentCost"))
+            .addArg(SCommandArg(SCommandArgType.INT).addAlias("int"))
+            .setNormalExecutor {
+                val data = it.sender.hunterDataCheck(it.args[2])?:return@setNormalExecutor
+
+                data.talentCost = it.args[4].toPlusInt(it.sender)?:return@setNormalExecutor
+                it.sender.sendTranslateMsg("set_talent_cost", data.name, data.talentCost.toString())
+            })
 
         registerDebugCommand("identity.op")
 
+    }
+
+    private fun setDebug(): SCommandObject = debug().addArg(SCommandArg("set")).addArg(SCommandArg(SCommandArgType.ONLINE_PLAYER).addAlias(
+        translate("player_name")))
+    private fun debug(): SCommandObject = command().addNeedPermission("identity.op").addArg(SCommandArg("debug"))
+
+    private fun CommandSender.survivorDataCheck(uuid: UUID?): SurvivorData? {
+        val data = IdentityFifty.survivors[uuid]
+        if (data == null){
+            sendTranslateMsg("survivor_data_not_found")
+            return null
+        }
+        return data
+    }
+
+    private fun CommandSender.survivorDataCheck(name: String?): SurvivorData? {
+        return survivorDataCheck(name?.toPlayer()?.uniqueId)
+    }
+
+    private fun CommandSender.hunterDataCheck(uuid: UUID?): HunterData? {
+        val data = IdentityFifty.hunters[uuid]
+        if (data == null){
+            sendTranslateMsg("hunter_data_not_found")
+            return null
+        }
+        return data
+    }
+
+    private fun CommandSender.hunterDataCheck(name: String?): HunterData? {
+        return hunterDataCheck(name?.toPlayer()?.uniqueId)
+    }
+
+    private fun String.toPlusInt(commandSender: CommandSender): Int? {
+        val int = this.toIntOrNull()
+        if (int == null || int < 0){
+            commandSender.sendTranslateMsg("plus_int_error")
+            return null
+        }
+        return int
+    }
+
+    private fun String.toPlusDouble(commandSender: CommandSender): Double? {
+        val double = this.toDoubleOrNull()
+        if (double == null || double < 0){
+            commandSender.sendTranslateMsg("plus_double_error")
+            return null
+        }
+        return double
     }
 
 }
