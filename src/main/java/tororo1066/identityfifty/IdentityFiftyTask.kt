@@ -237,6 +237,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     private var end = false
     //一撃死 全発電機発電後発動(60s)
     private var noOne = false
+    var count = 60
 
     private var hatchUUID: UUID? = null
 
@@ -470,7 +471,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             broadcast("§e§lゲート付近の発電機が開かれた！")
 
             noOne = true
-            var count = 60
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
                 count--
                 if (count <= 0){
@@ -790,6 +790,13 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     }
                 }
                 e.isDropItems = false
+                val data = IdentityFifty.hunters[e.player.uniqueId]!!
+                if (!data.disableSwingSlow){
+                    data.disableSwingSlow = true
+                    Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                        data.disableSwingSlow = false
+                    },20)
+                }
             }
         }
 
@@ -1092,6 +1099,10 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     if (e.clickedBlock!!.blockData is Door){
                         return@register
                     }
+                }
+                val data = IdentityFifty.hunters[e.player.uniqueId]!!
+                if (data.disableSwingSlow){
+                    return@register
                 }
                 if (e.player.getTargetEntity(4)?.type == EntityType.PLAYER)return@register
                 e.player.playSound(e.player.location,Sound.ENTITY_PLAYER_ATTACK_SWEEP,1f,1f)

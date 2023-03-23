@@ -7,4 +7,5 @@ class HunterData : PlayerData() {
     lateinit var hunterClass: AbstractHunter
     val talentClasses = HashMap<Class<out AbstractHunterTalent>,AbstractHunterTalent>()
     var talentCost = 10
+    var disableSwingSlow = false
 }

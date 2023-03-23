@@ -27,15 +27,23 @@ class Dasher : AbstractHunter("dasher") {
             return@setInteractEvent true
         }.setInitialCoolDown(800)
 
+        var viewing = false
+
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             val specPlayer = p.getTargetEntity(100)
             if (specPlayer != null){
                 if (IdentityFifty.survivors.containsKey(specPlayer.uniqueId)){
-                    p.walkSpeed = 0.29f
+                    if (!viewing){
+                        p.walkSpeed += 0.01f
+                        viewing = true
+                    }
                     return@Runnable
                 }
             }
-            p.walkSpeed = 0.28f
+            if (viewing){
+                p.walkSpeed -= 0.01f
+                viewing = false
+            }
         },0,2))
 
         p.inventory.addItem(passiveItem)
