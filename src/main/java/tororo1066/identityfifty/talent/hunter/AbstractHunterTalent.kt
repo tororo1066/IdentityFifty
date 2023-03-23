@@ -35,6 +35,9 @@ abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val p
         return Pair(blindTime, slowTime)
     }
 
+
+
+
     open fun onEnd(p: Player) {}
 
     companion object{
