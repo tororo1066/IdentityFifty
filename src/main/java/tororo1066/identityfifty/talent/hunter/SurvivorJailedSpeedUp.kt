@@ -1,12 +1,9 @@
 package tororo1066.identityfifty.talent.hunter
 
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitTask
-import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
 
-class SurvivorJailedSpeedUp :AbstractHunterTalent("survivor_jailed_speed_up",1,TalentPlane::class.java) {
+class SurvivorJailedSpeedUp: AbstractHunterTalent("survivor_jailed_speed_up",1,TalentPlane::class.java) {
     override fun lore(): List<String> {
         return listOf()
     }

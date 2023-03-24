@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.hunter
 import org.bukkit.Location
 import org.bukkit.entity.Player
 
-class LowHitPlate :AbstractHunterTalent("low_hit_plate",1,TalentPlane::class.java) {
+class LowHitPlate: AbstractHunterTalent("low_hit_plate",1,TalentPlane::class.java) {
     override fun lore(): List<String> {
         return listOf()
     }

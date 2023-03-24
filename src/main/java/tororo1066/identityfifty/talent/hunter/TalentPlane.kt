@@ -6,5 +6,4 @@ class TalentPlane: AbstractHunterTalent("talent_plane",0) {
         return listOf()
     }
 
-
 }

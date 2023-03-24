@@ -1,12 +1,10 @@
 package tororo1066.identityfifty.talent.hunter
 
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
-import java.util.*
 
-class HelpGlow : AbstractHunterTalent("help_glow",5,TalentPlane::class.java) {
+class HelpGlow: AbstractHunterTalent("help_glow",5,TalentPlane::class.java) {
     override fun lore(): List<String> {
         return listOf()
     }
