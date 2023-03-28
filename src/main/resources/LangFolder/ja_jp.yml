@@ -126,6 +126,7 @@ skill_teleport_lore_2: "§c§lクールタイム§f: §e§l80§b§l秒"
 skill_delay_generator: "§f破壊衝動"
 skill_delay_generator_lore_1: "§7指定した羊型発電機の体力を§5450§7回復させる"
 skill_delay_generator_lore_2: "§c§lクールタイム§f: §e§l80§b§l秒"
+detect_radius_player: "近くにプレイヤーの気配を感じる...!!"
 
 # hunter end
 
