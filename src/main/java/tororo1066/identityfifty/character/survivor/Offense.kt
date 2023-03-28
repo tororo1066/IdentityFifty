@@ -86,7 +86,7 @@ class Offense : AbstractSurvivor("offense") {
                 IdentityFifty.util.runTask {
                     p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, actionTime, 10))
                 }
-                item.setInteractCoolDown(actionTime*10 + 100)
+                item.setInteractCoolDown(actionTime*12 + 100)
             })
             return@setInteractEvent true
         }.setInitialCoolDown(100000)

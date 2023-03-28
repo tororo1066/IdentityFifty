@@ -66,7 +66,7 @@ class RunAway : AbstractSurvivor("runaway") {
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
         val data = IdentityFifty.survivors[p.uniqueId]!!
         if (data.talentClasses.containsKey(DamagedBoost::class.java)){
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,140,1))
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,130,1))
         } else {
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
         }

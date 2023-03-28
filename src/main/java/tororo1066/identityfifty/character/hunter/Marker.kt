@@ -70,6 +70,7 @@ class Marker: AbstractHunter("marker") {
             if (!IdentityFifty.survivors.containsKey(e.entity.uniqueId))return@register
             if (e.damager !is Arrow)return@register
             if (!e.damager.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"marker"),PersistentDataType.INTEGER))return@register
+            if (e.entity !is Player)return@register
             update(e.entity.uniqueId, (marks[e.entity.uniqueId]?.first?:0) + 5)
             e.damage = 0.0
         }

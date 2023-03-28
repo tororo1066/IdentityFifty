@@ -432,7 +432,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
             generatorUUID.remove(e.entity.uniqueId)
             remainingGenerator--
-            bossBar.setTitle("§d残り暗号機§f：§c§l${remainingGenerator}§f個")
+            bossBar.setTitle("§d残り発電機§f：§c§l${remainingGenerator}§f個")
             bossBar.progress = remainingGenerator.toDouble() / map.generatorGoal.toDouble()
             IdentityFifty.hunters.forEach {
                 it.value.hunterClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
@@ -829,6 +829,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         val helperData = IdentityFifty.survivors[data.lastPressUUID]!!
                         val helperPlayer = Bukkit.getPlayer(helperData.uuid)!!
 
+                        playerData.setHealth(3,true)
+
                         helperData.survivorClass.onHelp(e.player,helperPlayer)
                         helperData.talentClasses.values.forEach { clazz ->
                             clazz.onHelp(e.player,helperPlayer)
@@ -847,8 +849,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                 clazz.onSurvivorHelp(helperPlayer,e.player,p)
                             }
                         }
-
-                        playerData.setHealth(3,true)
                     }
                 }
             }
@@ -963,6 +963,12 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 end()
                 return@register
             }
+
+            if (survivorCount == 1 && hatchUUID != null){
+                val armorStand = Bukkit.getEntity(hatchUUID!!) as ArmorStand
+                armorStand.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19))
+                armorStand.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER,1)
+            }
         }
 
         sEvent.register(EntityDamageEvent::class.java) { e ->
@@ -1063,7 +1069,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 val maxHealth = sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
                 survivorData.talentClasses.values.forEach { clazz ->
-                    e.damage = clazz.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
+                    e.damage = clazz.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p)
                 }
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     sheep.noDamageTicks = 0
@@ -1077,7 +1083,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 var multiply = 1 - (survivors * 0.2)
                 if (multiply < 0.3) multiply = 0.3
                 val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
-                e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
+                e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage,maxHealth,cow.health,p)
                 survivorData.talentClasses.values.forEach { clazz ->
                     e.damage = clazz.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
                 }

@@ -136,9 +136,9 @@ class Coffin: AbstractSurvivor("coffin") {
                 it.key.toPlayer()?.sendTranslateMsg("coffin_helped")
             }
 
-            item.setInteractCoolDown(2000)
+            item.setInteractCoolDown(1800)
 
-        }.setInitialCoolDown(2000)
+        }.setInitialCoolDown(1800)
 
         p.inventory.addItem(passiveItem,coffinSkillItem)
     }
@@ -151,7 +151,7 @@ class Coffin: AbstractSurvivor("coffin") {
 
     override fun onJail(prisonData: PrisonData, p: Player) {
         val data = IdentityFifty.survivors[p.uniqueId]!!
-        data.remainingTime -= 25
+        data.remainingTime -= 20
     }
 
     override fun onEnd(p: Player) {
