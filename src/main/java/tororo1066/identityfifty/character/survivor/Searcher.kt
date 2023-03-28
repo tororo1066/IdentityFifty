@@ -12,6 +12,7 @@ import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.toPlayer
 
 class Searcher : AbstractSurvivor("searcher") {
     override fun onStart(p: Player) {
@@ -19,6 +20,7 @@ class Searcher : AbstractSurvivor("searcher") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("searcher_passive_lore_1"))
             .addLore(translate("searcher_passive_lore_2"))
+            .addLore(translate("searcher_passive_lore_3"))
 
         p.inventory.addItem(passiveItem)
 
@@ -44,6 +46,16 @@ class Searcher : AbstractSurvivor("searcher") {
 
         p.inventory.addItem(searchSkill)
 
+        tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            val players = p.location.getNearbyPlayers(15.0)
+                .filter { it != p && IdentityFifty.hunters.containsKey(it.uniqueId)}
+            players.forEach {
+                val data = IdentityFifty.hunters[it.uniqueId]?:return@forEach
+                data.glowManager.glow(IdentityFifty.survivors.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList(),GlowAPI.Color.RED,8)
+            }
+
+        },5,5))
+
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {
@@ -57,6 +69,7 @@ class Searcher : AbstractSurvivor("searcher") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("searcher_passive_lore_1"))
             .addLore(translate("searcher_passive_lore_2"))
+            .addLore(translate("searcher_passive_lore_3"))
 
         val searchSkillItem = SItem(Material.STICK).setDisplayName(translate("search_lens")).setCustomModelData(5)
             .addLore(translate("search_lens_lore_1"))

@@ -39,6 +39,7 @@ import org.bukkit.scoreboard.Team
 import tororo1066.identityfifty.data.GeneratorData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.otherPlugin.SWorldGuardAPI
@@ -932,7 +933,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                             data.talentClasses.values.forEach { clazz ->
                                                 modify = clazz.onHitWoodPlate(p, it.location,modify.first,modify.second,e.player)
                                             }
-                                            IdentityFifty.stunEffect(p,modify.first,modify.second)
+                                            IdentityFifty.stunEffect(p,modify.first,modify.second,StunState.WOODPLATE)
                                         }
                                         woodPlateUUID.remove(it.uniqueId)
                                         it.remove()
@@ -1019,6 +1020,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         val prisons = map.prisons.filter { it.value.inPlayer.size == 0 }.entries.shuffled()
                         if (prisons.isNotEmpty()){
                             val data = prisons[0]
+                            survivorData.healProcess = 0.0
                             survivorData.survivorClass.onJail(data.value,e.entity as Player)
                             survivorData.talentClasses.values.forEach {
                                 it.onJail(data.value,e.entity as Player)

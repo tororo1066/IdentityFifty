@@ -3,6 +3,7 @@ package tororo1066.identityfifty.commands
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
@@ -137,6 +138,19 @@ class IdentityCommand : SCommand("identity") {
                 it.sender.sendMessage("§e${data.value.name} §d???")
             }
         })
+
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist"))
+            .addArg(SCommandArg(SCommandArgType.ONLINE_PLAYER).addAlias("プレイヤー名"))
+            .setPlayerExecutor {
+                val p = Bukkit.getPlayer(it.args[1])!!
+                if (IdentityFifty.survivors.containsKey(p.uniqueId)) {
+                    it.sender.sendMessage("§e${p.name} §d${translate(IdentityFifty.survivors[p.uniqueId]!!.survivorClass.name)}")
+                } else if (IdentityFifty.hunters.containsKey(p.uniqueId)) {
+                    it.sender.sendMessage("§e${p.name} §d${translate(IdentityFifty.hunters[p.uniqueId]!!.hunterClass.name)}")
+                } else {
+                    it.sender.sendMessage("§c${p.name}はゲームに参加していません")
+                }
+            })
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist")).addArg(SCommandArg("all")).setPlayerExecutor {
             it.sender.sendMessage("§b${translate("survivor")}")

@@ -5,6 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
+import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
 
 abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val parent: Class<out AbstractHunterTalent>? = null) {
@@ -35,7 +36,9 @@ abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val p
         return Pair(blindTime, slowTime)
     }
 
-
+    open fun onStun(blindTime: Int, slowTime: Int, state: StunState, p: Player): Pair<Int,Int> {
+        return Pair(blindTime, slowTime)
+    }
 
 
     open fun onEnd(p: Player) {}

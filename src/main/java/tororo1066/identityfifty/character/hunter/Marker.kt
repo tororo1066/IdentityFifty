@@ -122,6 +122,8 @@ class Marker: AbstractHunter("marker") {
         data.glowManager.glow(players,GlowAPI.Color.RED,140)
         p.sendTranslateMsg("healed_survivor")
         p.playSound(p.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
+        healedPlayer.sendTranslateMsg("marker_heal_view")
+        healedPlayer.playSound(healedPlayer.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
     }
 
 

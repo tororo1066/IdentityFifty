@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
+import tororo1066.identityfifty.enumClass.StunState
 
 abstract class AbstractHunter(val name: String): Cloneable {
 
@@ -30,6 +31,10 @@ abstract class AbstractHunter(val name: String): Cloneable {
     open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}
 
     open fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
+        return Pair(blindTime, slowTime)
+    }
+
+    open fun onStun(blindTime: Int, slowTime: Int, state: StunState, p: Player): Pair<Int,Int> {
         return Pair(blindTime, slowTime)
     }
 

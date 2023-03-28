@@ -8,22 +8,14 @@ import tororo1066.identityfifty.IdentityFifty
 
 class GeneratorHeal : AbstractSurvivorTalent("generator_heal",5,FullSheepUp::class.java) {
     override fun lore(): List<String> {
-        return listOf("generator_heal_lore_1","generator_heal_lore_2")
+        return listOf("generator_heal_lore_1")
     }
 
-    var generator = true
-
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
-        if (generator) {
-            dieLocation.getNearbyPlayers(5.0).filter {it == p}.forEach{
-                val data = IdentityFifty.survivors[p.uniqueId]!!
-                data.setHealth(data.getHealth() + 1)
-                p.playSound(p.location, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f)
-            }
-            generator = false
-            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-                generator = true
-            },1200)
+        dieLocation.getNearbyPlayers(5.0).filter {it == p}.forEach{
+            val data = IdentityFifty.survivors[p.uniqueId]!!
+            data.setHealth(data.getHealth() + 1)
+            p.playSound(p.location, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f)
         }
     }
 }

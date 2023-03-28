@@ -9,7 +9,6 @@ import org.bukkit.Particle
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.character.hunter.*
@@ -18,12 +17,12 @@ import tororo1066.identityfifty.commands.IdentityCommand
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.identityfifty.talent.TalentSQL
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
-import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SInteractItemManager
 import java.io.File
 import java.net.InetSocketAddress
@@ -68,12 +67,20 @@ class IdentityFifty : SJavaPlugin() {
 
         /** スタンのエフェクト(デフォルトの時間) **/
         fun stunEffect(p: Player){
-            stunEffect(p,140,160)
+            stunEffect(p,140,160,StunState.DAMAGED)
         }
 
         /** スタンのエフェクト(時間指定) **/
-        fun stunEffect(p: Player, blindTime: Int, slowTime: Int){
+        fun stunEffect(p: Player, blindTime: Int, slowTime: Int, state: StunState){
             p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),50)
+            val data = hunters[p.uniqueId]
+            var stunTime = Pair(blindTime,slowTime)
+            if (data != null){
+                stunTime = data.hunterClass.onStun(stunTime.first, stunTime.second, state, p)
+                data.talentClasses.values.forEach { clazz ->
+                    stunTime = clazz.onStun(stunTime.first, stunTime.second, state, p)
+                }
+            }
             Bukkit.getScheduler().runTask(plugin, Runnable {
                 p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,blindTime,3,true,false,false))
                 p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,slowTime,200,true,false,false))
