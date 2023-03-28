@@ -1114,9 +1114,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
                 if (e.player.getTargetEntity(4)?.type == EntityType.PLAYER)return@register
                 e.player.playSound(e.player.location,Sound.ENTITY_PLAYER_ATTACK_SWEEP,1f,1f)
-                e.player.addPotionEffect(PotionEffect(PotionEffectType.SLOW,20,5,false,false,true))
-                e.player.addPotionEffect(PotionEffect(PotionEffectType.SLOW_DIGGING,20,5,false,false,true))
-                e.player.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,20,5,false,false,true))
+                IdentityFifty.stunEffect(e.player, 0, 20, StunState.AIRSWING)
             }
         }
 
