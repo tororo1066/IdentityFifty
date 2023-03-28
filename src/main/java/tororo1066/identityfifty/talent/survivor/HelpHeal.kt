@@ -8,14 +8,14 @@ class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.j
         return listOf("help_heal_lore_1")
     }
 
-    var healprivilege = true
+    var healPrivilegeCount = 2
 
     override fun onHelp(helpedPlayer: Player, p: Player) {
-        if (healprivilege){
+        if (healPrivilegeCount > 0){
             val data = IdentityFifty.survivors[helpedPlayer.uniqueId]!!
             data.setHealth(data.getHealth() + 1)
 
-            healprivilege = false
+            healPrivilegeCount--
         }
 
     }
