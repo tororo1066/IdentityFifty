@@ -18,4 +18,8 @@ class SurvivorJailedSpeedUp: AbstractHunterTalent("survivor_jailed_speed_up",1,T
         p.walkSpeed -= 0.009f
     }
 
+    override fun onSurvivorDie(survivor: Player, playerNumber: Int, p: Player) {
+        p.walkSpeed -= 0.009f
+    }
+
 }

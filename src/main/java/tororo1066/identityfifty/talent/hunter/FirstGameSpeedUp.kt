@@ -8,8 +8,13 @@ class FirstGameSpeedUp : AbstractHunterTalent("first_game_speed_up",1,TalentPlan
         return listOf()
     }
 
+    override fun onStart(p: Player) {
+        p.walkSpeed += 0.008f
+    }
+
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
-        val speedBuff = 0.0018f * remainingGenerator
+        p.walkSpeed -= 0.008f
+        val speedBuff = 0.008f / (6 - remainingGenerator)
         p.walkSpeed += speedBuff
     }
 }
