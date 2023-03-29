@@ -11,7 +11,7 @@ class RemainTimeDown: AbstractHunterTalent("remain_time_down",2,TalentPlane::cla
 
     override fun onStart(p: Player) {
         IdentityFifty.survivors.forEach { (_, data)->
-            data.remainingTime -= 20
+            data.remainingTime -= 10
         }
     }
 }

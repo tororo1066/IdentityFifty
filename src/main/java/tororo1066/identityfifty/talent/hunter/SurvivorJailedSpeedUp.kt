@@ -11,11 +11,11 @@ class SurvivorJailedSpeedUp: AbstractHunterTalent("survivor_jailed_speed_up",1,T
 
 
     override fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {
-        p.walkSpeed += 0.005f
+        p.walkSpeed += 0.009f
     }
 
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
-        p.walkSpeed -= 0.005f
+        p.walkSpeed -= 0.009f
     }
 
 }
