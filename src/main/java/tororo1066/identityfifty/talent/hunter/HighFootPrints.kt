@@ -10,7 +10,7 @@ class HighFootPrints: AbstractHunterTalent("high_foot_prints",2,TalentPlane::cla
 
     override fun onStart(p: Player) {
         IdentityFifty.survivors.forEach { (_,data) ->
-            data.footprintsTime *= 1.20
+            data.footprintsTime *= 1.2
         }
     }
 }

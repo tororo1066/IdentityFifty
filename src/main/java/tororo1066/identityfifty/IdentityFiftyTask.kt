@@ -1267,6 +1267,14 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                             survivor.talentClasses.values.forEach { clazz ->
                                 clazz.onDie(p)
                             }
+
+                            IdentityFifty.hunters.forEach { (uuid, data) ->
+                                val hunter = Bukkit.getPlayer(uuid)?:return@forEach
+                                data.hunterClass.onSurvivorDie(p,survivorCount,hunter)
+                                data.talentClasses.values.forEach { clazz ->
+                                    clazz.onSurvivorDie(p,survivorCount,hunter)
+                                }
+                            }
                         }
 
 

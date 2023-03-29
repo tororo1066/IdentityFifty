@@ -11,8 +11,8 @@ class AirSwingDown : AbstractHunterTalent("air_swing_down",1,TalentPlane::class.
     override fun onStun(blindTime: Int, slowTime: Int, state: StunState, p: Player): Pair<Int, Int> {
         if (state == StunState.AIRSWING){
             return Pair(blindTime,slowTime - 2)
-        } else {
-            return Pair(blindTime,slowTime)
         }
+
+        return super.onStun(blindTime, slowTime, state, p)
     }
 }

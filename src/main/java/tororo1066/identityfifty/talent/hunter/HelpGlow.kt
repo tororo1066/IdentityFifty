@@ -11,6 +11,6 @@ class HelpGlow: AbstractHunterTalent("help_glow",5,TalentPlane::class.java) {
 
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
         val data = IdentityFifty.survivors[gotHelpPlayer.uniqueId]?:return
-            data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,200)
+        data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,200)
     }
 }

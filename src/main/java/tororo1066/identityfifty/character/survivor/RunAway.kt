@@ -11,6 +11,7 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.identityfifty.talent.survivor.DamagedBoost
 import tororo1066.identityfifty.talent.survivor.GotHelpedSpeedUp
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
@@ -36,7 +37,7 @@ class RunAway : AbstractSurvivor("runaway") {
             p.playSound(p.location, Sound.ENTITY_COW_DEATH,1f,1f)
             entities.forEach {
                 if (!IdentityFifty.hunters.containsKey(it.uniqueId))return@forEach
-                IdentityFifty.stunEffect(it,0,20)
+                IdentityFifty.stunEffect(it,0,20,StunState.OTHER)
                 it.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,140,3,false,false,true))
                 it.sendTranslateMsg("camouflage_hit_hunter")
                 p.sendTranslateMsg("camouflage_hit_survivor",it.name)

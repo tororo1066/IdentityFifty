@@ -10,7 +10,7 @@ class EndGameSpeedUp :AbstractHunterTalent ("end_game_speed_up",1,TalentPlane::c
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
         val generator = remainingGenerator + 1
-        val speedBuff = 0.009f / generator
-        p.walkSpeed += generator
+        val speedBuff = 0.008f / generator
+        p.walkSpeed += speedBuff
     }
 }

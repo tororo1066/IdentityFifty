@@ -126,11 +126,11 @@ skill_teleport_lore_2: "§c§lクールタイム§f: §e§l80§b§l秒"
 skill_delay_generator: "§f破壊衝動"
 skill_delay_generator_lore_1: "§7指定した羊型発電機の体力を§5450§7回復させる"
 skill_delay_generator_lore_2: "§c§lクールタイム§f: §e§l80§b§l秒"
-detect_radius_player: "近くにプレイヤーの気配を感じる...!!"
-finish_gate_buff: "カーニバル"
-finish_gate_buff_lore_1: "牛型発電機が発電され終わったときに60秒自身にあらゆる効果が付与される"
-survivor_healed_stop: "古傷"
-survivor_healed_lore_1: "治療されたサバイバーを2秒間盲目にし3秒間動けなくさせる"
+detect_radius_player: "§c近くにプレイヤーの気配を感じる...!!"
+finish_gate_buff: "§fカーニバル"
+finish_gate_buff_lore_1: "§7牛型発電機が発電され終わったときに§560秒§7自身にあらゆる効果が付与される"
+survivor_healed_stop: "§f古傷"
+survivor_healed_lore_1: "§7治療されたサバイバーを§52秒間§7盲目にし§53秒間§7動けなくさせる"
 
 # hunter end
 

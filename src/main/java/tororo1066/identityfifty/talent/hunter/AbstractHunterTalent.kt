@@ -30,6 +30,8 @@ abstract class AbstractHunterTalent(val name: String, val unlockCost: Int, val p
 
     open fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {}
 
+    open fun onSurvivorDie(survivor: Player, playerNumber: Int, p: Player) {}
+
     open fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {}
 
     open fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
