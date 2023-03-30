@@ -7,7 +7,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class PlateGlow: AbstractHunterTalent("plate_glow",2,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("plate_glow_lore_1")
     }
 
 

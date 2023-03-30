@@ -5,7 +5,7 @@ import tororo1066.identityfifty.enumClass.StunState
 
 class StunTimeDown : AbstractHunterTalent("stun_time_down",1,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("stun_time_down_lore_1")
     }
 
     override fun onStun(blindTime: Int, slowTime: Int, state: StunState, p: Player): Pair<Int, Int> {

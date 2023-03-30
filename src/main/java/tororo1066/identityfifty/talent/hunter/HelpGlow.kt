@@ -6,7 +6,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class HelpGlow: AbstractHunterTalent("help_glow",5,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("help_glow_lore_1")
     }
 
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {

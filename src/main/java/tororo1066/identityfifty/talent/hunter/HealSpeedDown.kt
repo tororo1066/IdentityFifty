@@ -5,7 +5,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class HealSpeedDown: AbstractHunterTalent("heal_speed_down",1,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("heal_speed_down_lore_1")
     }
 
     override fun onStart(p: Player) {

@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 
 class LowHitPlate: AbstractHunterTalent("low_hit_plate",1,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("low_hit_plate_lore_1")
     }
 
     override fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int, Int> {

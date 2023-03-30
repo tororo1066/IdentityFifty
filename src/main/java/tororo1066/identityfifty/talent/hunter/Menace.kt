@@ -7,9 +7,9 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 
 class Menace : AbstractHunterTalent("menace",2,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("menace_lore_1","menace_lore_2")
     }
-    var menace = true
+    private var menace = true
 
     override fun onStart(p: Player) {
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {

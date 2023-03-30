@@ -8,7 +8,7 @@ import tororo1066.tororopluginapi.utils.toPlayer
 
 class StartGlow : AbstractHunterTalent("start_glow",2,GateOpenHunterBuff::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("start_glow_lore_1")
     }
 
     override fun onStart(p: Player) {

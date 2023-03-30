@@ -5,7 +5,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class NoOneUp: AbstractHunterTalent("no_one_up",5,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("no_one_up_lore_1")
     }
 
     override fun onStart(p: Player) {

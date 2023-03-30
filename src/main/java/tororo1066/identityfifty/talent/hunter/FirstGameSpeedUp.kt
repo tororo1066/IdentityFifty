@@ -6,7 +6,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class FirstGameSpeedUp : AbstractHunterTalent("first_game_speed_up",1,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("first_game_speed_up_lore_1")
     }
 
     private var preventWalkSpeed = 0f

@@ -7,7 +7,7 @@ import org.bukkit.potion.PotionEffectType
 
 class GateOpenHunterBuff : AbstractHunterTalent("gate_open_hunter_buff",2,TalentPlane::class.java) {
     override fun lore(): List<String> {
-        return listOf()
+        return listOf("gate_open_hunter_buff_lore_1")
     }
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
