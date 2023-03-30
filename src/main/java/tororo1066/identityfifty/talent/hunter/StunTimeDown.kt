@@ -9,6 +9,9 @@ class StunTimeDown : AbstractHunterTalent("stun_time_down",1,TalentPlane::class.
     }
 
     override fun onStun(blindTime: Int, slowTime: Int, state: StunState, p: Player): Pair<Int, Int> {
-        return Pair(blindTime - 10, slowTime - 10)
+        if (state == StunState.DAMAGED){
+            return Pair(blindTime - 10, slowTime - 10)
+        }
+        return super.onStun(blindTime, slowTime, state, p)
     }
 }

@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.tororopluginapi.utils.toPlayer
 
 class StartGlow : AbstractHunterTalent("start_glow",2,GateOpenHunterBuff::class.java) {
     override fun lore(): List<String> {
@@ -11,9 +12,8 @@ class StartGlow : AbstractHunterTalent("start_glow",2,GateOpenHunterBuff::class.
     }
 
     override fun onStart(p: Player) {
-        IdentityFifty.survivors.forEach { (uuid , data) ->
-            Bukkit.getPlayer(uuid)?:return@forEach
-            data.glowManager.glow(mutableListOf(p), GlowAPI.Color.RED,80)
-        }
+        val random = IdentityFifty.survivors.entries.random()
+        random.key.toPlayer()?:return
+        random.value.glowManager.glow(mutableListOf(p), GlowAPI.Color.RED,80)
     }
 }
