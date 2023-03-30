@@ -11,7 +11,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 
-class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, TalentPlane::class.java) {
+class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, EndGameSpeedUp::class.java) {
 
     override fun lore(): List<String> {
         return listOf("skill_delay_generator_lore_1","skill_delay_generator_lore_2")

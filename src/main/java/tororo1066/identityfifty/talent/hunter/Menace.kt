@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 
-class Menace : AbstractHunterTalent("menace",2,TalentPlane::class.java) {
+class Menace : AbstractHunterTalent("menace",2,HighFootPrints::class.java) {
     override fun lore(): List<String> {
         return listOf("menace_lore_1","menace_lore_2")
     }

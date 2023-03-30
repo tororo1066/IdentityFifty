@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-class FinishGateBuff :AbstractHunterTalent("finish_gate_buff",2,TalentPlane::class.java) {
+class FinishGateBuff :AbstractHunterTalent("finish_gate_buff",2,AirSwingDown::class.java) {
     override fun lore(): List<String> {
         return listOf("finish_gate_buff_lore_1")
     }

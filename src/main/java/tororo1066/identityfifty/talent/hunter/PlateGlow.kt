@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 
-class PlateGlow: AbstractHunterTalent("plate_glow",2,TalentPlane::class.java) {
+class PlateGlow: AbstractHunterTalent("plate_glow",2,HelpSpeedDown::class.java) {
     override fun lore(): List<String> {
         return listOf("plate_glow_lore_1")
     }

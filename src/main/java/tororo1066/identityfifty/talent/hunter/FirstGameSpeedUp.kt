@@ -4,7 +4,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 
-class FirstGameSpeedUp : AbstractHunterTalent("first_game_speed_up",1,TalentPlane::class.java) {
+class FirstGameSpeedUp : AbstractHunterTalent("first_game_speed_up",1,AirSwingDown::class.java) {
     override fun lore(): List<String> {
         return listOf("first_game_speed_up_lore_1")
     }

@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.hunter
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.data.PrisonData
 
-class SurvivorJailedSpeedUp: AbstractHunterTalent("survivor_jailed_speed_up",1,TalentPlane::class.java) {
+class SurvivorJailedSpeedUp: AbstractHunterTalent("survivor_jailed_speed_up",1,HelpSpeedDown::class.java) {
     override fun lore(): List<String> {
         return listOf("survivor_jailed_speed_up_lore_1")
     }

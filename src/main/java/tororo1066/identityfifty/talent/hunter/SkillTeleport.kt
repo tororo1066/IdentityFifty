@@ -11,7 +11,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 
-class SkillTeleport: AbstractHunterTalent("skill_teleport",5,TalentPlane::class.java) {
+class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::class.java) {
 
     override fun lore(): List<String> {
         return listOf("skill_teleport_lore_1","skill_teleport_lore_2")

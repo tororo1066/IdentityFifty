@@ -6,7 +6,7 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.utils.toPlayer
 
-class StartGlow : AbstractHunterTalent("start_glow",2,GateOpenHunterBuff::class.java) {
+class StartGlow : AbstractHunterTalent("start_glow",2,PlateGlow::class.java) {
     override fun lore(): List<String> {
         return listOf("start_glow_lore_1")
     }

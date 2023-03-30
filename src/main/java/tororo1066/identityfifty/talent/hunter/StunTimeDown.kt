@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.hunter
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.enumClass.StunState
 
-class StunTimeDown : AbstractHunterTalent("stun_time_down",1,TalentPlane::class.java) {
+class StunTimeDown : AbstractHunterTalent("stun_time_down",1,HealSpeedDown::class.java) {
     override fun lore(): List<String> {
         return listOf("stun_time_down_lore_1")
     }

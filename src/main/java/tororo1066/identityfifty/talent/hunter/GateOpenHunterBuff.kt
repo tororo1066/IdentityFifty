@@ -5,7 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-class GateOpenHunterBuff : AbstractHunterTalent("gate_open_hunter_buff",2,TalentPlane::class.java) {
+class GateOpenHunterBuff : AbstractHunterTalent("gate_open_hunter_buff",2,FinishGateBuff::class.java) {
     override fun lore(): List<String> {
         return listOf("gate_open_hunter_buff_lore_1")
     }
