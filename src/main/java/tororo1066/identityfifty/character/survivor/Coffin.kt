@@ -145,7 +145,7 @@ class Coffin: AbstractSurvivor("coffin") {
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
-        data.healTick = 160
+        data.healTick = 180
         return data
     }
 

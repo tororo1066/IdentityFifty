@@ -12,6 +12,7 @@ helped_survivor: "§c{0}が救助された！"
 # debug command
 player_name: "プレイヤー名"
 survivor_data_not_found: "§cサバイバーのデータが見つかりませんでした"
+hunter_data_not_found: "§cハンターのデータが見つかりませんでした"
 plus_int_error: "§c0以上の整数を入力してください"
 plus_double_error: "§c0.0以上の実数を入力してください"
 now_remaining_time: "§d{0}の死ぬまでの時間§7: §a{1}"
@@ -172,7 +173,8 @@ survivor_jailed_speed_up_lore_1: "§7サバイバーが捕まっている人数�
 # talent end
 
 nurse: "医師"
-nurse_passive_lore_1: "§f§l治療意欲.§e他人を治療する時間が10秒から5秒になる"
+nurse_passive_lore_1: "§f§l治療意欲.§e他人を治療する時間が12秒から5秒になる"
+nurse_passive_lore_2: "§f§l医療知識.§e小さいダメージを回復できる"
 syringe: "§a自己修復剤"
 syringe_lore: "§e自分を回復できる"
 
@@ -296,7 +298,7 @@ marker_heal_view: "§c回復によってハンターに位置が見られた..."
 
 coffin: "納棺師"
 coffin_passive_lore_1: "§f§l死の仕事.§e捕まった時にいきなり死ぬまでの時間が20減る"
-coffin_passive_lore_2: "§f§l命の管理職.§e他人を治療する時間が10秒から8秒になる"
+coffin_passive_lore_2: "§f§l命の管理職.§e他人を治療する時間が12秒から9秒になる"
 coffin_skill: "§5棺桶"
 coffin_skill_lore_1: "§e足元に誰からでも見られる棺桶を置く"
 coffin_skill_lore_2: "§e捕まっているときに棺桶を捨てるとそこにテレポートする"

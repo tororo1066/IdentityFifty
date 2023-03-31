@@ -17,6 +17,7 @@ class Nurse : AbstractSurvivor("nurse") {
         super.onStart(p)
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("nurse_passive_lore_1"))
+            .addLore(translate("nurse_passive_lore_2"))
         p.inventory.addItem(passiveItem)
         val healItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore"))
@@ -43,12 +44,14 @@ class Nurse : AbstractSurvivor("nurse") {
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
         data.healTick = 100
+        data.healSmallHealth = true
         return data
     }
 
     override fun info(): ArrayList<ItemStack> {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("nurse_passive_lore_1"))
+            .addLore(translate("nurse_passive_lore_2"))
         val healItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore"))
         val healItem2 = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)

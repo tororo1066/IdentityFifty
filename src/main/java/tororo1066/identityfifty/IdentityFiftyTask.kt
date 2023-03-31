@@ -642,8 +642,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
                 val playerData = IdentityFifty.survivors[it.uniqueId]!!
 
-                //ヘルスがマックスなら処理をしない
-                if (playerData.getHealth() == 5){
+                //ヘルスが4以上なら特定のキャラ以外処理をしない
+                if (playerData.getHealth() >= 4 && !helperData.healSmallHealth){
                     return@forEach
                 }
 
@@ -713,7 +713,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
 
                     healTime = allPlayerHealTick / healPlayers //回復合計時間 / 回復人数
-                    healTime = (healTime / (1 + (0.5 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.5 * (回復人数 - 1)))
+                    healTime = (healTime / (1 + (0.3 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.5 * (回復人数 - 1)))
                     healTime += playerData.otherPlayerHealDelay
                     healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt()
 
