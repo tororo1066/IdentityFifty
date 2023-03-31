@@ -144,7 +144,7 @@ heal_speed_down_lore_1: "§7サバイバーの回復時間が§51.05倍§7にな
 help_glow: "§f復讐の目"
 help_glow_lore_1: "§7サバイバーが救助された時にそのサバイバーを§510秒間§7光らせる"
 help_glow_lore_2: "§7発光したサバイバーには通知がされる"
-help_glow_inform_to_survivor: "$cハンターに狙われている...!!"
+help_glow_inform_to_survivor: "§cハンターに狙われている...!!"
 help_speed_down: "§f愚行傍観"
 help_speed_down_lore_1: "§7サバイバーの救助時間が§51.05倍§7になる"
 high_foot_prints: "§f達観"
