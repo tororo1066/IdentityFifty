@@ -19,6 +19,7 @@ import tororo1066.tororopluginapi.sCommand.SCommandArgType
 import tororo1066.tororopluginapi.sCommand.SCommandObject
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
+import kotlin.math.cos
 
 class IdentityCommand : SCommand("identity") {
 
@@ -38,20 +39,24 @@ class IdentityCommand : SCommand("identity") {
         return data
     }
 
-    private fun saveSurvivorTalents(data: SurvivorData): List<AbstractSurvivorTalent> {
+    private fun saveSurvivorTalents(data: SurvivorData): Pair<List<AbstractSurvivorTalent>,Int> {
         val talents = mutableListOf<AbstractSurvivorTalent>()
+        var cost = 0
         data.talentClasses.forEach {
             talents.add(it.value)
+            cost += it.value.unlockCost
         }
-        return talents
+        return Pair(talents,cost)
     }
 
-    private fun saveHunterTalents(data: HunterData): List<AbstractHunterTalent> {
+    private fun saveHunterTalents(data: HunterData): Pair<List<AbstractHunterTalent>,Int> {
         val talents = mutableListOf<AbstractHunterTalent>()
+        var cost = 0
         data.talentClasses.forEach {
             talents.add(it.value)
+            cost += it.value.unlockCost
         }
-        return talents
+        return Pair(talents,cost)
     }
 
     init {
@@ -66,9 +71,10 @@ class IdentityCommand : SCommand("identity") {
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!.clone()
                 val data = createSurvivorData(it.sender)
                 abstractSurvivor.parameters(data)
-                saveTalents?.forEach { clazz ->
+                saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz
                 }
+                saveTalents?.second?.let { it1 -> data.talentCost -= it1 }
                 IdentityFifty.survivors[it.sender.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_character", translate(abstractSurvivor.name))
@@ -84,9 +90,10 @@ class IdentityCommand : SCommand("identity") {
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[3]]!!.clone()
                 val data = createSurvivorData(p)
                 abstractSurvivor.parameters(data)
-                saveTalents?.forEach { clazz ->
+                saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz
                 }
+                saveTalents?.second?.let { it1 -> data.talentCost -= it1 }
                 IdentityFifty.survivors[p.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_other_character", p.name, translate(abstractSurvivor.name))
@@ -103,9 +110,10 @@ class IdentityCommand : SCommand("identity") {
                 val abstractHunter = IdentityFifty.huntersData[it.args[1]]!!.clone()
                 val data = createHunterData(it.sender)
                 abstractHunter.parameters(data)
-                saveTalents?.forEach { clazz ->
+                saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz
                 }
+                saveTalents?.second?.let { it1 -> data.talentCost -= it1 }
                 IdentityFifty.hunters[it.sender.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_character", translate(abstractHunter.name))
@@ -121,9 +129,10 @@ class IdentityCommand : SCommand("identity") {
                 val abstractHunter = IdentityFifty.huntersData[it.args[3]]!!.clone()
                 val data = createHunterData(p)
                 abstractHunter.parameters(data)
-                saveTalents?.forEach { clazz ->
+                saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz
                 }
+                saveTalents?.second?.let { it1 -> data.talentCost -= it1 }
                 IdentityFifty.hunters[p.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_other_character", p.name, translate(abstractHunter.name))
