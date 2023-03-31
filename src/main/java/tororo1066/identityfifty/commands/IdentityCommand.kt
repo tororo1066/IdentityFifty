@@ -9,6 +9,8 @@ import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.*
 import tororo1066.identityfifty.inventory.*
+import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
+import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sCommand.SCommand
@@ -36,6 +38,22 @@ class IdentityCommand : SCommand("identity") {
         return data
     }
 
+    private fun saveSurvivorTalents(data: SurvivorData): List<AbstractSurvivorTalent> {
+        val talents = mutableListOf<AbstractSurvivorTalent>()
+        data.talentClasses.forEach {
+            talents.add(it.value)
+        }
+        return talents
+    }
+
+    private fun saveHunterTalents(data: HunterData): List<AbstractHunterTalent> {
+        val talents = mutableListOf<AbstractHunterTalent>()
+        data.talentClasses.forEach {
+            talents.add(it.value)
+        }
+        return talents
+    }
+
     init {
         registerSLangCommand(IdentityFifty.plugin,"identity.op")
 
@@ -44,9 +62,13 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.hunters.containsKey(it.sender.uniqueId)) {
                     IdentityFifty.hunters.remove(it.sender.uniqueId)
                 }
+                val saveTalents = IdentityFifty.survivors[it.sender.uniqueId]?.let { it1 -> saveSurvivorTalents(it1) }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!.clone()
                 val data = createSurvivorData(it.sender)
                 abstractSurvivor.parameters(data)
+                saveTalents?.forEach { clazz ->
+                    data.talentClasses[clazz.javaClass] = clazz
+                }
                 IdentityFifty.survivors[it.sender.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_character", translate(abstractSurvivor.name))
@@ -58,9 +80,13 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.hunters.containsKey(p.uniqueId)) {
                     IdentityFifty.hunters.remove(p.uniqueId)
                 }
+                val saveTalents = IdentityFifty.survivors[p.uniqueId]?.let { it1 -> saveSurvivorTalents(it1) }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[3]]!!.clone()
                 val data = createSurvivorData(p)
                 abstractSurvivor.parameters(data)
+                saveTalents?.forEach { clazz ->
+                    data.talentClasses[clazz.javaClass] = clazz
+                }
                 IdentityFifty.survivors[p.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_other_character", p.name, translate(abstractSurvivor.name))
@@ -73,9 +99,13 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.survivors.containsKey(it.sender.uniqueId)) {
                     IdentityFifty.survivors.remove(it.sender.uniqueId)
                 }
+                val saveTalents = IdentityFifty.hunters[it.sender.uniqueId]?.let { it1 -> saveHunterTalents(it1) }
                 val abstractHunter = IdentityFifty.huntersData[it.args[1]]!!.clone()
                 val data = createHunterData(it.sender)
                 abstractHunter.parameters(data)
+                saveTalents?.forEach { clazz ->
+                    data.talentClasses[clazz.javaClass] = clazz
+                }
                 IdentityFifty.hunters[it.sender.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_character", translate(abstractHunter.name))
@@ -87,9 +117,13 @@ class IdentityCommand : SCommand("identity") {
                 if (IdentityFifty.survivors.containsKey(p.uniqueId)) {
                     IdentityFifty.survivors.remove(p.uniqueId)
                 }
+                val saveTalents = IdentityFifty.hunters[p.uniqueId]?.let { it1 -> saveHunterTalents(it1) }
                 val abstractHunter = IdentityFifty.huntersData[it.args[3]]!!.clone()
                 val data = createHunterData(p)
                 abstractHunter.parameters(data)
+                saveTalents?.forEach { clazz ->
+                    data.talentClasses[clazz.javaClass] = clazz
+                }
                 IdentityFifty.hunters[p.uniqueId] = data
 
                 it.sender.sendTranslateMsg("select_other_character", p.name, translate(abstractHunter.name))

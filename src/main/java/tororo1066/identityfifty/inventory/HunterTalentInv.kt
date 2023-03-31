@@ -6,8 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
-import tororo1066.identityfifty.data.SurvivorData
-import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
+import tororo1066.identityfifty.talent.hunter.*
 import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -20,8 +19,7 @@ class HunterTalentInv(val data: HunterData) {
     abstract inner class AbstractHunterTalentInv: SInventory(IdentityFifty.plugin,translate("hunter_talent"),6) {
         fun glass() = SInventoryItem(Material.ORANGE_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
         fun roadGlass() = SInventoryItem(Material.BLACK_STAINED_GLASS_PANE).setDisplayName(" ").setCanClick(false)
-        private fun costHead(p: Player) = createInputItem(
-            SItem(Material.PLAYER_HEAD).setDisplayName(translate("cost_head",p.name))
+        private fun costHead(p: Player) = createInputItem(SItem(Material.PLAYER_HEAD).setDisplayName(translate("cost_head",p.name))
             .addLore(translate("cost_head_point_lore",data.talentCost.toString()))
             .addLore(translate("cost_head_preset_lore"))
             .addLore(translate("cost_head_create_preset_lore"))
@@ -50,7 +48,7 @@ class HunterTalentInv(val data: HunterData) {
                             .addLore(translate("talent_remove")).setCanClick(false).setClickEvent second@ { e ->
                                 if (e.click == ClickType.LEFT){
                                     val costs = pair.second.sumOf { sum -> sum.unlockCost }
-                                    val defaultCosts = SurvivorData().talentCost
+                                    val defaultCosts = HunterData().talentCost
                                     if (defaultCosts < costs){
                                         p.sendTranslateMsg("not_enough_talent_point")
                                         return@second
@@ -81,7 +79,7 @@ class HunterTalentInv(val data: HunterData) {
         fun talentItem(talent: AbstractHunterTalent): SInventoryItem {
             return SInventoryItem(if (data.talentClasses.containsKey(talent.javaClass)) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE)
                 .setDisplayName(translate(talent.name))
-                .setLore(listOf("§f§l${talent.lore().map { translate(it) }}"))
+                .addLore(talent.lore().map { translate(it) })
                 .addLore(" ", if (data.talentClasses.containsKey(talent.javaClass)) translate("unlocked") else translate("locked"),
                     translate("need_point",talent.unlockCost.toString()))
                 .setCanClick(false)
@@ -144,8 +142,19 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(47,51), glass())
 
-            setItems(listOf(13,19,21,23,25,31),roadGlass())
+            setItems(listOf(5,7,8,11,13,19,21,23,25,31,33,36,37,39),roadGlass())
 
+            setItem(4,talentItem(HelpSpeedDown()))
+            setItem(6,talentItem(PlateGlow()))
+            setItem(22,talentItem(TalentPlane()))
+            setItem(18,talentItem(EndGameSpeedUp()))
+            setItem(2,talentItem(RemainTimeDown()))
+            setItem(20,talentItem(LowHitPlate()))
+            setItem(24,talentItem(AirSwingDown()))
+            setItem(42,talentItem(FinishGateBuff()))
+            setItem(26,talentItem(FirstGameSpeedUp()))
+            setItem(40,talentItem(HealSpeedDown()))
+            setItem(38,talentItem(HighFootPrints()))
 
             return true
         }
@@ -160,7 +169,8 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(45,46,47,48,50,51), glass())
             setItems(listOf(26),roadGlass())
-
+            setItem(25,talentItem(SkillDelayGenerator()))
+            setItem(44,talentItem(Menace()))
             return true
         }
     }
@@ -174,7 +184,8 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(47,48,50,51,52,53), glass())
             setItems(listOf(18),roadGlass())
-
+            setItem(19,talentItem(SkillTeleport()))
+            setItem(0,talentItem(StartGlow()))
             return true
         }
     }
@@ -186,9 +197,11 @@ class HunterTalentInv(val data: HunterData) {
             setItem(50,BannerItems.down().setClickEvent {
                 Center().open(p)
             })
-            setItems(listOf(45,46,47,51,52,53), glass())
-            setItems(listOf(22,40),roadGlass())
-
+            setItems(listOf(45,46,47,48,51,52,53), glass())
+            setItems(listOf(22,29,38,40),roadGlass())
+            setItem(20,talentItem(SurvivorHealedStop()))
+            setItem(31,talentItem(SurvivorJailedSpeedUp()))
+            setItem(13,talentItem(HelpGlow()))
             return true
         }
     }
@@ -200,9 +213,11 @@ class HunterTalentInv(val data: HunterData) {
             setItem(48,BannerItems.up().setClickEvent {
                 Center().open(p)
             })
-            setItems(listOf(45,46,47,51,52,53), glass())
-            setItems(listOf(4,22),roadGlass())
-
+            setItems(listOf(45,46,47,50,51,52,53), glass())
+            setItems(listOf(4,6,15,22),roadGlass())
+            setItem(24,talentItem(GateOpenHunterBuff()))
+            setItem(13,talentItem(StunTimeDown()))
+            setItem(31,talentItem(NoOneUp()))
             return true
         }
     }

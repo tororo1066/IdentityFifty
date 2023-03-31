@@ -15,7 +15,7 @@ class Menace : AbstractHunterTalent("menace",2,HighFootPrints::class.java) {
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             val radiusPlayer = p.location.getNearbyPlayers(25.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
             if(menace && radiusPlayer.isNotEmpty()){
-                p.sendTranslateMsg("detect_radius_player")
+                p.sendTranslateMsg("menace_detect_radius_player")
                 menace = false
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     menace = true

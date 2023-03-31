@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.SDebug
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -54,7 +55,7 @@ class Offense : AbstractSurvivor("offense") {
                             it.sendTranslateMsg("rugby_ball_hit_hunter")
                             p.playSound(p.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
                             p.sendTranslateMsg("rugby_ball_hit",it.name)
-                            IdentityFifty.stunEffect(it, (actionTime*5-20), (actionTime*5))
+                            IdentityFifty.stunEffect(it, (actionTime*5-20), (actionTime*5), StunState.OTHER)
                         }
                         break
                     }
