@@ -24,7 +24,7 @@ class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glo
             }
             IdentityFifty.survivors.forEach { (uuid, data) ->
                 Bukkit.getPlayer(uuid)?:return@forEach
-                data.glowManager.glow(players,GlowAPI.Color.RED,100)
+                data.glowManager.glow(players,GlowAPI.Color.BLUE,100)
             }
         },0,5)
     }
