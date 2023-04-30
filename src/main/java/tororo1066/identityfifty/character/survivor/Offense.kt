@@ -43,7 +43,7 @@ class Offense : AbstractSurvivor("offense") {
                     var players: List<Player> = listOf()
                     lock = true
                     IdentityFifty.util.runTask {
-                        players = p.location.getNearbyPlayers(1.5).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
+                        players = p.location.getNearbyPlayers(1.0).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
                         lock = false
                     }
                     while (lock){

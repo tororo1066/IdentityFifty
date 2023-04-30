@@ -71,7 +71,9 @@ class Marker: AbstractHunter("marker") {
             if (e.damager !is Arrow)return@register
             if (!e.damager.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"marker"),PersistentDataType.INTEGER))return@register
             if (e.entity !is Player)return@register
+            val data = IdentityFifty.survivors[e.entity.uniqueId]?:return@register
             update(e.entity.uniqueId, (marks[e.entity.uniqueId]?.first?:0) + 5)
+            data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,100)
             e.damage = 0.0
         }
 

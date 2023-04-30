@@ -29,6 +29,7 @@ class SurvivorData : PlayerData() {
     var remainingTime = 180
     var footprintsCount = 0
     var footprintsTime = 2.0
+    var footprintsModify = 1.0
     var helpTick = 100
     var otherPlayerHelpDelay = 0
     var otherPlayerHelpDelayPercentage = 0.0

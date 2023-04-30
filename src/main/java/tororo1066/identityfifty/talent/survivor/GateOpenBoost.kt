@@ -8,7 +8,7 @@ import tororo1066.identityfifty.IdentityFifty
 
 class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5,FullCowUp::class.java) {
     override fun lore(): List<String> {
-        return listOf("gate_open_boost_lore_1", "gate_open_boost_lore_2")
+        return listOf("gate_open_boost_lore_1")
     }
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {

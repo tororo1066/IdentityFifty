@@ -24,10 +24,10 @@ import java.util.UUID
 
 class Coffin: AbstractSurvivor("coffin") {
 
-    var coffin: Location? = null
-    var coffinUUID: UUID? = null
-    var coffinTask: BukkitTask? = null
-    val sEvent = SEvent(IdentityFifty.plugin)
+    private var coffin: Location? = null
+    private var coffinUUID: UUID? = null
+    private var coffinTask: BukkitTask? = null
+    private val sEvent = SEvent(IdentityFifty.plugin)
 
     override fun onStart(p: Player) {
         super.onStart(p)

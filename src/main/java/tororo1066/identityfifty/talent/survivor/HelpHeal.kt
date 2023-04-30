@@ -13,7 +13,7 @@ class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.j
     override fun onHelp(helpedPlayer: Player, p: Player) {
         if (healPrivilegeCount > 0){
             val data = IdentityFifty.survivors[helpedPlayer.uniqueId]!!
-            data.setHealth(data.getHealth() + 1)
+            data.setHealth(data.getHealth() + 2)
 
             healPrivilegeCount--
         }

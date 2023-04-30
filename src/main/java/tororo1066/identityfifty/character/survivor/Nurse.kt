@@ -20,7 +20,7 @@ class Nurse : AbstractSurvivor("nurse") {
             .addLore(translate("nurse_passive_lore_2"))
         p.inventory.addItem(passiveItem)
         val healItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
-            .addLore(translate("syringe_lore"))
+            .addLore(translate("syringe_lore_1"))
         for (i in 1..2){
             val healSkillItem = IdentityFifty.interactManager.createSInteractItem(healItem,true).setInteractEvent { e, item ->
                 e.item!!.amount -= 1
@@ -43,7 +43,7 @@ class Nurse : AbstractSurvivor("nurse") {
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
-        data.healTick = 100
+        data.healTick = 120
         data.healSmallHealth = true
         return data
     }
@@ -53,9 +53,9 @@ class Nurse : AbstractSurvivor("nurse") {
             .addLore(translate("nurse_passive_lore_1"))
             .addLore(translate("nurse_passive_lore_2"))
         val healItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
-            .addLore(translate("syringe_lore"))
+            .addLore(translate("syringe_lore_1"))
         val healItem2 = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
-            .addLore(translate("syringe_lore")).setCustomData(IdentityFifty.plugin,"aaa", PersistentDataType.INTEGER,1)
+            .addLore(translate("syringe_lore_1")).setCustomData(IdentityFifty.plugin,"aaa", PersistentDataType.INTEGER,1)
 
         return arrayListOf(passiveItem,healItem,healItem2)
     }

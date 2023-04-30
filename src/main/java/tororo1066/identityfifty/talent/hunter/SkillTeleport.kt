@@ -53,7 +53,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
             },50)
 
             return@setInteractEvent true
-        }.setInitialCoolDown(1600)
+        }.setInitialCoolDown(2400)
 
         p.inventory.addItem(teleportSkillItem)
     }

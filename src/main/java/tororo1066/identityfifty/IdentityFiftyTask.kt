@@ -31,9 +31,6 @@ import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
-import org.bukkit.scheduler.BukkitTask
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Team
 import tororo1066.identityfifty.data.GeneratorData
@@ -472,6 +469,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             broadcast("§e§lゲート付近の発電機が開かれた！")
 
             noOne = true
+            val cloneTime = count
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
                 count--
                 if (count <= 0){
@@ -479,7 +477,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     bossBar.progress = 0.0
                     it.cancel()
                 }
-                bossBar.progress = count.toDouble() / 60.0
+                bossBar.progress = count.toDouble() / cloneTime.toDouble()
             },0,20)
 
             Bukkit.getOnlinePlayers().forEach {
@@ -642,6 +640,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
                 val playerData = IdentityFifty.survivors[it.uniqueId]!!
 
+                if (playerData.getHealth() >= 5)return@forEach
+
                 //ヘルスが4以上なら特定のキャラ以外処理をしない
                 if (playerData.getHealth() >= 4 && !helperData.healSmallHealth){
                     return@forEach
@@ -678,6 +678,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         runTask {
                             IdentityFifty.hunters.forEach { clazz ->
                                 clazz.value.hunterClass.onSurvivorHeal(it.player!!, e.player, clazz.key.toPlayer()!!)
+                                clazz.value.talentClasses.values.forEach { talentClass ->
+                                    talentClass.onSurvivorHeal(it.player!!, e.player, clazz.key.toPlayer()!!)
+                                }
                             }
                         }
                         task.cancel()
@@ -855,7 +858,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
 
             val data = IdentityFifty.survivors[e.player.uniqueId]!!
-            var footprints = data.footprintsTime
+            var footprints = data.footprintsTime * data.footprintsModify
 
             if (data.footprintsCount >= 4){
                 data.footprintsCount = 0
@@ -1012,6 +1015,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     if (onDamage.first){
                         IdentityFifty.stunEffect(e.damager as Player)
                     }
+
                     map.world.spawnParticle(Particle.ELECTRIC_SPARK,e.entity.location,30)
                     survivorData.setHealth(survivorData.getHealth() - onDamage.second)
                     if (survivorData.getHealth() == 1){
@@ -1048,6 +1052,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                             end()
                         }
                     }
+
+                    hunterData.hunterClass.onFinishedAttack(e.entity as Player, onDamage.second, e.damager as Player)
                 } else {
                     if (e.damager is Arrow)return@register
                     e.isCancelled = true
@@ -1087,7 +1093,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage,maxHealth,cow.health,p)
                 survivorData.talentClasses.values.forEach { clazz ->
-                    e.damage = clazz.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
+                    e.damage = clazz.cowGeneratorModify(e.damage,maxHealth,cow.health,p)
                 }
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     cow.noDamageTicks = 0
@@ -1149,6 +1155,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 data.talentClasses.values.forEach {
                     it.onStart(p)
                 }
+                data.quickChatBarData.init()
             }
         }
 
@@ -1159,6 +1166,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 data.talentClasses.values.forEach {
                     it.onStart(p)
                 }
+                data.quickChatBarData.init()
             }
         }
 

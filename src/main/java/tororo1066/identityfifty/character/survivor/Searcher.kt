@@ -27,8 +27,9 @@ class Searcher : AbstractSurvivor("searcher") {
         val searchSkillItem = SItem(Material.STICK).setDisplayName(translate("search_lens")).setCustomModelData(5)
             .addLore(translate("search_lens_lore_1"))
             .addLore(translate("search_lens_lore_2"))
+            .addLore(translate("search_lens_lore_3"))
 
-        val searchSkill = IdentityFifty.interactManager.createSInteractItem(searchSkillItem,true).setInteractEvent { e, item ->
+        val searchSkill = IdentityFifty.interactManager.createSInteractItem(searchSkillItem).setInteractEvent { e, item ->
             p.sendTranslateMsg("search_lens_used")
             val players = ArrayList<Player>()
             IdentityFifty.survivors.forEach { (uuid, _) ->
@@ -74,6 +75,7 @@ class Searcher : AbstractSurvivor("searcher") {
         val searchSkillItem = SItem(Material.STICK).setDisplayName(translate("search_lens")).setCustomModelData(5)
             .addLore(translate("search_lens_lore_1"))
             .addLore(translate("search_lens_lore_2"))
+            .addLore(translate("search_lens_lore_3"))
         return arrayListOf(passiveItem,searchSkillItem)
     }
 }

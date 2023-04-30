@@ -18,7 +18,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class Fader: AbstractHunter("fader"){
-    val traps = LinkedHashMap<UUID,TrapData>()
+    private val traps = LinkedHashMap<UUID,TrapData>()
 
     override fun onStart(p: Player) {
         traps.clear()

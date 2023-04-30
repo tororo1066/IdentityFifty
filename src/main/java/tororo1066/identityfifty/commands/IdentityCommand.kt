@@ -9,6 +9,7 @@ import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.*
 import tororo1066.identityfifty.inventory.*
+import tororo1066.identityfifty.quickchat.QuickChatBarData
 import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
 import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
@@ -36,6 +37,7 @@ class IdentityCommand : SCommand("identity") {
         data.name = p.name
         data.glowManager = GlowManager(p.uniqueId)
         data.skinModifier = SkinModifier(p.uniqueId)
+        data.quickChatBarData = QuickChatBarData(p.uniqueId)
         return data
     }
 
