@@ -740,7 +740,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 val hatchTimeInitial = data.hatchTick
 
                 Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
-                    //場を離れたりシフト解除すると救助キャンセル
+                    //場を離れたりシフト解除するとキャンセル
                     if (!e.player.location.getNearbyEntitiesByType(ArmorStand::class.java,1.5).contains(it) || !e.player.isSneaking){
                         data.hatchBossBar.removeAll()
                         task.cancel()

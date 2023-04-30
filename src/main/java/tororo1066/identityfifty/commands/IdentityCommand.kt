@@ -164,7 +164,7 @@ class IdentityCommand : SCommand("identity") {
                 }
 
                 if (map.hunterLimit < IdentityFifty.hunters.size) {
-                    it.sender.prefixMsg("§cサバイバーは${map.hunterLimit}人までです！")
+                    it.sender.prefixMsg("§cハンターは${map.hunterLimit}人までです！")
                     return@setPlayerExecutor
                 }
 
@@ -185,7 +185,7 @@ class IdentityCommand : SCommand("identity") {
         })
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist"))
-            .addArg(SCommandArg(SCommandArgType.ONLINE_PLAYER).addAlias("プレイヤー名"))
+            .addArg(SCommandArg(SCommandArgType.ONLINE_PLAYER).addAlias(translate("player_name")))
             .setPlayerExecutor {
                 val p = Bukkit.getPlayer(it.args[1])!!
                 if (IdentityFifty.survivors.containsKey(p.uniqueId)) {

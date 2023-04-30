@@ -12,7 +12,7 @@ class MapData: Cloneable {
         fun loadFromYml(config: YamlConfiguration): MapData {
             val data = MapData()
             data.name = config.getString("name")?:"name"
-            data.world = Bukkit.getWorld(config.getString("world")!!)!!
+            data.world = Bukkit.getWorld(config.getString("world","world")!!)!!
             data.survivorLimit = config.getInt("survivorLimit")
             data.hunterLimit = config.getInt("hunterLimit")
             data.generatorLimit = config.getInt("generatorLimit")
