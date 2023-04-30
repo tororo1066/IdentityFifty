@@ -19,7 +19,7 @@ class Menace : AbstractHunterTalent("menace",2,HighFootPrints::class.java) {
                 menace = false
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     menace = true
-                },600)
+                },500)
             }
         },0,5))
 
