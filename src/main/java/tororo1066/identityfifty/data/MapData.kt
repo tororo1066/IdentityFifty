@@ -70,6 +70,8 @@ class MapData: Cloneable {
                 data.hatches[hatchData.location] = hatchData
             }
 
+            data.lobbyLocation = config.getLocation("lobbyLocation")
+
             return data
         }
     }
@@ -89,9 +91,9 @@ class MapData: Cloneable {
     val goalRegions = ArrayList<String>()
     val prisons = HashMap<Location,PrisonData>()
     var woodPlates = HashMap<Location,WoodPlateData>()
-
     var hatches = HashMap<Location,HatchData>()
 
+    var lobbyLocation: Location? = null
     public override fun clone(): MapData {
         return super.clone() as MapData
     }

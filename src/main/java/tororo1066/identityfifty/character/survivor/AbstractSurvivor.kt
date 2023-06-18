@@ -8,7 +8,6 @@ import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
-import tororo1066.tororopluginapi.sItem.SItem
 
 abstract class AbstractSurvivor(val name: String): Cloneable {
 

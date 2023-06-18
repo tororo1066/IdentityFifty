@@ -4,6 +4,7 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
 import org.bukkit.attribute.Attribute
+import org.bukkit.entity.Cow
 import org.bukkit.entity.Player
 import org.bukkit.entity.Sheep
 import org.bukkit.inventory.ItemStack
@@ -61,6 +62,16 @@ class Gambler: AbstractHunter("gambler") {
                             it.health += 200
                         }
                         it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
+                    }
+
+                    p.world.getEntitiesByClass(Cow::class.java).filter { it.persistentDataContainer.has(
+                        NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"), PersistentDataType.INTEGER) }.forEach {
+                        if (it.health + 100 > it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
+                            it.health = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue
+                        } else {
+                            it.health += 100
+                        }
+                        it.customName = "§f§l牛型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                     }
                 }
                 in 85..100->{

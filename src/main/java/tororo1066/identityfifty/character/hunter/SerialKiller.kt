@@ -39,13 +39,14 @@ class SerialKiller: AbstractHunter("serialkiller") {
         val killFindSkillItem = IdentityFifty.interactManager.createSInteractItem(killFindSkill).setInteractEvent { _, _ ->
             p.playSound(p.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
             p.playSound(p.location, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f)
+            val uuid = UUID.randomUUID()
             IdentityFifty.survivors.values.forEach {
-                it.footprintsModify += 9.0
+                it.footprintsModify += uuid to 10.0
             }
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 IdentityFifty.survivors.values.forEach {
-                    it.footprintsModify -= 9.0
+                    it.footprintsModify -= uuid
                 }
             }, 200)
 
@@ -70,10 +71,14 @@ class SerialKiller: AbstractHunter("serialkiller") {
 
                     bossBar.removePlayer(p)
 
+                    it.cancel()
                 }
 
                 timer--
-                bossBar.progress = 1.0 - (timer.toDouble() / 600.0)
+                val progress = 1.0 - (timer.toDouble() / 600.0)
+                if (progress <= 1.0){
+                    bossBar.progress = progress
+                }
                 bossBar.setTitle(translate("kill_find_remaining_time", (floor(timer / 20.0 * 10.0) / 10.0).toString()))
             }, 0, 1)
             return@setInteractEvent true

@@ -37,6 +37,7 @@ dependencies {
     implementation 'com.elmakers.mine.bukkit:EffectLib:9.4'
     compileOnly 'LibsDisguises:LibsDisguises:10.0.31'
     api 'org.apache.httpcomponents.client5:httpclient5:5.2-beta1'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.10'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens

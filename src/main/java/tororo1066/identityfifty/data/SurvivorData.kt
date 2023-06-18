@@ -29,7 +29,7 @@ class SurvivorData : PlayerData() {
     var remainingTime = 180
     var footprintsCount = 0
     var footprintsTime = 2.0
-    var footprintsModify = 1.0
+    var footprintsModify = HashMap<UUID,Double>()
     var helpTick = 100
     var otherPlayerHelpDelay = 0
     var otherPlayerHelpDelayPercentage = 0.0
@@ -45,6 +45,7 @@ class SurvivorData : PlayerData() {
     var heartProcess = 0.0
     var heartProcessRules = arrayListOf(Pair(25.0,0.2), Pair(20.0,0.1), Pair(15.0,0.2), Pair(10.0,0.5))
     var healSmallHealth = false
+    var cancelGeneratorAttack = false
 
     val talentClasses = HashMap<Class<out AbstractSurvivorTalent>,AbstractSurvivorTalent>()
     var talentCost = 10

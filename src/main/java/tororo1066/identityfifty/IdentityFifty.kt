@@ -9,6 +9,7 @@ import org.bukkit.Particle
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.character.hunter.*
@@ -17,12 +18,14 @@ import tororo1066.identityfifty.commands.IdentityCommand
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.discord.DiscordClient
 import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.identityfifty.talent.TalentSQL
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
+import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SInteractItemManager
 import java.io.File
 import java.net.InetSocketAddress
@@ -58,6 +61,8 @@ class IdentityFifty : SJavaPlugin() {
         /** 稼働中のゲームの変数 **/
         var identityFiftyTask: IdentityFiftyTask? = null
 
+        lateinit var discordClient: DiscordClient
+
         const val prefix = "§b[§cIdentity§eFifty§b]§r"
 
         /** リソパのurl **/
@@ -82,11 +87,11 @@ class IdentityFifty : SJavaPlugin() {
                 }
             }
             Bukkit.getScheduler().runTask(plugin, Runnable {
-                p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,blindTime,3,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,slowTime,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,slowTime,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,slowTime,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW_DIGGING,slowTime,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,stunTime.first,3,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,stunTime.second,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,stunTime.second,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,stunTime.second,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW_DIGGING,stunTime.second,200,true,false,false))
             })
         }
 
@@ -141,24 +146,28 @@ class IdentityFifty : SJavaPlugin() {
         }
         IdentityCommand()
 
+        discordClient = DiscordClient()
+
         val packLines = File(dataFolder.path + "/secrecy/resourcePackUrl.txt").readLines()
         resourceUrl = packLines[0]
         http = HttpServer.create(InetSocketAddress(8000), 0)
         saveResource("IdentityFifty.zip",true)
         http?.createContext("/Resource",FileHandler(File(dataFolder.path + "/IdentityFifty.zip")))
         http?.start()
-//        SEvent(this).register(PlayerJoinEvent::class.java) { e ->
-//            if (e.player.name == "tororo_1066"){
-//                e.player.setResourcePack("http://localhost:8000/Resource")
-//            } else {
-//                e.player.setResourcePack(resourceUrl)
-//            }
-//        }
+
+        SEvent(this).register(PlayerJoinEvent::class.java) { e ->
+            if (e.player.name == "tororo_1066"){
+                e.player.setResourcePack("http://localhost:8000/Resource")
+            } else {
+                e.player.setResourcePack(resourceUrl)
+            }
+        }
 
     }
 
     override fun onDisable() {
         http?.stop(0)
+        discordClient.jda.shutdown()
     }
 
     class FileHandler(private val file: File): HttpHandler {

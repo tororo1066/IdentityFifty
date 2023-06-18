@@ -1,15 +1,12 @@
 package tororo1066.identityfifty.character.survivor
 
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
-import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.identityfifty.talent.survivor.DamagedBoost

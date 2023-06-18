@@ -6,3 +6,12 @@ mysql:
   pass: pass
   user: root
   db: identity
+discord:
+  enabled: false
+  token: ???
+  commandChannel: ???
+  infoChannel: ???
+  entryPermission: ???
+  opPermission: ???
+  guild: ???
+  map: ???

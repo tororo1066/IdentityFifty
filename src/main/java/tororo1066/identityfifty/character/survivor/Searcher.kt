@@ -7,7 +7,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
-import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -48,6 +47,9 @@ class Searcher : AbstractSurvivor("searcher") {
         p.inventory.addItem(searchSkill)
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            if (IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(p.uniqueId) == false){
+                return@Runnable
+            }
             val players = p.location.getNearbyPlayers(15.0)
                 .filter { it != p && IdentityFifty.hunters.containsKey(it.uniqueId)}
             players.forEach {

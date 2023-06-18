@@ -24,6 +24,7 @@ class AreaMan: AbstractHunter("areaman") {
         val areaSkill = SItem(Material.STICK).setDisplayName(translate("area_skill")).setCustomModelData(9)
             .addLore(translate("area_skill_lore_1"))
             .addLore(translate("area_skill_lore_2"))
+            .addLore(translate("area_skill_lore_3"))
 
         val areaSkillItem = IdentityFifty.interactManager.createSInteractItem(areaSkill,true).setInitialCoolDown(1200).setInteractEvent { e, item ->
             val cylinder = CylinderEffect(IdentityFifty.effectManager)
@@ -95,6 +96,7 @@ class AreaMan: AbstractHunter("areaman") {
         val areaSkill = SItem(Material.STICK).setDisplayName(translate("area_skill")).setCustomModelData(9)
             .addLore(translate("area_skill_lore_1"))
             .addLore(translate("area_skill_lore_2"))
+            .addLore(translate("area_skill_lore_3"))
         return arrayListOf(passiveItem,areaSkill)
     }
 }

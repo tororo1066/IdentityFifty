@@ -1,6 +1,5 @@
 package tororo1066.identityfifty.quickchat
 
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.event.block.Action
@@ -12,7 +11,7 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SInteractItem
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.toPlayer
-import java.util.UUID
+import java.util.*
 
 class QuickChatBarData(val uuid: UUID) {
 
@@ -22,7 +21,8 @@ class QuickChatBarData(val uuid: UUID) {
             SheepGeneratorNow(),
             CowGeneratorNow(),
             HealMe(),
-            HelpMe()
+            HelpMe(),
+            WillFinishedGenerator()
         )
 
         val hunterChats = arrayListOf<AbstractQuickChat>()

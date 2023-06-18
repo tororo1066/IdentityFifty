@@ -15,6 +15,8 @@ import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
 import tororo1066.tororopluginapi.otherClass.PlusInt
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.LocType
+import tororo1066.tororopluginapi.utils.toLocString
 
 class MapConfigInv(private val name: String, private val mapData: MapData) : LargeSInventory(IdentityFifty.plugin,"§e§l${mapData.name}の設定") {
 
@@ -169,6 +171,15 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         }
 
         items.add(setHatches)
+
+        val lobbyLocation = createInputItem(SItem(Material.QUARTZ).setDisplayName("§aゲームが終わったときのテレポート先設定")
+            .addLore("§a現在の値：§e${mapData.lobbyLocation?.toLocString(LocType.WORLD_BLOCK_SPACE)}"),
+            Location::class.java) { loc, _ ->
+            mapData.lobbyLocation = loc
+            p.sendMessage("§aゲームが終わったときのテレポート先を§d${loc.toLocString(LocType.WORLD_BLOCK_SPACE)}§aにしました")
+        }
+
+        items.add(lobbyLocation)
 
         val save = SItem(Material.LIME_STAINED_GLASS).setDisplayName("§a保存").toSInventoryItem().setCanClick(false).setClickEvent { e ->
             e.whoClicked.closeInventory()
@@ -461,6 +472,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         config.set("prisonLocations",mapData.prisons.values.stream().map { "${it.spawnLoc.blockX},${it.spawnLoc.blockY},${it.spawnLoc.blockZ},${it.escapeLoc.blockX},${it.escapeLoc.blockY},${it.escapeLoc.blockZ},${it.doorLoc.blockX},${it.doorLoc.blockY},${it.doorLoc.blockZ}" }.toList())
         config.set("woodPlates",mapData.woodPlates.values.stream().map { "${it.loc.blockX},${it.loc.blockY},${it.loc.blockZ},${it.length},${it.face.name}" }.toList())
         config.set("hatches",mapData.hatches.values.stream().map { "${it.location.blockX},${it.location.blockY},${it.location.blockZ}" }.toList())
+        config.set("lobbyLocation",mapData.lobbyLocation)
         sConfig.saveConfig(config,"map/${name}")
         IdentityFifty.maps[name] = mapData
         return true

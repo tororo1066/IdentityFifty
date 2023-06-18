@@ -11,11 +11,10 @@ import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.StunState
-import tororo1066.tororopluginapi.SDebug
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
-import tororo1066.tororopluginapi.utils.*
+import tororo1066.tororopluginapi.utils.setPitchL
 
 class Offense : AbstractSurvivor("offense") {
 

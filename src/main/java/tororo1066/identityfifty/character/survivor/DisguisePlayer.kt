@@ -9,9 +9,11 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import java.util.UUID
 
 class DisguisePlayer: AbstractSurvivor("disguise") {
 
@@ -58,8 +60,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
         val data = IdentityFifty.survivors[p.uniqueId]!!
         if (data.skinModifier.isDisguise()){
             data.skinModifier.unDisguise()
-            damager.addPotionEffect(PotionEffect(PotionEffectType.SLOW,50,4,false,false,true))
-            damager.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,50,3,false,false,true))
+            IdentityFifty.stunEffect(damager,30,60,StunState.OTHER)
             p.sendTranslateMsg("disguise_skill_end")
             return Pair(false,0)
         }
@@ -67,7 +68,13 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
     }
 
     override fun onHelp(helpedPlayer: Player, p: Player) {
+        val helpedPlayerData = IdentityFifty.survivors[helpedPlayer.uniqueId]!!
+        val uuid = UUID.randomUUID()
+        helpedPlayerData.footprintsModify += uuid to 0.0
         helpedPlayer.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,100,1,true,false))
+        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+            helpedPlayerData.footprintsModify -= uuid
+        }, 100)
     }
 
     override fun info(): ArrayList<ItemStack> {

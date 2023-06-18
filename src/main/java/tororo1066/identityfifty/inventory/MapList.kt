@@ -5,7 +5,6 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
-import tororo1066.tororopluginapi.sInventory.SInventory
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
 import tororo1066.tororopluginapi.sItem.SItem
 

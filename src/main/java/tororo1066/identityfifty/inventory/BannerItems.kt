@@ -1,16 +1,8 @@
 package tororo1066.identityfifty.inventory
 
-import org.bukkit.DyeColor
 import org.bukkit.Material
-import org.bukkit.block.banner.Pattern
-import org.bukkit.block.banner.PatternType
-import org.bukkit.inventory.ItemFlag
-import tororo1066.identityfifty.IdentityFifty
-import tororo1066.tororopluginapi.defaultMenus.NormalInventory
-import tororo1066.tororopluginapi.frombukkit.SBukkit
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
-import tororo1066.tororopluginapi.sItem.SItem
 
 object BannerItems {
 
