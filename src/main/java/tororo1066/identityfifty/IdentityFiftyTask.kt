@@ -658,7 +658,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             //回復の処理
             e.player.location.getNearbyPlayers(3.0).forEach {
                 if (it == e.player)return@forEach
-                if (!IdentityFifty.survivors.containsKey(it.uniqueId))return@forEach
+                if (!aliveSurvivors().contains(it.uniqueId))return@forEach
                 val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
                 val playerData = IdentityFifty.survivors[it.uniqueId]!!
 

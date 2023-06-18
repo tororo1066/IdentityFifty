@@ -32,7 +32,7 @@ class Helper : AbstractSurvivor("helper") {
             if (inPrison(p))return@setInteractEvent false
             val nearPlayer = p.location.getNearbyPlayers(8.0).firstOrNull {
                 IdentityFifty.identityFiftyTask?.aliveSurvivors()
-                    ?.contains(it.uniqueId) == true && it.uniqueId != p.uniqueId
+                    ?.contains(it.uniqueId) == true && it.uniqueId != p.uniqueId && !inPrison(it)
             }
             if (nearPlayer == null){
                 p.sendTranslateMsg("helper_protect_cant_use")
