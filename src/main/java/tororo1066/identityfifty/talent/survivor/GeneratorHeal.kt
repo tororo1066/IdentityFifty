@@ -6,7 +6,7 @@ import org.bukkit.Sound
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 
-class GeneratorHeal : AbstractSurvivorTalent("generator_heal",5,FullSheepUp::class.java) {
+class GeneratorHeal : AbstractSurvivorTalent("generator_heal",2,JailedOtherSurvivorGlow::class.java) {
     override fun lore(): List<String> {
         return listOf("generator_heal_lore_1")
     }

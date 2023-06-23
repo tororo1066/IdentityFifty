@@ -118,7 +118,9 @@ got_helped_speed_up: "§f仇返し"
 got_helped_speed_up_lore_1: "§7救助された時に2秒間移動速度が§520%§7上がる"
 hit_plate_effect: "§f命の妨害"
 hit_plate_effect_lore_1: "§7板を当てたときにハンターを§55秒§7光らせ(全員から見れる)、§51秒間§7盲目を延ばす"
-
+each_other_buff: "§f主導者"
+each_other_buff_lore_1: "§7自身の体力が最大の時、体力最大のサバイバーとの位置情報が共有され、"
+each_other_buff_lore_2: "§7さらにそのサバイバーが近くで発電しているとき自身の発電速度が§510%§7上昇する"
 # survivor end
 
 # hunter start

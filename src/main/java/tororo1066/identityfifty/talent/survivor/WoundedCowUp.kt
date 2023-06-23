@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.survivor
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 
-class WoundedCowUp :AbstractSurvivorTalent("wounded_cow_up",1,GotHelpedSpeedUp::class.java) {
+class WoundedCowUp :AbstractSurvivorTalent("wounded_cow_up",1,HatchLow::class.java) {
     override fun lore(): List<String> {
         return listOf("wounded_cow_up_lore_1")
     }

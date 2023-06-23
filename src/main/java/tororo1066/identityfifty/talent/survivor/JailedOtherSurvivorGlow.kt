@@ -8,7 +8,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.character.survivor.AbstractSurvivor
 import tororo1066.identityfifty.data.PrisonData
 
-class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glow",2,RemainTimeUp::class.java) {
+class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glow",2,HatchLow::class.java) {
     override fun lore(): List<String> {
         return listOf("jailed_other_survivor_glow_lore_1")
     }

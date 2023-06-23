@@ -8,7 +8,7 @@ class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.j
         return listOf("help_heal_lore_1")
     }
 
-    var healPrivilegeCount = 2
+    var healPrivilegeCount = 1
 
     override fun onHelp(helpedPlayer: Player, p: Player) {
         if (healPrivilegeCount > 0){
