@@ -5,6 +5,10 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.map.MapView.Scale
+import tororo1066.identityfifty.enumClass.AllowAction
+import kotlin.math.max
+import kotlin.math.min
 
 class MapData: Cloneable {
 
@@ -72,6 +76,11 @@ class MapData: Cloneable {
 
             data.lobbyLocation = config.getLocation("lobbyLocation")
 
+            val mapId = config.getInt("mapId",-1)
+            if (mapId != -1){
+                data.mapId = mapId
+            }
+
             return data
         }
     }
@@ -94,6 +103,9 @@ class MapData: Cloneable {
     var hatches = HashMap<Location,HatchData>()
 
     var lobbyLocation: Location? = null
+
+    var mapId: Int? = null
+
     public override fun clone(): MapData {
         return super.clone() as MapData
     }

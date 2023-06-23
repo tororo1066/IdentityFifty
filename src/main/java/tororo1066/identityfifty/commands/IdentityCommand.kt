@@ -69,14 +69,13 @@ class IdentityCommand : SCommand("identity","","identity.user") {
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
             .setPlayerExecutor {
                 if (DiscordClient.enable){
-                    if (!DiscordClient.survivors.contains(it.sender.uniqueId)){
+                    if (!DiscordClient.survivors.containsKey(it.sender.uniqueId)){
                         it.sender.sendMessage("§cあなたは選択できません")
                         return@setPlayerExecutor
                     }
                 }
-                if (IdentityFifty.hunters.containsKey(it.sender.uniqueId)) {
-                    IdentityFifty.hunters.remove(it.sender.uniqueId)
-                }
+                IdentityFifty.hunters.remove(it.sender.uniqueId)
+                IdentityFifty.spectators.remove(it.sender.uniqueId)
                 val saveTalents = IdentityFifty.survivors[it.sender.uniqueId]?.let { it1 -> saveSurvivorTalents(it1) }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!.clone()
                 val data = createSurvivorData(it.sender)
@@ -91,12 +90,12 @@ class IdentityCommand : SCommand("identity","","identity.user") {
             })
 
         addCommand(SCommandObject().addNeedPermission("identity.op")
-            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
+            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("survivor"))
+            .addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
             .setNormalExecutor {
                 val p = Bukkit.getPlayer(it.args[2])!!
-                if (IdentityFifty.hunters.containsKey(p.uniqueId)) {
-                    IdentityFifty.hunters.remove(p.uniqueId)
-                }
+                IdentityFifty.hunters.remove(p.uniqueId)
+                IdentityFifty.spectators.remove(p.uniqueId)
                 val saveTalents = IdentityFifty.survivors[p.uniqueId]?.let { it1 -> saveSurvivorTalents(it1) }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[3]]!!.clone()
                 val data = createSurvivorData(p)
@@ -115,14 +114,15 @@ class IdentityCommand : SCommand("identity","","identity.user") {
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("hunter")).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray()))
             .setPlayerExecutor {
                 if (DiscordClient.enable){
-                    if (!DiscordClient.hunters.contains(it.sender.uniqueId)){
+                    if (!DiscordClient.hunters.containsKey(it.sender.uniqueId)){
                         it.sender.sendMessage("§cあなたは選択できません")
                         return@setPlayerExecutor
                     }
                 }
-                if (IdentityFifty.survivors.containsKey(it.sender.uniqueId)) {
-                    IdentityFifty.survivors.remove(it.sender.uniqueId)
-                }
+
+                IdentityFifty.survivors.remove(it.sender.uniqueId)
+                IdentityFifty.spectators.remove(it.sender.uniqueId)
+
                 val saveTalents = IdentityFifty.hunters[it.sender.uniqueId]?.let { it1 -> saveHunterTalents(it1) }
                 val abstractHunter = IdentityFifty.huntersData[it.args[1]]!!.clone()
                 val data = createHunterData(it.sender)
@@ -137,12 +137,14 @@ class IdentityCommand : SCommand("identity","","identity.user") {
             })
 
         addCommand(SCommandObject().addNeedPermission("identity.op")
-            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("hunter")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray()))
+            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("hunter"))
+            .addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).addArg(SCommandArg().addAllowString(IdentityFifty.huntersData.keys.toTypedArray()))
             .setNormalExecutor {
                 val p = Bukkit.getPlayer(it.args[2])!!
-                if (IdentityFifty.survivors.containsKey(p.uniqueId)) {
-                    IdentityFifty.survivors.remove(p.uniqueId)
-                }
+
+                IdentityFifty.survivors.remove(p.uniqueId)
+                IdentityFifty.spectators.remove(p.uniqueId)
+
                 val saveTalents = IdentityFifty.hunters[p.uniqueId]?.let { it1 -> saveHunterTalents(it1) }
                 val abstractHunter = IdentityFifty.huntersData[it.args[3]]!!.clone()
                 val data = createHunterData(p)
@@ -156,6 +158,50 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                 it.sender.sendTranslateMsg("select_other_character", p.name, translate(abstractHunter.name))
             })
 
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("spectator"))
+            .setPlayerExecutor {
+                if (DiscordClient.enable){
+                    if (!DiscordClient.spectators.containsKey(it.sender.uniqueId)){
+                        it.sender.sendMessage("§cあなたは選択できません")
+                        return@setPlayerExecutor
+                    }
+                }
+
+                IdentityFifty.survivors.remove(it.sender.uniqueId)
+                IdentityFifty.hunters.remove(it.sender.uniqueId)
+
+                val data = SpectatorData().apply {
+                    uuid = it.sender.uniqueId
+                    mcid = it.sender.name
+                    actions.addAll(IdentityFifty.allowSpectatorActions)
+                }
+
+                IdentityFifty.spectators[data.uuid] = data
+
+                it.sender.sendTranslateMsg("select_spectator")
+            })
+
+        addCommand(SCommandObject().addNeedPermission("identity.op")
+            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg("spectator"))
+            .addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER))
+            .setNormalExecutor {
+
+                val p = Bukkit.getPlayer(it.args[2])!!
+
+                IdentityFifty.survivors.remove(p.uniqueId)
+                IdentityFifty.hunters.remove(p.uniqueId)
+
+                val data = SpectatorData().apply {
+                    uuid = p.uniqueId
+                    mcid = p.name
+                    actions.addAll(IdentityFifty.allowSpectatorActions)
+                }
+
+                IdentityFifty.spectators[data.uuid] = data
+
+                it.sender.sendTranslateMsg("select_other_spectator", p.name)
+            })
+
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("unregister")).setPlayerExecutor {
             if (DiscordClient.enable){
                 it.sender.sendMessage("§c登録解除はできません")
@@ -163,17 +209,20 @@ class IdentityCommand : SCommand("identity","","identity.user") {
             }
             IdentityFifty.hunters.remove(it.sender.uniqueId)
             IdentityFifty.survivors.remove(it.sender.uniqueId)
+            IdentityFifty.spectators.remove(it.sender.uniqueId)
 
             it.sender.sendTranslateMsg("unregistered")
         })
 
         addCommand(SCommandObject().addNeedPermission("identity.op")
-            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("unregister")).addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).setNormalExecutor {
-            val p = Bukkit.getPlayer(it.args[2])!!
-            IdentityFifty.hunters.remove(p.uniqueId)
-            IdentityFifty.survivors.remove(p.uniqueId)
+            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("unregister"))
+            .addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).setNormalExecutor {
+                val p = Bukkit.getPlayer(it.args[2])!!
+                IdentityFifty.hunters.remove(p.uniqueId)
+                IdentityFifty.survivors.remove(p.uniqueId)
+                IdentityFifty.spectators.remove(p.uniqueId)
 
-            it.sender.sendTranslateMsg("unregistered_other", p.name)
+                it.sender.sendTranslateMsg("unregistered_other", p.name)
         })
 
         addCommand(SCommandObject().addNeedPermission("identity.op")
@@ -194,8 +243,7 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                 IdentityFifty.identityFiftyTask?.start()
             })
 
-        addCommand(SCommandObject().addNeedPermission("identity.op")
-            .addArg(SCommandArg().addAllowString("playerlist")).setPlayerExecutor {
+        addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist")).setPlayerExecutor {
             it.sender.sendMessage("§b${translate("survivor")}")
             IdentityFifty.survivors.forEach { data ->
                 it.sender.sendMessage("§e${data.value.name} §d???")

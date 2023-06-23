@@ -8,6 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -56,6 +57,7 @@ class Helper : AbstractSurvivor("helper") {
                 noDamage = false
             },140)
 
+            IdentityFifty.broadcastSpectators(translate("spec_helper_protect_used",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
 
         }.setInitialCoolDown(600)

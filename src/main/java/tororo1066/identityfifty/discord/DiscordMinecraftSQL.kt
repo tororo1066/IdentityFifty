@@ -11,10 +11,10 @@ import java.util.UUID
 class DiscordMinecraftSQL: USQLTable("discord_minecraft", SMySQL(IdentityFifty.plugin)) {
 
     companion object {
-        val id = USQLVariable(USQLVariable.INT, autoIncrement = true)
-        val discordId = USQLVariable(USQLVariable.BIGINT)
-        val uuid = USQLVariable(USQLVariable.VARCHAR,36)
-        val mcid = USQLVariable(USQLVariable.VARCHAR,16)
+        val id = USQLVariable(USQLVariable.Int, autoIncrement = true)
+        val discordId = USQLVariable(USQLVariable.BigInt)
+        val uuid = USQLVariable(USQLVariable.VarChar,36)
+        val mcid = USQLVariable(USQLVariable.VarChar,16)
     }
 
     fun getFromDiscordId(id: Long): SMySQLResultSet? {

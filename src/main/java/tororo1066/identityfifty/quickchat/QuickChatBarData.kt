@@ -5,7 +5,9 @@ import org.bukkit.Sound
 import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.quickchat.survivor.*
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SInteractItem
@@ -22,6 +24,7 @@ class QuickChatBarData(val uuid: UUID) {
             CowGeneratorNow(),
             HealMe(),
             HelpMe(),
+            IWillHelpYou(),
             WillFinishedGenerator()
         )
 
@@ -85,12 +88,26 @@ class QuickChatBarData(val uuid: UUID) {
                                 it.sendMessage("§7[§f${e.player.name}§7] -> §r${chat.message}")
                                 it.playSound(it.location, Sound.ITEM_BOOK_PAGE_TURN, 1f, 2f)
                             }
+
+                            IdentityFifty.broadcastSpectators("§7[§f${e.player.name}§7] -> §r${chat.message}",
+                                AllowAction.RECEIVE_HUNTERS_CHAT)
+
+                            val data = IdentityFifty.hunters[e.player.uniqueId]
+                            data?.glowManager?.glow(IdentityFifty.hunters.mapNotNull { it.key.toPlayer() }.toMutableList(),
+                                GlowAPI.Color.WHITE, 50)
                             returnItems()
                         } else {
                             IdentityFifty.survivors.keys.mapNotNull { it.toPlayer() }.forEach {
                                 it.sendMessage("§7[§f${e.player.name}§7] -> §r${chat.message}")
                                 it.playSound(it.location, Sound.ITEM_BOOK_PAGE_TURN, 1f, 2f)
                             }
+
+                            IdentityFifty.broadcastSpectators("§7[§f${e.player.name}§7] -> §r${chat.message}",
+                                AllowAction.RECEIVE_SURVIVORS_CHAT)
+
+                            val data = IdentityFifty.survivors[e.player.uniqueId]
+                            data?.glowManager?.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(),
+                                GlowAPI.Color.WHITE, 50)
                             returnItems()
                         }
                         return@chat true
@@ -110,7 +127,7 @@ class QuickChatBarData(val uuid: UUID) {
             }
 
             return@setInteractEvent true
-        }
+        }.setInitialCoolDown(100)
 
         return functionItem
     }

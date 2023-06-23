@@ -12,16 +12,17 @@ class GlowManager(private val uuid: UUID) {
     private var isGlowing = false
     private var otherGlow = false
     private var tick = 0
-    private val nowSeeablePlayers = ArrayList<UUID>()
+    private val nowVisiblePlayers = ArrayList<UUID>()
 
-    fun glow(seeablePlayer: MutableCollection<Player>, color: GlowAPI.Color, duration: Int){
+    fun glow(visiblePlayers: MutableCollection<Player>, color: GlowAPI.Color, duration: Int){
+        visiblePlayers.addAll(IdentityFifty.spectators.keys.mapNotNull { it.toPlayer() })
         if (isGlowing){
             if (duration < tick){
                 val p = Bukkit.getPlayer(uuid)?:return
-                for (player in seeablePlayer){
+                for (player in visiblePlayers){
                     if (!GlowAPI.isGlowing(p,player)){
                         GlowAPI.setGlowing(p,color,player)
-                        nowSeeablePlayers.add(player.uniqueId)
+                        nowVisiblePlayers.add(player.uniqueId)
                     }
                 }
                 return
@@ -33,9 +34,9 @@ class GlowManager(private val uuid: UUID) {
 
         tick = duration
 
-        GlowAPI.setGlowing(p,color,seeablePlayer)
-        for (player in seeablePlayer){
-            nowSeeablePlayers.add(player.uniqueId)
+        GlowAPI.setGlowing(p,color,visiblePlayers)
+        for (player in visiblePlayers){
+            nowVisiblePlayers.add(player.uniqueId)
         }
         Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
 
@@ -43,7 +44,7 @@ class GlowManager(private val uuid: UUID) {
             if (tick <= 0 || otherGlow){
                 otherGlow = false
                 isGlowing = false
-                GlowAPI.setGlowing(p,false, nowSeeablePlayers.mapNotNull { map -> map.toPlayer() })
+                GlowAPI.setGlowing(p,false, nowVisiblePlayers.mapNotNull { map -> map.toPlayer() })
                 if (IdentityFifty.survivors.containsKey(uuid)){
                     IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(p.name)
                 }
@@ -56,9 +57,9 @@ class GlowManager(private val uuid: UUID) {
                 return@Consumer
             }
 
-            GlowAPI.setGlowing(p,false,seeablePlayer)
+            GlowAPI.setGlowing(p,false,visiblePlayers)
 
-            GlowAPI.setGlowing(p,color,seeablePlayer)
+            GlowAPI.setGlowing(p,color,visiblePlayers)
 
             tick--
         },0,1)

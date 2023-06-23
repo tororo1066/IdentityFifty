@@ -15,7 +15,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.*
-import kotlin.math.min
+import kotlin.collections.HashMap
 import kotlin.random.Random
 
 class DiscordClient: ListenerAdapter(), Listener {
@@ -38,6 +38,7 @@ class DiscordClient: ListenerAdapter(), Listener {
     companion object {
         val survivors = HashMap<UUID,Long>()
         val hunters = HashMap<UUID,Long>()
+        val spectators = HashMap<UUID,Long>()
         var enable = false
     }
 
@@ -60,29 +61,37 @@ class DiscordClient: ListenerAdapter(), Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     fun event(e: PlayerLoginEvent){
-        if (himoMode && (!survivors.containsKey(e.player.uniqueId) && !hunters.containsKey(e.player.uniqueId)) &&
-            discordSQL.getFromUUID(e.player.uniqueId) == null){
+        val uuid = e.player.uniqueId
+        if (himoMode && (!survivors.containsKey(uuid) && !hunters.containsKey(uuid)
+                    && !spectators.containsKey(uuid)) && discordSQL.getFromUUID(uuid) == null){
             var random = Random.nextInt(100000,999999)
             while (himo.containsKey(random)){
                 random = Random.nextInt(100000,999999)
             }
-            himo[random] = e.player.uniqueId to e.player.name
+            himo[random] = uuid to e.player.name
             e.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("${e.player.name}のコード $random"))
             return
         }
         if (!enable)return
-        if ((!survivors.containsKey(e.player.uniqueId) && !hunters.containsKey(e.player.uniqueId))
+        if ((!survivors.containsKey(uuid) && !hunters.containsKey(uuid)
+                    && !spectators.containsKey(uuid))
                     && !e.player.hasPermission("identity.op")){
-            e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Component.text("You can't join this server."))
+            e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Component.text("Discord: https://discord.gg/yTubxkj"))
             return
         }
         e.allow()
-        val isSurvivor = survivors.containsKey(e.player.uniqueId)
-        if (isSurvivor){
-            e.player.sendMessage("§aサバイバーを選択してください")
-        } else {
-            e.player.sendMessage("§aハンターを選択してください")
-        }
+        val isSurvivor = survivors.containsKey(uuid)
+        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+            if (IdentityFifty.spectators.containsKey(e.player.uniqueId)){
+                e.player.performCommand("identity spectator")
+                return@Runnable
+            }
+            if (isSurvivor){
+                e.player.sendMessage("§aサバイバーを選択してください")
+            } else {
+                e.player.sendMessage("§aハンターを選択してください")
+            }
+        },20)
     }
 
     fun run(){
@@ -97,11 +106,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                 Thread.sleep(5000)
 
                 Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
-                    survivors.forEach {
-                        it.key.toPlayer()?.kick(Component.text("遊んでくれてありがとう:heart:"))
-                    }
-
-                    hunters.forEach {
+                    (survivors + hunters + spectators).forEach {
                         it.key.toPlayer()?.kick(Component.text("遊んでくれてありがとう:heart:"))
                     }
                 })
@@ -110,8 +115,10 @@ class DiscordClient: ListenerAdapter(), Listener {
 
                 IdentityFifty.survivors.clear()
                 IdentityFifty.hunters.clear()
+                IdentityFifty.spectators.clear()
                 survivors.clear()
                 hunters.clear()
+                spectators.clear()
                 channel.sendMessage("参加可能になりました 0/4 0/1").queue()
                 canEntry = true
 
@@ -132,13 +139,11 @@ class DiscordClient: ListenerAdapter(), Listener {
                 while (IdentityFifty.survivors.size != 4 || IdentityFifty.hunters.size != 1){
                     if (count <= 0){
                         channel.sendMessage("5分経過したため取り消しました")
-                        survivors.keys.forEach {
-                            it.toPlayer()?.kick(Component.text("5分経過したため取り消しました"))
-                        }
-
-                        hunters.keys.forEach {
-                            it.toPlayer()?.kick(Component.text("5分経過したため取り消しました"))
-                        }
+                        Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+                            (survivors + hunters + spectators).keys.forEach {
+                                it.toPlayer()?.kick(Component.text("5分経過したため取り消しました"))
+                            }
+                        })
                         continue
                     }
                     Thread.sleep(1)
@@ -173,7 +178,7 @@ class DiscordClient: ListenerAdapter(), Listener {
         when(command){
             ""->{
                 e.message.reply("""
-                    !entry (survivor or hunter) ゲームにエントリーします
+                    !entry (survivor or hunter or spectator or unregister) ゲームにエントリーします
                     !himo discordアカウントとminecraftを紐づけします
                 """.trimIndent()).queue()
             }
@@ -185,7 +190,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                 }
 
                 if (args.size != 1){
-                    e.message.reply("!entry (hunter or survivor)").queue()
+                    e.message.reply("!entry (hunter or survivor or spectator or unregister)").queue()
                     return
                 }
 
@@ -199,8 +204,8 @@ class DiscordClient: ListenerAdapter(), Listener {
                     return
                 }
 
-                if (args[0].lowercase() !in listOf("survivor","hunter","unregister")){
-                    e.message.reply("!entry (hunter or survivor or unregister)").queue()
+                if (args[0].lowercase() !in listOf("survivor","hunter","spectator","unregister")){
+                    e.message.reply("!entry (hunter or survivor or spectator or unregister)").queue()
                     return
                 }
 
@@ -210,19 +215,27 @@ class DiscordClient: ListenerAdapter(), Listener {
                         e.message.reply("マインクラフトとdiscordを紐付けしてください").queue()
                         return
                     }
-                    hunters.remove(UUID.fromString(minecraftData.getString("uuid")))
-                    survivors.remove(UUID.fromString(minecraftData.getString("uuid")))
+                    val uuid = UUID.fromString(minecraftData.getString("uuid"))
+                    hunters.remove(uuid)
+                    survivors.remove(uuid)
+                    spectators.remove(uuid)
+                    IdentityFifty.hunters.remove(uuid)
+                    IdentityFifty.survivors.remove(uuid)
+                    IdentityFifty.spectators.remove(uuid)
                     e.message.reply("登録解除しました").queue()
                     jda.getTextChannelById(infoChannel)!!
                         .sendMessage("${minecraftData.getString("mcid")}が" +
                                 "登録解除しました\n" +
                                 "${survivors.size}/4 ${hunters.size}/1").queue()
+
+                    Bukkit.getPlayer(uuid)?.kick(Component.text("登録解除"))
+
                     return
                 }
 
-                val isSurvivor = args[0].lowercase() == "survivor"
 
-                if (hunters.containsValue(member.idLong) || survivors.containsValue(member.idLong)){
+                if (hunters.containsValue(member.idLong) || survivors.containsValue(member.idLong)
+                    || spectators.containsValue(member.idLong)){
                     e.message.reply("既に参加済みです").queue()
                     return
                 }
@@ -232,6 +245,14 @@ class DiscordClient: ListenerAdapter(), Listener {
                     e.message.reply("マインクラフトとdiscordを紐付けしてください").queue()
                     return
                 }
+
+                if (args[0].lowercase() == "spectator"){
+                    spectators[UUID.fromString(minecraftData.getString("uuid"))] = member.idLong
+                    e.message.reply("観戦者として参加しました").queue()
+                    return
+                }
+
+                val isSurvivor = args[0].lowercase() == "survivor"
 
                 if (isSurvivor && survivors.size >= 4){
                     e.message.reply("サバイバーは満員です").queue()
@@ -248,7 +269,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                     hunters[UUID.fromString(minecraftData.getString("uuid"))] = member.idLong
                 }
 
-                e.message.reply("参加しました").queue()
+                e.message.reply("参加しました\n<#1119575979241766975> を読むことを推奨します").queue()
                 jda.getTextChannelById(infoChannel)!!
                     .sendMessage("${minecraftData.getString("mcid")}が" +
                             "${if (isSurvivor) "サバイバー" else "ハンター"}として参加しました\n" +

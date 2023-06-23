@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitTask
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 import java.util.*
@@ -41,6 +42,7 @@ class Fader: AbstractHunter("fader"){
                 p.removePotionEffect(PotionEffectType.INVISIBILITY)
                 val blindness = p.getPotionEffect(PotionEffectType.BLINDNESS)
                 if (blindness != null && blindness.amplifier != 3){
+                    p.isSprinting = false
                     p.removePotionEffect(PotionEffectType.BLINDNESS)
                 }
                 p.removePotionEffect(PotionEffectType.SPEED)
@@ -89,6 +91,8 @@ class Fader: AbstractHunter("fader"){
                                     surP.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
                                     surP.sendMessage(IdentityFifty.prefix + translate("glow_trap_hit_survivor"))
                                     data.glowManager.glow(mutableListOf(p),GlowAPI.Color.DARK_RED,280)
+                                    IdentityFifty.broadcastSpectators(translate("spec_glow_trap_hit",surP.name),
+                                        AllowAction.RECEIVE_HUNTERS_ACTION)
                                 }
                                 Bukkit.getEntity(it.uniqueId)?.remove()
                                 traps.remove(it.uniqueId)
@@ -98,6 +102,8 @@ class Fader: AbstractHunter("fader"){
 
                         traps[it.uniqueId] = TrapData(it.uniqueId,task)
                     }
+                    IdentityFifty.broadcastSpectators(translate("spec_glow_trap_used",p.name),
+                        AllowAction.RECEIVE_HUNTERS_ACTION)
                     return@setInteractEvent true
                 }
 

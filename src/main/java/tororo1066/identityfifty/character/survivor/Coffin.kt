@@ -15,6 +15,7 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -56,6 +57,9 @@ class Coffin: AbstractSurvivor("coffin") {
                 sEvent.unregisterAll()
             }
 
+            IdentityFifty.broadcastSpectators(translate("spec_coffin_placed",p.name),
+                AllowAction.RECEIVE_SURVIVORS_ACTION)
+
             p.world.spawn(p.location,ArmorStand::class.java) {
                 p.playSound(p.location, Sound.ENTITY_EVOKER_FANGS_ATTACK, 1f, 2f)
                 coffin = it.location
@@ -85,6 +89,8 @@ class Coffin: AbstractSurvivor("coffin") {
                         coffinTask = null
                         sEvent.unregisterAll()
                         p.sendTranslateMsg("coffin_broken")
+                        IdentityFifty.broadcastSpectators(translate("spec_coffin_broken",p.name),
+                            AllowAction.RECEIVE_SURVIVORS_ACTION)
                     }
                 }
 
@@ -135,6 +141,9 @@ class Coffin: AbstractSurvivor("coffin") {
             IdentityFifty.hunters.forEach {
                 it.key.toPlayer()?.sendTranslateMsg("coffin_helped")
             }
+
+            IdentityFifty.broadcastSpectators(translate("spec_coffin_helped",p.name),
+                AllowAction.RECEIVE_SURVIVORS_ACTION)
 
             item.setInteractCoolDown(1800)
 

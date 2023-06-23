@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -34,6 +35,8 @@ class Offense : AbstractSurvivor("offense") {
         val tackleItem = IdentityFifty.interactManager.createSInteractItem(tackleSkillItem,true).setInteractEvent { e, item ->
             var actionTime = 0
             var lock: Boolean
+            IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_used",p.name),
+                AllowAction.RECEIVE_SURVIVORS_ACTION)
             Bukkit.getScheduler().runTaskAsynchronously(IdentityFifty.plugin, Runnable {
                 while (true){
                     if (actionTime >= 60){
@@ -54,6 +57,8 @@ class Offense : AbstractSurvivor("offense") {
                             it.sendTranslateMsg("rugby_ball_hit_hunter")
                             p.playSound(p.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
                             p.sendTranslateMsg("rugby_ball_hit",it.name)
+                            IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_hit",p.name,it.name),
+                                AllowAction.RECEIVE_SURVIVORS_ACTION)
                             IdentityFifty.stunEffect(it, (actionTime*5-20), (actionTime*5), StunState.OTHER)
                         }
                         break

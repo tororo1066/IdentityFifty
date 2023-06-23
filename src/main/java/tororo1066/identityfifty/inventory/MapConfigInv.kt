@@ -18,7 +18,7 @@ import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.LocType
 import tororo1066.tororopluginapi.utils.toLocString
 
-class MapConfigInv(private val name: String, private val mapData: MapData) : LargeSInventory(IdentityFifty.plugin,"§e§l${mapData.name}の設定") {
+class MapConfigInv(private val mapName: String, private val mapData: MapData) : LargeSInventory(IdentityFifty.plugin,"§e§l${mapData.name}の設定") {
 
     private val sInput = SInput(IdentityFifty.plugin)
 
@@ -42,7 +42,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
             p.playSound(p.location,Sound.UI_BUTTON_CLICK,1f,1f)
         }
 
-        editNow.add(name)
+        editNow.add(mapName)
 
         val items = ArrayList<SInventoryItem>()
 
@@ -181,9 +181,17 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
 
         items.add(lobbyLocation)
 
+        val mapId = createInputItem(SItem(Material.MAP).setDisplayName("§aマップid設定").addLore("§a現在の値：§e${mapData.mapId}"),
+            PlusInt::class.java) { int, _ ->
+            mapData.mapId = int.get()
+            p.sendMessage("§aマップidを§d${int.get()}§aにしました")
+        }
+
+        items.add(mapId)
+
         val save = SItem(Material.LIME_STAINED_GLASS).setDisplayName("§a保存").toSInventoryItem().setCanClick(false).setClickEvent { e ->
             e.whoClicked.closeInventory()
-            editNow.remove(name)
+            editNow.remove(mapName)
             if (!save()){
                 e.whoClicked.sendMessage("§4保存に失敗しました")
                 return@setClickEvent
@@ -196,7 +204,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         setResourceItems(items)
 
         setOnClose {
-            editNow.remove(name)
+            editNow.remove(mapName)
         }
 
         return true
@@ -455,7 +463,7 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
 
     private fun save(): Boolean{
         val sConfig = SConfig(IdentityFifty.plugin)
-        val config = sConfig.getConfig("map/${name}")?:return false
+        val config = sConfig.getConfig("map/${mapName}")?:return false
         config.set("name",mapData.name)
         config.set("world",mapData.world.name)
         config.set("survivorLimit",mapData.survivorLimit)
@@ -473,8 +481,9 @@ class MapConfigInv(private val name: String, private val mapData: MapData) : Lar
         config.set("woodPlates",mapData.woodPlates.values.stream().map { "${it.loc.blockX},${it.loc.blockY},${it.loc.blockZ},${it.length},${it.face.name}" }.toList())
         config.set("hatches",mapData.hatches.values.stream().map { "${it.location.blockX},${it.location.blockY},${it.location.blockZ}" }.toList())
         config.set("lobbyLocation",mapData.lobbyLocation)
-        sConfig.saveConfig(config,"map/${name}")
-        IdentityFifty.maps[name] = mapData
+        config.set("mapId",mapData.mapId)
+        sConfig.saveConfig(config,"map/${mapName}")
+        IdentityFifty.maps[mapName] = mapData
         return true
     }
 

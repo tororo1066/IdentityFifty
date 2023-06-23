@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffectType
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -39,6 +40,8 @@ class SerialKiller: AbstractHunter("serialkiller") {
         val killFindSkillItem = IdentityFifty.interactManager.createSInteractItem(killFindSkill).setInteractEvent { _, _ ->
             p.playSound(p.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
             p.playSound(p.location, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f)
+            IdentityFifty.broadcastSpectators(translate("spec_kill_find_used",p.name),
+                AllowAction.RECEIVE_HUNTERS_ACTION)
             val uuid = UUID.randomUUID()
             IdentityFifty.survivors.values.forEach {
                 it.footprintsModify += uuid to 10.0
@@ -66,6 +69,8 @@ class SerialKiller: AbstractHunter("serialkiller") {
                         data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), GlowAPI.Color.RED, 140)
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,140,1))
                         p.sendTranslateMsg("kill_find_failed")
+                        IdentityFifty.broadcastSpectators(translate("spec_kill_find_failed",p.name),
+                            AllowAction.RECEIVE_HUNTERS_ACTION)
                         p.playSound(p.location, Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1f)
                     }
 
@@ -82,7 +87,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
                 bossBar.setTitle(translate("kill_find_remaining_time", (floor(timer / 20.0 * 10.0) / 10.0).toString()))
             }, 0, 1)
             return@setInteractEvent true
-        }.setInitialCoolDown(1000)
+        }.setInitialCoolDown(1100)
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             val survivors = (IdentityFifty.identityFiftyTask?.aliveSurvivors()?:return@Runnable)

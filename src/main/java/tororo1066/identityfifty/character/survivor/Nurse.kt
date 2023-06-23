@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.toPlayer
@@ -35,6 +36,8 @@ class Nurse : AbstractSurvivor("nurse") {
                     }
                 }
                 p.world.playSound(p.location,Sound.ENTITY_PLAYER_LEVELUP,1f,1f)
+
+                IdentityFifty.broadcastSpectators(translate("spec_syringe_used",p.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
                 return@setInteractEvent true
             }
             p.inventory.addItem(healSkillItem)

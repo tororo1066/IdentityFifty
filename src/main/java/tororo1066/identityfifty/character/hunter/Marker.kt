@@ -16,6 +16,7 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -50,6 +51,8 @@ class Marker: AbstractHunter("marker") {
             arrow.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"marker"),
                 PersistentDataType.INTEGER,1)
 
+            IdentityFifty.broadcastSpectators(translate("spec_market_crossbow_used",p.name),
+                AllowAction.RECEIVE_HUNTERS_ACTION)
 
             arrowTask = object : BukkitRunnable() {
                 override fun run() {
@@ -75,6 +78,8 @@ class Marker: AbstractHunter("marker") {
             update(e.entity.uniqueId, (marks[e.entity.uniqueId]?.first?:0) + 5)
             data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,100)
             e.damage = 0.0
+            IdentityFifty.broadcastSpectators(translate("spec_market_crossbow_hit",p.name,e.entity.name),
+                AllowAction.RECEIVE_HUNTERS_ACTION)
         }
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {

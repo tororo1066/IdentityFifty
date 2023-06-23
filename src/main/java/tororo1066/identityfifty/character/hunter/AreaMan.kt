@@ -9,6 +9,7 @@ import org.bukkit.potion.PotionEffectType
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -58,6 +59,8 @@ class AreaMan: AbstractHunter("areaman") {
                     Thread.sleep(100)
                 }
             })
+
+            IdentityFifty.broadcastSpectators(translate("spec_area_skill_used",p.name), AllowAction.RECEIVE_HUNTERS_ACTION)
 
             return@setInteractEvent true
         }

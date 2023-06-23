@@ -13,12 +13,12 @@ import java.util.UUID
 class TalentSQL: USQLTable("talent", SMySQL(IdentityFifty.plugin)){
 
     companion object{
-        val id = USQLVariable(USQLVariable.INT,autoIncrement = true)
-        val uuid = USQLVariable(USQLVariable.VARCHAR,36,false,USQLVariable.Index.KEY)
-        val name = USQLVariable(USQLVariable.VARCHAR,16)
-        val preset_name = USQLVariable(USQLVariable.VARCHAR,50)
-        val type = USQLVariable(USQLVariable.VARCHAR,16)
-        val talent_list = USQLVariable(USQLVariable.TEXT)
+        val id = USQLVariable(USQLVariable.Int,autoIncrement = true)
+        val uuid = USQLVariable(USQLVariable.VarChar,36,false,USQLVariable.Index.KEY)
+        val name = USQLVariable(USQLVariable.VarChar,16)
+        val preset_name = USQLVariable(USQLVariable.VarChar,50)
+        val type = USQLVariable(USQLVariable.VarChar,16)
+        val talent_list = USQLVariable(USQLVariable.Text)
     }
 
     init {

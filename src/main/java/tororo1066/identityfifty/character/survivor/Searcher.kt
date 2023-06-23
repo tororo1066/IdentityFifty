@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -41,6 +42,7 @@ class Searcher : AbstractSurvivor("searcher") {
                 Bukkit.getPlayer(uuid)?:return@forEach
                 data.glowManager.glow(players, GlowAPI.Color.RED,240)
             }
+            IdentityFifty.broadcastSpectators(translate("spec_search_lens_used",p.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(1100)
 

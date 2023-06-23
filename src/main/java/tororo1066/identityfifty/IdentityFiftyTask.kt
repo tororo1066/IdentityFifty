@@ -30,9 +30,11 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Team
@@ -41,6 +43,7 @@ import tororo1066.identityfifty.data.GeneratorData
 import tororo1066.identityfifty.data.MapData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.StunState
+import tororo1066.identityfifty.map.IdentityFiftyMapRenderer
 import tororo1066.tororopluginapi.SStr.Companion.toSStr
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -189,6 +192,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
         IdentityFifty.survivors.clear()
         IdentityFifty.hunters.clear()
+        IdentityFifty.spectators.clear()
 
         Bukkit.getOnlinePlayers().forEach {
             it.walkSpeed = 0.2f
@@ -319,6 +323,17 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             IdentityFifty.stunEffect(p)
         }
 
+        IdentityFifty.spectators.forEach { (uuid, data) ->
+            val p = Bukkit.getPlayer(uuid)!!
+            runTask {
+                p.gameMode = GameMode.SPECTATOR
+                p.inventory.clear()
+                p.teleport(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.random())
+            }
+        }
+
+        IdentityFifty.characterLogSQL.insertAll()
+
         //牢屋の脱出判定のlocationにアマスタを出す この周囲でシフトすることで救助できる
         map.prisons.forEach {
             runTask {
@@ -327,6 +342,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         intArrayOf(it.key.blockX,it.key.blockY,it.key.blockZ))
                     stand.isInvisible = true
                     stand.isInvulnerable = true
+                    stand.isCollidable = false
                     prisonUUID.add(stand.uniqueId)
                 }
             }
@@ -369,6 +385,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     stand.isInvisible = true
                     stand.isInvulnerable = true
                     stand.isMarker = true
+                    stand.isCollidable = false
                     woodPlateUUID.add(stand.uniqueId)
                 }
 
@@ -518,7 +535,11 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             if (IdentityFifty.survivors.size == aliveSurvivors().size){
                 val hunters = IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList()
+                hunters.forEach {
+                    it.sendTranslateMsg("survivor_all_glowed")
+                }
                 IdentityFifty.survivors.values.forEach {
+                    it.uuid.toPlayer()?.sendTranslateMsg("survivor_all_glowed_for_survivor")
                     it.glowManager.glow(hunters,GlowAPI.Color.RED,100)
                 }
             }
@@ -1203,12 +1224,21 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
+        sEvent.register(PlayerSwapHandItemsEvent::class.java) { e ->
+            if (IdentityFifty.survivors.containsKey(e.player.uniqueId) || IdentityFifty.hunters.containsKey(e.player.uniqueId)){
+                e.isCancelled = true
+            }
+        }
+
         sEvent.register(AsyncChatEvent::class.java, EventPriority.LOWEST) { e ->
             if (aliveSurvivors().contains(e.player.uniqueId)){
                 if (e.message().toSStr().toString().startsWith("-")){
                     return@register
                 } else {
                     e.isCancelled = true
+                    IdentityFifty.survivors.keys.forEach {
+                        it.toPlayer()?.sendMessage("§7[§f${e.player.name}§7] -> ${e.message().toSStr()}§r")
+                    }
                     Bukkit.getOnlinePlayers().filter { !IdentityFifty.hunters.containsKey(it.uniqueId) }.forEach {
                         it.sendMessage("§7[§f${e.player.name}§7] -> ${e.message().toSStr()}§r")
                     }
@@ -1245,6 +1275,18 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }.start()
         }
 
+        val bukkitMap = Bukkit.getMap(map.mapId?:-1)
+        var mapItem: ItemStack? = null
+        if (bukkitMap != null){
+            mapItem = ItemStack(Material.FILLED_MAP)
+            val meta = mapItem.itemMeta as MapMeta
+            meta.mapView = bukkitMap
+            meta.mapView!!.addRenderer(IdentityFiftyMapRenderer(map))
+            mapItem.itemMeta = meta
+        }
+
+
+
         IdentityFifty.survivors.forEach { (uuid, data) ->
             val p = Bukkit.getPlayer(uuid)!!
             titleTask(p){
@@ -1252,6 +1294,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 data.talentClasses.values.forEach {
                     it.onStart(p)
                 }
+                mapItem?.let { p.inventory.addItem(it) }
                 data.quickChatBarData.init()
             }
         }
@@ -1263,6 +1306,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 data.talentClasses.values.forEach {
                     it.onStart(p)
                 }
+                mapItem?.let { p.inventory.addItem(it) }
                 data.quickChatBarData.init()
             }
         }

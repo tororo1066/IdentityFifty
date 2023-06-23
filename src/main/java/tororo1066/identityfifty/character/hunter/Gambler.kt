@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -33,6 +34,8 @@ class Gambler: AbstractHunter("gambler") {
                     IdentityFifty.survivors.values.forEach {
                         it.glowManager.glow(players, GlowAPI.Color.RED, 300)
                     }
+                    IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_1",p.name),
+                        AllowAction.RECEIVE_HUNTERS_ACTION)
                 }
                 in 21..35->{
                     p.sendTranslateMsg("gamble_dice_action_2")
@@ -43,14 +46,20 @@ class Gambler: AbstractHunter("gambler") {
                     players.forEach {
                         it.sendTranslateMsg("gamble_dice_action_2_survivors")
                     }
+                    IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_2",p.name),
+                        AllowAction.RECEIVE_HUNTERS_ACTION)
                 }
                 in 36..50->{
                     p.sendTranslateMsg("gamble_dice_action_3")
                     p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 300, 1, false, false))
+                    IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_3",p.name),
+                        AllowAction.RECEIVE_HUNTERS_ACTION)
                 }
                 in 51..65->{
                     p.sendTranslateMsg("gamble_dice_action_4")
                     p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 300, 0, false, false))
+                    IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_4",p.name),
+                        AllowAction.RECEIVE_HUNTERS_ACTION)
                 }
                 in 66..84->{
                     p.sendTranslateMsg("gamble_dice_action_5")
@@ -73,6 +82,9 @@ class Gambler: AbstractHunter("gambler") {
                         }
                         it.customName = "§f§l牛型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                     }
+
+                    IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_5",p.name),
+                        AllowAction.RECEIVE_HUNTERS_ACTION)
                 }
                 in 85..100->{
                     p.sendTranslateMsg("gamble_dice_action_6")
@@ -85,6 +97,9 @@ class Gambler: AbstractHunter("gambler") {
                         }
                         it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                     }
+
+                    IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_6",p.name),
+                        AllowAction.RECEIVE_HUNTERS_ACTION)
                 }
             }
         })

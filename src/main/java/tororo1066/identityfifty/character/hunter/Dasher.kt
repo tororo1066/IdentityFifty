@@ -9,6 +9,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 
@@ -24,6 +25,7 @@ class Dasher : AbstractHunter("dasher") {
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { _, _ ->
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
             p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
+            IdentityFifty.broadcastSpectators(translate("spec_hyper_engine_used",p.name),AllowAction.RECEIVE_HUNTERS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(800)
 

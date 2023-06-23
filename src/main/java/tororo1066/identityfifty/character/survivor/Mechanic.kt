@@ -8,6 +8,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 
@@ -33,6 +34,8 @@ class Mechanic: AbstractSurvivor("mechanic") {
                 it.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
                 it.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 60, 2, false))
             }
+            IdentityFifty.broadcastSpectators(translate("spec_slow_timer_used",p.name),
+                AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(1200)
 
