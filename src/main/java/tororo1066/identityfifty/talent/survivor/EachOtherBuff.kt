@@ -27,7 +27,7 @@ class EachOtherBuff : AbstractSurvivorTalent ("each_other_buff",5,FullSheepUp::c
                     playerData.glowManager.glow(mutableListOf(targetPlayer),GlowAPI.Color.BLUE,20)
                 }
             }
-        },0,19))
+        },0,5))
     }
 
     override fun sheepGeneratorModify(damage: Double, remainingGenerator: Int, maxHealth: Double, nowHealth: Double, p: Player): Double {
@@ -41,7 +41,7 @@ class EachOtherBuff : AbstractSurvivorTalent ("each_other_buff",5,FullSheepUp::c
             data.getHealth() == 5
         }
         if (playerList.isNotEmpty()){
-            return damage * 1.1
+            return damage * 1.125
         }
         return damage
     }
@@ -57,7 +57,7 @@ class EachOtherBuff : AbstractSurvivorTalent ("each_other_buff",5,FullSheepUp::c
             data.getHealth() == 5
         }
         if (playerList.isNotEmpty()){
-            return damage * 1.1
+            return damage * 1.125
         }
         return damage
     }
