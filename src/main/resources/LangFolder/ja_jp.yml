@@ -91,7 +91,7 @@ low_foot_prints_lore_1: "§7足跡の残る時間が§50.8倍§7になる"
 remain_time_up: "§f悪足搔き"
 remain_time_up_lore_1: "§7捕まってから死ぬまでの時間が§520§7増える"
 plate_speed_up: "§f畏怖恐怖"
-plate_speed_up_lore_1: "§7板を倒した時に5秒間移動速度が§540%§7上がる"
+plate_speed_up_lore_1: "§7板を倒した時に3秒間移動速度が§560%§7上がる"
 plate_speed_up_lore_2: "§c§lクールタイム§f: §e§l40§b§l秒"
 gate_open_boost: "§f一筋の縄"
 gate_open_boost_lore_1: "§7羊型発電機が全部発電し終わると§54秒間§7移動速度が§560%§7上がり、§52§7回復する"
@@ -122,8 +122,8 @@ got_helped_speed_up_lore_1: "§7救助された時に2秒間移動速度が§520
 hit_plate_effect: "§f命の妨害"
 hit_plate_effect_lore_1: "§7板を当てたときにハンターを§55秒§7光らせ(全員から見れる)、§51秒間§7盲目を延ばす"
 each_other_buff: "§f主導者"
-each_other_buff_lore_1: "§7自身の体力が最大の時、体力最大のサバイバーとの位置情報が共有され、"
-each_other_buff_lore_2: "§7さらにそのサバイバーが近くで発電しているとき自身の発電速度が§510%§7上昇する"
+each_other_buff_lore_1: "§7負傷している味方を表示する。"
+each_other_buff_lore_2: "§7またHPがMAXのサバイバーと一緒に発電しているとき自身の発電速度が§515%§7上昇する"
 # survivor end
 
 # hunter start
