@@ -17,7 +17,7 @@ class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",5,WoundedCowUp::cla
 
     override fun onWoodPlate(loc: Location, p: Player) {
         if(boost){
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,2))
             boost = false
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
