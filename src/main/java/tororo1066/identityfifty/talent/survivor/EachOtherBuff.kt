@@ -23,11 +23,11 @@ class EachOtherBuff : AbstractSurvivorTalent ("each_other_buff",5,FullSheepUp::c
 
 
                 if(health == 5){
-                    data.glowManager.glow(mutableListOf(p), GlowAPI.Color.BLUE,30)
-                    playerData.glowManager.glow(mutableListOf(targetPlayer),GlowAPI.Color.BLUE,30)
+                    data.glowManager.glow(mutableListOf(p), GlowAPI.Color.BLUE,20)
+                    playerData.glowManager.glow(mutableListOf(targetPlayer),GlowAPI.Color.BLUE,20)
                 }
             }
-        },0,20))
+        },0,19))
     }
 
     override fun sheepGeneratorModify(damage: Double, remainingGenerator: Int, maxHealth: Double, nowHealth: Double, p: Player): Double {
