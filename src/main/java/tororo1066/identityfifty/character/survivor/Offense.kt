@@ -106,7 +106,7 @@ class Offense : AbstractSurvivor("offense") {
     }
 
     override fun onHitWoodPlate(
-        hittedPlayer: Player,
+        hitPlayer: Player,
         loc: Location,
         blindTime: Int,
         slowTime: Int,

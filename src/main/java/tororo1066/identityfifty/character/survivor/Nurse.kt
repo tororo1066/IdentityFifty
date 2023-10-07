@@ -46,7 +46,7 @@ class Nurse : AbstractSurvivor("nurse") {
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
-        data.healTick = 120
+        data.healTick = 140
         data.healSmallHealth = true
         return data
     }

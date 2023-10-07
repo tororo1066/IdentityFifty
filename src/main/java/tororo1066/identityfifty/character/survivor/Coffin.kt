@@ -112,11 +112,18 @@ class Coffin: AbstractSurvivor("coffin") {
             }
 
             val prisonData = IdentityFifty.identityFiftyTask!!.map.prisons.entries.find { it.value.inPlayer.contains(p.uniqueId) }!!
-            prisonData.value.inPlayer.remove(p.uniqueId)
             val playerData = IdentityFifty.survivors[p.uniqueId]!!
+            prisonData.value.inPlayer.remove(p.uniqueId)
+            val onGotHelp = playerData.survivorClass.onGotHelp(p,p)
+            if (onGotHelp == ReturnAction.CANCEL){
+                p.teleport(prisonData.value.spawnLoc)
+                return@setDropEvent
+            }
+            if (onGotHelp == ReturnAction.RETURN){
+                return@setDropEvent
+            }
             playerData.setHealth(3, true)
             playerData.survivorClass.onHelp(p,p)
-            playerData.survivorClass.onGotHelp(p,p)
             playerData.talentClasses.values.forEach {
                 it.onHelp(p,p)
                 it.onGotHelp(p,p)

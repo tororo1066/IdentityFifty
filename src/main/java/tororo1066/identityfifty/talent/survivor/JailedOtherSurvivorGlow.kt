@@ -5,7 +5,6 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
-import tororo1066.identityfifty.character.survivor.AbstractSurvivor
 import tororo1066.identityfifty.data.PrisonData
 
 class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glow",2,HatchLow::class.java) {
@@ -19,8 +18,8 @@ class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glo
         glowtask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             val players = ArrayList<Player>()
             IdentityFifty.survivors.forEach { (uuid, _) ->
-                val playerinfo = Bukkit.getPlayer(uuid)?:return@forEach
-                players.add(playerinfo)
+                val playerInfo = Bukkit.getPlayer(uuid)?:return@forEach
+                players.add(playerInfo)
             }
             IdentityFifty.survivors.forEach { (uuid, data) ->
                 Bukkit.getPlayer(uuid)?:return@forEach
@@ -30,6 +29,11 @@ class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glo
     }
 
     override fun onGotHelp(helper: Player, p: Player) {
+        glowtask?.cancel()
+        glowtask = null
+    }
+
+    override fun onDie(p: Player) {
         glowtask?.cancel()
         glowtask = null
     }

@@ -58,6 +58,7 @@ class Fader: AbstractHunter("fader"){
                     .addLore(translate("glow_trap_lore_2"))
                     .addLore(translate("glow_trap_lore_3"))
                     .addLore(translate("glow_trap_lore_4"))
+                    .addLore(translate("glow_trap_lore_5"))
                     .setCustomData(IdentityFifty.plugin,"glow_trap", PersistentDataType.INTEGER, 1)
                 val trapSkillItem = IdentityFifty.interactManager.createSInteractItem(trap, true).setInteractEvent { e, item ->
                     e.item!!.amount -= 1
@@ -82,7 +83,10 @@ class Fader: AbstractHunter("fader"){
                         val task = object : BukkitRunnable(){
 
                             override fun run() {
-                                val players = it.location.getNearbyPlayers(2.0).filter { fil-> IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(fil.uniqueId) == true }
+                                val players = it.location.getNearbyPlayers(2.0).filter {
+                                    fil-> IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(fil.uniqueId) == true
+                                        && !fil.isSneaking
+                                }
                                 if (players.isEmpty())return
                                 players.forEach { surP ->
                                     val data = IdentityFifty.survivors[surP.uniqueId]?:return@forEach
@@ -90,7 +94,7 @@ class Fader: AbstractHunter("fader"){
                                     p.sendMessage(IdentityFifty.prefix + translate("glow_trap_hit"))
                                     surP.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
                                     surP.sendMessage(IdentityFifty.prefix + translate("glow_trap_hit_survivor"))
-                                    data.glowManager.glow(mutableListOf(p),GlowAPI.Color.DARK_RED,280)
+                                    data.glowManager.glow(mutableListOf(p),GlowAPI.Color.DARK_RED,240)
                                     IdentityFifty.broadcastSpectators(translate("spec_glow_trap_hit",surP.name),
                                         AllowAction.RECEIVE_HUNTERS_ACTION)
                                 }
@@ -151,6 +155,7 @@ class Fader: AbstractHunter("fader"){
             .addLore(translate("glow_trap_lore_2"))
             .addLore(translate("glow_trap_lore_3"))
             .addLore(translate("glow_trap_lore_4"))
+            .addLore(translate("glow_trap_lore_5"))
         return arrayListOf(passiveItem,trap)
     }
 }

@@ -9,6 +9,6 @@ class PrisonData {
     lateinit var escapeLoc: Location
     lateinit var doorLoc: Location
     val inPlayer = ArrayList<UUID>()
-    lateinit var lastPressUUID: UUID
+    var lastPressUUID: UUID? = null
 
 }

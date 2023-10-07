@@ -86,7 +86,7 @@ class IdentityFifty : SJavaPlugin() {
 
         /** スタンのエフェクト(デフォルトの時間) **/
         fun stunEffect(p: Player){
-            stunEffect(p,140,160,StunState.DAMAGED)
+            stunEffect(p,120,150,StunState.DAMAGED)
         }
 
         /** スタンのエフェクト(時間指定) **/
@@ -150,7 +150,7 @@ class IdentityFifty : SJavaPlugin() {
     private fun registerAll(){
         register(Nurse(),Dasher(),RunAway(),Searcher(),Helper(),AreaMan(),
             DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense(),Marker(),
-            Coffin(),SerialKiller())
+            Coffin(),SerialKiller(),Controller())
     }
     override fun onStart() {
         saveDefaultConfig()

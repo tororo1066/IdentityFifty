@@ -65,7 +65,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
         val data = IdentityFifty.survivors[p.uniqueId]!!
         if (data.skinModifier.isDisguise()){
             data.skinModifier.unDisguise()
-            IdentityFifty.stunEffect(damager,20,50,StunState.OTHER)
+            IdentityFifty.stunEffect(damager,20,60,StunState.OTHER)
             p.sendTranslateMsg("disguise_skill_end")
             IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_end",p.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)

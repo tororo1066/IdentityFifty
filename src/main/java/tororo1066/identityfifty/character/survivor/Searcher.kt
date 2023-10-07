@@ -52,7 +52,7 @@ class Searcher : AbstractSurvivor("searcher") {
             if (IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(p.uniqueId) == false){
                 return@Runnable
             }
-            val players = p.location.getNearbyPlayers(15.0)
+            val players = p.location.getNearbyPlayers(12.0)
                 .filter { it != p && IdentityFifty.hunters.containsKey(it.uniqueId)}
             players.forEach {
                 val data = IdentityFifty.hunters[it.uniqueId]?:return@forEach

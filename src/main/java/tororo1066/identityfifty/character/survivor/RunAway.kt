@@ -56,13 +56,14 @@ class RunAway : AbstractSurvivor("runaway") {
         return data
     }
 
-    override fun onGotHelp(helper: Player, p: Player) {
+    override fun onGotHelp(helper: Player, p: Player): ReturnAction {
         val data = IdentityFifty.survivors[p.uniqueId]!!
         if (data.talentClasses.containsKey(GotHelpedSpeedUp::class.java)){
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,120,1))
         } else {
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
         }
+        return super.onGotHelp(helper, p)
     }
 
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {

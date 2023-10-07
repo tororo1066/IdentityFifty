@@ -68,7 +68,7 @@ class Gambler: AbstractHunter("gambler") {
                         if (it.health + 200 > it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
                             it.health = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue
                         } else {
-                            it.health += 200
+                            it.health += 175
                         }
                         it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                     }
@@ -93,7 +93,7 @@ class Gambler: AbstractHunter("gambler") {
                         if (it.health - 100 < 1){
                             it.health = 1.0
                         } else {
-                            it.health -= 100
+                            it.health -= 150
                         }
                         it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
                     }

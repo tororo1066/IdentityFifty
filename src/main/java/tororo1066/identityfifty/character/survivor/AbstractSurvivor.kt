@@ -31,13 +31,31 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
 
     open fun onJail(prisonData: PrisonData, p: Player) {}
 
-    open fun onHitWoodPlate(hittedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
+    open fun onHitWoodPlate(hitPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int,Int> {
         return Pair(blindTime,slowTime)
+    }
+
+    open fun onTryHeal(healPlayer: Player, p: Player): Boolean {
+        return true
+    }
+
+    open fun onTryGotHeal(healer: Player, p: Player): Boolean {
+        return true
+    }
+
+//    open fun onHeal(heal: Int, toHealth: Int, healedPlayer: Player, p: Player) {}
+//
+//    open fun onGotHeal(healer: ArrayList<Player>, p: Player) {}
+//
+    open fun onTryGotHelp(helper: Player, p: Player): Boolean {
+        return true
     }
 
     open fun onHelp(helpedPlayer: Player, p: Player) {}
 
-    open fun onGotHelp(helper: Player, p: Player) {}
+    open fun onGotHelp(helper: Player, p: Player): ReturnAction {
+        return ReturnAction.CONTINUE
+    }
 
     open fun onDie(p: Player) {
         p.inventory.clear()
@@ -63,5 +81,11 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
 
     protected fun inPrison(p: Player): Boolean {
         return IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == true
+    }
+
+    enum class ReturnAction {
+        CANCEL,
+        CONTINUE,
+        RETURN
     }
 }

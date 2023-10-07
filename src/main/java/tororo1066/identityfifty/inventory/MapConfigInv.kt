@@ -13,6 +13,7 @@ import tororo1066.tororopluginapi.SInput
 import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.defaultMenus.LargeSInventory
 import tororo1066.tororopluginapi.otherClass.PlusInt
+import tororo1066.tororopluginapi.otherUtils.UsefulUtility
 import tororo1066.tororopluginapi.sInventory.SInventoryItem
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.LocType
@@ -188,6 +189,19 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
         }
 
         items.add(mapId)
+
+        val windowBlock = createInputItem(SItem(Material.SOUL_SAND).setDisplayName("§a窓のブロック設定").addLore("§a現在の値：§e${mapData.windowBlock}"),
+            String::class.java) { str, _ ->
+            val material = UsefulUtility.sTry({ Material.valueOf(str) }, { null })
+            if (material == null){
+                p.sendMessage("§4ブロックが存在しません")
+                return@createInputItem
+            }
+            mapData.windowBlock = material
+            p.sendMessage("§a窓のブロックを§d${material}§aにしました")
+        }
+
+        items.add(windowBlock)
 
         val save = SItem(Material.LIME_STAINED_GLASS).setDisplayName("§a保存").toSInventoryItem().setCanClick(false).setClickEvent { e ->
             e.whoClicked.closeInventory()
@@ -482,6 +496,7 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
         config.set("hatches",mapData.hatches.values.stream().map { "${it.location.blockX},${it.location.blockY},${it.location.blockZ}" }.toList())
         config.set("lobbyLocation",mapData.lobbyLocation)
         config.set("mapId",mapData.mapId)
+        config.set("windowBlock",mapData.windowBlock.name)
         sConfig.saveConfig(config,"map/${mapName}")
         IdentityFifty.maps[mapName] = mapData
         return true

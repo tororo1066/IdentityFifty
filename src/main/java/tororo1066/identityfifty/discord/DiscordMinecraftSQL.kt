@@ -1,12 +1,11 @@
 package tororo1066.identityfifty.discord
 
-import org.bukkit.Bukkit
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.mysql.SMySQL
 import tororo1066.tororopluginapi.mysql.SMySQLResultSet
 import tororo1066.tororopluginapi.mysql.ultimate.USQLTable
 import tororo1066.tororopluginapi.mysql.ultimate.USQLVariable
-import java.util.UUID
+import java.util.*
 
 class DiscordMinecraftSQL: USQLTable("discord_minecraft", SMySQL(IdentityFifty.plugin)) {
 

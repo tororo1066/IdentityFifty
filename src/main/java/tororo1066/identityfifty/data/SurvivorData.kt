@@ -45,7 +45,10 @@ class SurvivorData : PlayerData() {
     var heartProcess = 0.0
     var heartProcessRules = arrayListOf(Pair(25.0,0.2), Pair(20.0,0.1), Pair(15.0,0.2), Pair(10.0,0.5))
     var healSmallHealth = false
+    var canHelpSelf = false
+
     var cancelGeneratorAttack = false
+    var onWindow = false
 
     val talentClasses = HashMap<Class<out AbstractSurvivorTalent>,AbstractSurvivorTalent>()
     var talentCost = 10

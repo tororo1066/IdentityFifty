@@ -10,7 +10,7 @@ class SurvivorHealedStop : AbstractHunterTalent("survivor_healed_stop",2,RemainT
     }
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
-        healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.SLOW,60,200))
-        healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,60,3))
+        healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.SLOW,100,200))
+        healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,140,3))
     }
 }

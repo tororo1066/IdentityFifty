@@ -2,6 +2,7 @@ package tororo1066.identityfifty.data
 
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.configuration.file.YamlConfiguration
@@ -81,6 +82,8 @@ class MapData: Cloneable {
                 data.mapId = mapId
             }
 
+            data.windowBlock = Material.valueOf(config.getString("windowBlock","SOUL_SAND")!!)
+
             return data
         }
     }
@@ -101,6 +104,7 @@ class MapData: Cloneable {
     val prisons = HashMap<Location,PrisonData>()
     var woodPlates = HashMap<Location,WoodPlateData>()
     var hatches = HashMap<Location,HatchData>()
+    lateinit var windowBlock: Material
 
     var lobbyLocation: Location? = null
 

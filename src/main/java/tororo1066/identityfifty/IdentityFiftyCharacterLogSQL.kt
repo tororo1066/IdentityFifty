@@ -9,6 +9,7 @@ class IdentityFiftyCharacterLogSQL: USQLTable("identity_character_log", SMySQL(I
     companion object {
         val id = USQLVariable(USQLVariable.Int, autoIncrement = true)
         val uuid = USQLVariable(USQLVariable.VarChar, length = 36)
+        val mcid = USQLVariable(USQLVariable.VarChar, length = 16, nullable = true)
         val type = USQLVariable(USQLVariable.VarChar, length = 10)
         val value = USQLVariable(USQLVariable.VarChar, length = 100)
         val date = USQLVariable(USQLVariable.DateTime)
@@ -16,11 +17,11 @@ class IdentityFiftyCharacterLogSQL: USQLTable("identity_character_log", SMySQL(I
 
     fun insertAll(){
         IdentityFifty.survivors.values.forEach {
-            callBackInsert(it.uuid,"survivor",it.survivorClass.name,"now()")
+            callBackInsert(it.uuid, it.name, "survivor", it.survivorClass.name, "now()")
         }
 
         IdentityFifty.hunters.values.forEach {
-            callBackInsert(it.uuid,"hunters",it.hunterClass.name,"now()")
+            callBackInsert(it.uuid, it.name, "hunters", it.hunterClass.name, "now()")
         }
     }
 }

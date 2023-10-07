@@ -130,15 +130,15 @@ class DiscordClient: ListenerAdapter(), Listener {
 
                 val usersAsMention = survivors.values.plus(hunters.values).map { jda.retrieveUserById(it).complete()?.asMention?:"不明" }
 
-                channel.sendMessage("5分以内にサーバーに参加してキャラを選択してください" +
+                channel.sendMessage("7分以内にサーバーに参加してキャラを選択してください" +
                         " /gwarp xtororo" +
                         "\n${usersAsMention.joinToString(" ")}")
                     .queue()
 
-                var count = 1000 * 60 * 5
+                var count = 1000 * 60 * 7
                 while (IdentityFifty.survivors.size != 4 || IdentityFifty.hunters.size != 1){
                     if (count <= 0){
-                        channel.sendMessage("5分経過したため取り消しました")
+                        channel.sendMessage("7分経過したため取り消しました")
                         Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
                             (survivors + hunters + spectators).keys.forEach {
                                 it.toPlayer()?.kick(Component.text("5分経過したため取り消しました"))
@@ -212,7 +212,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                 if (args[0].lowercase() == "unregister"){
                     val minecraftData = discordSQL.getFromDiscordId(member.idLong)
                     if (minecraftData == null){
-                        e.message.reply("マインクラフトとdiscordを紐付けしてください").queue()
+                        e.message.reply("マインクラフトとdiscordを紐付けしてください !himo").queue()
                         return
                     }
                     val uuid = UUID.fromString(minecraftData.getString("uuid"))
@@ -228,7 +228,9 @@ class DiscordClient: ListenerAdapter(), Listener {
                                 "登録解除しました\n" +
                                 "${survivors.size}/4 ${hunters.size}/1").queue()
 
-                    Bukkit.getPlayer(uuid)?.kick(Component.text("登録解除"))
+                    Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+                        Bukkit.getPlayer(uuid)?.kick(Component.text("登録解除"))
+                    })
 
                     return
                 }
@@ -242,7 +244,7 @@ class DiscordClient: ListenerAdapter(), Listener {
 
                 val minecraftData = discordSQL.getFromDiscordId(member.idLong)
                 if (minecraftData == null){
-                    e.message.reply("マインクラフトとdiscordを紐付けしてください").queue()
+                    e.message.reply("マインクラフトとdiscordを紐付けしてください !himo").queue()
                     return
                 }
 

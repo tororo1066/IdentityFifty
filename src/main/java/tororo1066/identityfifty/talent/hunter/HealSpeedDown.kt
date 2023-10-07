@@ -10,7 +10,7 @@ class HealSpeedDown: AbstractHunterTalent("heal_speed_down",1,TalentPlane::class
 
     override fun onStart(p: Player) {
         IdentityFifty.survivors.forEach { (_, data) ->
-            data.healTick = (data.healTick * 1.05).toInt()
+            data.healTick = (data.healTick * 1.1).toInt()
         }
     }
 }

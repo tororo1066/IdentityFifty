@@ -30,10 +30,10 @@ class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, EndG
 
             p.playSound(p.location, Sound.BLOCK_ANVIL_USE,0.8f,2f)
             targetEntity as Sheep
-            if (targetEntity.health + 450 > targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
+            if (targetEntity.health + 400 > targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
                 targetEntity.health = targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue
             } else {
-                targetEntity.health += 450
+                targetEntity.health += 400
             }
             targetEntity.customName = "§f§l羊型発電機§5(§e${targetEntity.health.toInt()}§f/§b${targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
             return@setInteractEvent true

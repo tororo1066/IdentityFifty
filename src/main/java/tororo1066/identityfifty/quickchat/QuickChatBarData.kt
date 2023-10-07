@@ -94,7 +94,7 @@ class QuickChatBarData(val uuid: UUID) {
 
                             val data = IdentityFifty.hunters[e.player.uniqueId]
                             data?.glowManager?.glow(IdentityFifty.hunters.mapNotNull { it.key.toPlayer() }.toMutableList(),
-                                GlowAPI.Color.WHITE, 50)
+                                GlowAPI.Color.WHITE, 80)
                             returnItems()
                         } else {
                             IdentityFifty.survivors.keys.mapNotNull { it.toPlayer() }.forEach {
@@ -107,7 +107,7 @@ class QuickChatBarData(val uuid: UUID) {
 
                             val data = IdentityFifty.survivors[e.player.uniqueId]
                             data?.glowManager?.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(),
-                                GlowAPI.Color.WHITE, 50)
+                                GlowAPI.Color.WHITE, 80)
                             returnItems()
                         }
                         return@chat true
