@@ -35,12 +35,12 @@ class Controller: AbstractSurvivor("controller") {
             .addLore(translate("controller_passive_lore_1"))
             .addLore(translate("controller_passive_lore_2"))
             .addLore(translate("controller_passive_lore_3"))
-            .addLore(translate("controller_passive_lore_4"))
 
         val controllerSkill = SItem(Material.STICK).setDisplayName(translate("control_doll"))
             .addLore(translate("control_doll_lore_1"))
             .addLore(translate("control_doll_lore_2"))
             .addLore(translate("control_doll_lore_3"))
+            .addLore(translate("control_doll_lore_4"))
             .setCustomModelData(26)
 
         val controllerSkillItem = IdentityFifty.interactManager.createSInteractItem(controllerSkill,true).setInteractEvent { _, item ->
@@ -270,13 +270,13 @@ class Controller: AbstractSurvivor("controller") {
             .addLore(translate("controller_passive_lore_1"))
             .addLore(translate("controller_passive_lore_2"))
             .addLore(translate("controller_passive_lore_3"))
-            .addLore(translate("controller_passive_lore_4"))
 
         val controllerSkill = SItem(Material.STICK).setDisplayName(translate("control_doll"))
             .addLore(translate("control_doll_lore_1"))
             .addLore(translate("control_doll_lore_2"))
             .addLore(translate("control_doll_lore_3"))
-            .setCustomModelData(27)
+            .addLore(translate("control_doll_lore_4"))
+            .setCustomModelData(26)
 
         return arrayListOf(passiveItem,controllerSkill)
     }
