@@ -29,6 +29,14 @@ abstract class AbstractSurvivorTalent(val name: String, val unlockCost: Int, var
         return Pair(blindTime,slowTime)
     }
 
+    open fun onTryHeal(healPlayer: Player, p: Player): Boolean {
+        return true
+    }
+
+//    open fun onTryGotHeal(healer: Player, p: Player): Boolean {
+//        return true
+//    }
+
     open fun onHelp(helpedPlayer: Player, p: Player) {}
 
     open fun onGotHelp(helper: Player, p: Player) {}

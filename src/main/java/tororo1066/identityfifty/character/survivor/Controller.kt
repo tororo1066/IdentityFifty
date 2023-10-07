@@ -13,6 +13,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
@@ -65,21 +67,32 @@ class Controller: AbstractSurvivor("controller") {
                 }
             }
 
+            fun teleport(p: Player, loc: Location){
+                p.isInvisible = true
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 23, 100, false, false, false))
+                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    p.teleport(loc)
+                    Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                        p.isInvisible = false
+                    }, 10)
+                }, 3)
+            }
+
             if (movingNow){
-                IdentityFifty.broadcastSpectators(translate("spec_controller_end",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                IdentityFifty.broadcastSpectators(translate("spec_control_doll_end",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
                 val loc = p.location
                 p.inventory.setItem(EquipmentSlot.HEAD, null)
                 if (latestEntity != null){
                     latestEntity!!.stopDisguise()
                     latestEntity!!.entity.remove()
-                    p.teleport(latestEntity!!.entity.location)
+                    teleport(p, latestEntity!!.entity.location)
                 }
                 saveDisguise(loc)
                 movingNow = false
                 p.playSound(p.location, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
                 return@setInteractEvent true
             }
-            IdentityFifty.broadcastSpectators(translate("spec_controller_used",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+            IdentityFifty.broadcastSpectators(translate("spec_control_doll_used",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
 
             sEvent.unregisterAll()
             movingNow = true
@@ -92,17 +105,19 @@ class Controller: AbstractSurvivor("controller") {
                 disguise.isSelfDisguiseVisible = false
                 disguise.startDisguise()
 
-                p.inventory.setItem(EquipmentSlot.HEAD, SItem(Material.LEATHER_HELMET)
-                    .setEnchantment(Enchantment.BINDING_CURSE,1))
-
                 if (latestEntity != null){
                     val loc = latestEntity!!.entity.location
                     latestEntity!!.stopDisguise()
                     latestEntity!!.entity.remove()
-                    p.teleport(loc)
+                    teleport(p, loc)
                 } else {
-                    p.teleport(p.location.setPitchL(0f))
+                    teleport(p, p.location.setPitchL(0f))
                 }
+
+                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    p.inventory.setItem(EquipmentSlot.HEAD, SItem(Material.LEATHER_HELMET)
+                        .setEnchantment(Enchantment.BINDING_CURSE,1))
+                }, 23)
 
                 latestEntity = disguise
 
@@ -127,7 +142,7 @@ class Controller: AbstractSurvivor("controller") {
                         p.inventory.setItem(EquipmentSlot.HEAD, null)
                         latestEntity!!.stopDisguise()
                         latestEntity!!.entity.remove()
-                        p.teleport(latestEntity!!.entity.location)
+                        teleport(p, latestEntity!!.entity.location)
                         saveDisguise(loc)
                         movingNow = false
                         p.damage(1.0, e.damager)
@@ -136,11 +151,11 @@ class Controller: AbstractSurvivor("controller") {
                             e.isCancelled = true
                             return@register
                         }
-                        IdentityFifty.broadcastSpectators(translate("spec_controller_broken",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                        IdentityFifty.broadcastSpectators(translate("spec_control_doll_broken",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
                         p.inventory.setItem(EquipmentSlot.HEAD, null)
                         disguise.stopDisguise()
                         it.remove()
-                        p.teleport(it.location)
+                        teleport(p, it.location)
                         latestEntity = null
 
                         sEvent.unregisterAll()
@@ -151,7 +166,7 @@ class Controller: AbstractSurvivor("controller") {
                             e.isCancelled = true
                             return@register
                         }
-                        IdentityFifty.broadcastSpectators(translate("spec_controller_broken",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                        IdentityFifty.broadcastSpectators(translate("spec_control_doll_broken",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
                         e.damage = 0.0
                         latestEntity!!.stopDisguise()
                         e.entity.remove()

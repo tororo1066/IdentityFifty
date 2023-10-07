@@ -33,7 +33,7 @@ class AreaMan: AbstractHunter("areaman") {
             .addLore(translate("area_skill_lore_3"))
             .addLore(translate("area_skill_lore_4"))
 
-        val areaSkillItem = IdentityFifty.interactManager.createSInteractItem(areaSkill,true).setInitialCoolDown(400).setInteractEvent { e, item ->
+        val areaSkillItem = IdentityFifty.interactManager.createSInteractItem(areaSkill,true).setInitialCoolDown(600).setInteractEvent { e, item ->
 
             val length = 15
             val width = 6
@@ -68,7 +68,7 @@ class AreaMan: AbstractHunter("areaman") {
             }
 
             if (glowedPlayers.isNotEmpty()){
-                p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 100, glowedPlayers.size-1, true, false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 40+glowedPlayers.size*40, glowedPlayers.size-1, true, false))
             }
 
             IdentityFifty.broadcastSpectators(translate("spec_area_skill_used",p.name), AllowAction.RECEIVE_HUNTERS_ACTION)
