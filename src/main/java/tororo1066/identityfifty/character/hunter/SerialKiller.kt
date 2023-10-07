@@ -32,7 +32,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
             .addLore(translate("serialkiller_passive_lore_1"))
             .addLore(translate("serialkiller_passive_lore_2"))
 
-        val killFindSkill = SItem(Material.STICK).setDisplayName(translate("kill_find")).setCustomModelData(26)
+        val killFindSkill = SItem(Material.STICK).setDisplayName(translate("kill_find")).setCustomModelData(27)
             .addLore(translate("kill_find_lore_1"))
             .addLore(translate("kill_find_lore_2"))
             .addLore(translate("kill_find_lore_3"))
