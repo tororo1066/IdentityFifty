@@ -145,7 +145,9 @@ class Controller: AbstractSurvivor("controller") {
                         teleport(p, latestEntity!!.entity.location)
                         saveDisguise(loc)
                         movingNow = false
-                        p.damage(1.0, e.damager)
+                        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                            p.damage(1.0, e.damager)
+                        }, 5)
                     } else if (e.entity == p && movingNow){ //操作中で尚且つ、人形が攻撃を受けた場合
                         if (!IdentityFifty.hunters.containsKey(e.damager.uniqueId)){
                             e.isCancelled = true

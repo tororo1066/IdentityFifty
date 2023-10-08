@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.character.survivor
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -30,7 +31,7 @@ class Nurse : AbstractSurvivor("nurse") {
         val speedUpItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore_1"))
             .addLore(translate("syringe_lore_2"))
-        val speedUpSkillItem = IdentityFifty.interactManager.createSInteractItem(speedUpItem,true).setInteractEvent { e, item ->
+        val speedUpSkillItem = IdentityFifty.interactManager.createSInteractItem(speedUpItem,true).setInteractEvent { _, _ ->
             val data = IdentityFifty.survivors[p.uniqueId]!!
             if (data.getHealth() <= 2){
                 p.sendTranslateMsg("nurse_syringe_cant_use")

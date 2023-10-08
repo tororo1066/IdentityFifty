@@ -10,14 +10,13 @@ import java.util.function.Consumer
 
 class GlowManager(private val uuid: UUID) {
     private var isGlowing = false
-    private var otherGlow = false
     private var tick = 0
     private val nowVisiblePlayers = ArrayList<UUID>()
 
     fun glow(visiblePlayers: MutableCollection<Player>, color: GlowAPI.Color, duration: Int){
         visiblePlayers.addAll(IdentityFifty.spectators.keys.mapNotNull { it.toPlayer() })
         if (isGlowing){
-            if (duration < tick){
+            if (tick < duration){
                 val p = Bukkit.getPlayer(uuid)?:return
                 for (player in visiblePlayers){
                     if (!GlowAPI.isGlowing(p,player)){
@@ -27,7 +26,6 @@ class GlowManager(private val uuid: UUID) {
                 }
                 return
             }
-            otherGlow = true
         }
 
         val p = Bukkit.getPlayer(uuid)?:return
@@ -41,8 +39,7 @@ class GlowManager(private val uuid: UUID) {
         Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
 
 
-            if (tick <= 0 || otherGlow){
-                otherGlow = false
+            if (tick <= 0){
                 isGlowing = false
                 GlowAPI.setGlowing(p,false, nowVisiblePlayers.mapNotNull { map -> map.toPlayer() })
                 if (IdentityFifty.survivors.containsKey(uuid)){
@@ -52,6 +49,7 @@ class GlowManager(private val uuid: UUID) {
                 if (IdentityFifty.hunters.containsKey(uuid)){
                     IdentityFifty.identityFiftyTask?.hunterTeam?.addEntry(p.name)
                 }
+                nowVisiblePlayers.clear()
 
                 it.cancel()
                 return@Consumer

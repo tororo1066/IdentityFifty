@@ -850,9 +850,9 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     return@forEach
                 }
 
-                if (!helperData.survivorClass.onTryHeal(e.player, it))return@forEach
-                if (helperData.talentClasses.any { clazz -> !clazz.value.onTryHeal(e.player, it) })return@forEach
-                if (!playerData.survivorClass.onTryGotHeal(it, e.player))return@forEach
+                if (!helperData.survivorClass.onTryHeal(it, e.player))return@forEach
+                if (helperData.talentClasses.any { clazz -> !clazz.value.onTryHeal(it, e.player) })return@forEach
+                if (!playerData.survivorClass.onTryGotHeal(e.player, it))return@forEach
 
                 //既にそのサバイバーを回復しているサバイバーがいるなら回復しているプレイヤー一覧とbossbarに追加するだけ
                 if (playerData.healingPlayers.isNotEmpty()){
