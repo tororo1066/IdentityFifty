@@ -24,7 +24,7 @@ class EachOtherBuff : AbstractSurvivorTalent ("each_other_buff",5,FullSheepUp::c
 
                 if(health in 2..4){
                     data.glowManager.glow(mutableListOf(p), GlowAPI.Color.YELLOW,20)
-                    playerData.glowManager.glow(mutableListOf(targetPlayer),GlowAPI.Color.YELLOW,20)
+
                 }
             }
         },0,19))
