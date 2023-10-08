@@ -39,6 +39,7 @@ class SurvivorData : PlayerData() {
     lateinit var hatchBossBar: BossBar
     var healingPlayers = HashMap<UUID,SurvivorData>()
     var healTick = 240
+    var healTickModify = HashMap<UUID,Double>()
     var otherPlayerHealDelay = 0
     var otherPlayerHealDelayPercentage = 0.0
     var hatchTick = 200
@@ -46,6 +47,7 @@ class SurvivorData : PlayerData() {
     var heartProcessRules = arrayListOf(Pair(25.0,0.2), Pair(20.0,0.1), Pair(15.0,0.2), Pair(10.0,0.5))
     var healSmallHealth = false
     var canHelpSelf = false
+    var canHealSelf = false
 
     var cancelGeneratorAttack = false
     var onWindow = false

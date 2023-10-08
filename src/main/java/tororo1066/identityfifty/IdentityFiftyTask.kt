@@ -836,10 +836,12 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             //回復の処理
             e.player.location.getNearbyPlayers(3.0).forEach {
-                if (it == e.player)return@forEach
                 if (!aliveSurvivors().contains(it.uniqueId))return@forEach
+
                 val helperData = IdentityFifty.survivors[e.player.uniqueId]!!
                 val playerData = IdentityFifty.survivors[it.uniqueId]!!
+
+                if (it == e.player && !helperData.canHealSelf)return@forEach
 
                 if (playerData.getHealth() >= 5)return@forEach
 
@@ -849,6 +851,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
 
                 if (!helperData.survivorClass.onTryHeal(e.player, it))return@forEach
+                if (helperData.talentClasses.any { clazz -> !clazz.value.onTryHeal(e.player, it) })return@forEach
                 if (!playerData.survivorClass.onTryGotHeal(it, e.player))return@forEach
 
                 //既にそのサバイバーを回復しているサバイバーがいるなら回復しているプレイヤー一覧とbossbarに追加するだけ
@@ -859,6 +862,8 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
                 var healTime = 0 //これが助けるのに必要な時間(tick)
                 healTime += helperData.healTick //回復する側の必要時間をまず入れる(tick)
+
+                helperData.healTickModify.forEach { tick -> healTime = (healTime * tick.value).toInt() }
 
                 healTime += playerData.otherPlayerHealDelay //回復される側の他のサバイバーからの回復時間の遅延(tick)
 
@@ -912,17 +917,20 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         }
                         val data = playerData.healingPlayers[p.uniqueId]!!
                         healPlayers++
-                        allPlayerHealTick += data.healTick
+                        var healTick = data.healTick
+                        helperData.healTickModify.forEach { tick -> healTick = (healTick * tick.value).toInt() }
+                        allPlayerHealTick += healTick
                     }
 
                     if (healPlayers == 0){
+                        playerData.healProcess /= 2
                         task.cancel()
                         return@Consumer
                     }
 
 
                     healTime = allPlayerHealTick / healPlayers //回復合計時間 / 回復人数
-                    healTime = (healTime / (1 + (0.3 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.5 * (回復人数 - 1)))
+                    healTime = (healTime / (1 + (0.3 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.3 * (回復人数 - 1)))
                     healTime += playerData.otherPlayerHealDelay
                     healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt()
 
@@ -1041,7 +1049,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
         sEvent.register(PlayerMoveEvent::class.java) { e ->
             if (e.player.gameMode == GameMode.SPECTATOR)return@register
-            if (!IdentityFifty.survivors.containsKey(e.player.uniqueId))return@register
             val from = e.from.clone()
             from.yaw = 0f
             from.pitch = 0f
@@ -1052,6 +1059,15 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             if (from == to)return@register
 
             val loc = to.toBlockLocation()
+
+            val doorPrison = map.prisons.values.find { it.doorLoc == loc }
+            if (doorPrison != null){
+                if (!doorPrison.inPlayer.contains(e.player.uniqueId)){
+                    e.isCancelled = true
+                }
+            }
+
+            if (!IdentityFifty.survivors.containsKey(e.player.uniqueId))return@register
 
             val playerData = IdentityFifty.survivors[e.player.uniqueId]!!
             if (containWindowBlock(loc)){
@@ -1105,11 +1121,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                 clazz.onSurvivorHelp(helperPlayer,e.player,p)
                             }
                         }
-                    } else {
-                        e.isCancelled = true
                     }
-                } else {
-                    e.isCancelled = true
                 }
             }
 
