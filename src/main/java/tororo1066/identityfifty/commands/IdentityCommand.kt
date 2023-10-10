@@ -1,10 +1,8 @@
 package tororo1066.identityfifty.commands
 
 import org.bukkit.Bukkit
-import org.bukkit.Particle
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
@@ -22,7 +20,6 @@ import tororo1066.tororopluginapi.sCommand.SCommandArgType
 import tororo1066.tororopluginapi.sCommand.SCommandObject
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
-import kotlin.math.cos
 
 class IdentityCommand : SCommand("identity","","identity.user") {
 

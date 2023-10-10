@@ -199,7 +199,7 @@ class IdentityFifty : SJavaPlugin() {
 
     override fun onDisable() {
         http?.stop(0)
-        discordClient.jda.shutdown()
+        discordClient.jda.shutdownNow()
     }
 
     class FileHandler(private val file: File): HttpHandler {

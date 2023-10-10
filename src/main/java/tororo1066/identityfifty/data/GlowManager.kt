@@ -1,47 +1,50 @@
 package tororo1066.identityfifty.data
 
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.scheduler.BukkitTask
 import org.inventivetalent.glow.GlowAPI
+import org.inventivetalent.glow.GlowAPI.Color
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
-import java.util.function.Consumer
 
 class GlowManager(private val uuid: UUID) {
-    private var isGlowing = false
-    private var tick = 0
-    private val nowVisiblePlayers = ArrayList<UUID>()
 
-    fun glow(visiblePlayers: MutableCollection<Player>, color: GlowAPI.Color, duration: Int){
+    val glowTasks = HashMap<UUID,GlowTask>()
+
+    fun glow(visiblePlayers: MutableCollection<Player>, color: Color, duration: Int) {
         visiblePlayers.addAll(IdentityFifty.spectators.keys.mapNotNull { it.toPlayer() })
-        if (isGlowing){
-            if (tick < duration){
-                val p = Bukkit.getPlayer(uuid)?:return
-                for (player in visiblePlayers){
-                    if (!GlowAPI.isGlowing(p,player)){
-                        GlowAPI.setGlowing(p,color,player)
-                        nowVisiblePlayers.add(player.uniqueId)
-                    }
-                }
+        visiblePlayers.forEach {
+            glowTask(it,color,duration)
+        }
+    }
+
+    private fun glowTask(visiblePlayer: Player, color: Color, duration: Int) {
+        glowTasks[visiblePlayer.uniqueId]?.let {
+            if (it.tick <= duration) {
+                it.cancel()
+            } else {
                 return
             }
         }
+        val task = GlowTask(uuid,visiblePlayer,color,duration)
+        glowTasks[visiblePlayer.uniqueId] = task
+    }
 
-        val p = Bukkit.getPlayer(uuid)?:return
-
-        tick = duration
-
-        GlowAPI.setGlowing(p,color,visiblePlayers)
-        for (player in visiblePlayers){
-            nowVisiblePlayers.add(player.uniqueId)
+    class GlowTask(private val uuid: UUID, private val visiblePlayer: Player, private val color: Color, private val duration: Int) : BukkitRunnable() {
+        var tick = duration
+        init {
+            runTaskTimer(IdentityFifty.plugin,0,1)
         }
-        Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
-
-
-            if (tick <= 0){
-                isGlowing = false
-                GlowAPI.setGlowing(p,false, nowVisiblePlayers.mapNotNull { map -> map.toPlayer() })
+        override fun run() {
+            val p = uuid.toPlayer()
+            if (p == null){
+                cancel()
+                return
+            }
+            if (tick <= 0) {
+                GlowAPI.setGlowing(p, false, visiblePlayer)
                 if (IdentityFifty.survivors.containsKey(uuid)){
                     IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(p.name)
                 }
@@ -49,17 +52,13 @@ class GlowManager(private val uuid: UUID) {
                 if (IdentityFifty.hunters.containsKey(uuid)){
                     IdentityFifty.identityFiftyTask?.hunterTeam?.addEntry(p.name)
                 }
-                nowVisiblePlayers.clear()
-
-                it.cancel()
-                return@Consumer
+                cancel()
+                return
             }
-
-            GlowAPI.setGlowing(p,false,visiblePlayers)
-
-            GlowAPI.setGlowing(p,color,visiblePlayers)
-
+            GlowAPI.setGlowing(p, false, visiblePlayer)
+            GlowAPI.setGlowing(p, color, visiblePlayer)
             tick--
-        },0,1)
+        }
     }
+
 }
