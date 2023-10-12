@@ -12,7 +12,7 @@ class GateOpenHunterBuff : AbstractHunterTalent("gate_open_hunter_buff",2,Finish
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
         if (remainingGenerator == 0){
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,0))
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
         }
     }
 }
