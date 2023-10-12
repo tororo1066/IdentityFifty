@@ -1,9 +1,10 @@
 package tororo1066.identityfifty.quickchat.survivor
 
 import tororo1066.identityfifty.quickchat.AbstractQuickChat
+import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 
 class SheepGeneratorNow: AbstractQuickChat() {
 
     override val message: String
-        get() = "羊型発電機を発電中！"
+        get() = translate("sheep_generator_now")
 }

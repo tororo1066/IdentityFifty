@@ -37,6 +37,7 @@ class Offense : AbstractSurvivor("offense") {
             var lock: Boolean
             IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_used",p.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
+            p.teleport(getRayLoc(p.location))
             Bukkit.getScheduler().runTaskAsynchronously(IdentityFifty.plugin, Runnable {
                 while (true){
                     if (actionTime >= 60){
@@ -45,7 +46,7 @@ class Offense : AbstractSurvivor("offense") {
                     var players: List<Player> = listOf()
                     lock = true
                     IdentityFifty.util.runTask {
-                        players = p.location.getNearbyPlayers(1.0).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
+                        players = p.location.getNearbyPlayers(1.5).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
                         lock = false
                     }
                     while (lock){
@@ -67,8 +68,11 @@ class Offense : AbstractSurvivor("offense") {
                     val block1 = p.world.rayTraceBlocks(p.location,p.location.setPitchL(0f).direction,1.5)?.hitBlock
                     val block2 = p.world.rayTraceBlocks(p.location.add(0.0,1.0,0.0),p.location.setPitchL(0f).direction,1.5)?.hitBlock
 
-                    if (block1 != null){
-                        if (!block1.isPassable)break
+                    if (block1 != null && !block1.isPassable){
+                        val maxDiff = block1.boundingBox.maxY-block1.boundingBox.minY
+                        if (maxDiff > 0.5){
+                            break
+                        }
                     }
                     if (block2 != null){
                         if (!block2.isPassable)break
@@ -78,7 +82,7 @@ class Offense : AbstractSurvivor("offense") {
                     IdentityFifty.util.runTask {
                         val loc = p.location.setPitchL(0f)
                         val vec = loc.add(loc.direction.normalize().multiply(1.5))
-                        p.teleport(getRayLoc(Location(p.world,vec.x, loc.y, vec.z, loc.yaw, loc.pitch)))
+                        p.teleport(getRayLoc(Location(p.world,vec.x, loc.y+1, vec.z, loc.yaw, loc.pitch)))
                         p.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
                         lock = false
                     }
@@ -89,9 +93,9 @@ class Offense : AbstractSurvivor("offense") {
                 }
 
                 IdentityFifty.util.runTask {
-                    p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, actionTime, 10))
+                    p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (actionTime.toDouble()*1.1).toInt(), 10))
                 }
-                item.setInteractCoolDown(actionTime*12 + 100)
+                item.setInteractCoolDown(actionTime*10 + 100)
             })
             return@setInteractEvent true
         }.setInitialCoolDown(100000)
@@ -112,7 +116,7 @@ class Offense : AbstractSurvivor("offense") {
         slowTime: Int,
         p: Player
     ): Pair<Int, Int> {
-        return Pair(blindTime+20,slowTime+20)
+        return Pair(blindTime+40,slowTime+40)
     }
 
     override fun info(): ArrayList<ItemStack> {
@@ -134,9 +138,9 @@ class Offense : AbstractSurvivor("offense") {
             if (loc.y <= 0){
                 return loc
             }
-            loc = loc.add(0.0,-1.0,0.0)
-            if (!loc.block.type.isAir){
-                return loc.add(0.0,1.0,0.0)
+            loc = loc.add(0.0,-0.1,0.0)
+            if (!loc.block.isPassable){
+                return loc.add(0.0,0.1,0.0)
             }
         }
     }

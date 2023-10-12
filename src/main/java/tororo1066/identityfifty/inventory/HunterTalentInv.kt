@@ -151,7 +151,7 @@ class HunterTalentInv(val data: HunterData) {
             setItem(2,talentItem(RemainTimeDown()))
             setItem(20,talentItem(LowHitPlate()))
             setItem(24,talentItem(AirSwingDown()))
-            setItem(42,talentItem(FinishGateBuff()))
+            setItem(42,talentItem(GateOpenHunterBuff()))
             setItem(26,talentItem(FirstGameSpeedUp()))
             setItem(40,talentItem(HealSpeedDown()))
             setItem(38,talentItem(HighFootPrints()))
@@ -215,7 +215,7 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(45,46,47,50,51,52,53), glass())
             setItems(listOf(4,6,15,22),roadGlass())
-            setItem(24,talentItem(GateOpenHunterBuff()))
+            setItem(24,talentItem(FinishGateBuff()))
             setItem(13,talentItem(StunTimeDown()))
             setItem(31,talentItem(NoOneUp()))
             return true

@@ -60,15 +60,15 @@ import kotlin.random.Random
 
 class IdentityFiftyTask(val map: MapData) : Thread() {
 
-    private fun allPlayerAction(action: (UUID)->Unit){
-        IdentityFifty.survivors.forEach {
-            action.invoke(it.key)
-        }
-
-        IdentityFifty.hunters.forEach {
-            action.invoke(it.key)
-        }
-    }
+//    private fun allPlayerAction(action: (UUID)->Unit){
+//        IdentityFifty.survivors.forEach {
+//            action.invoke(it.key)
+//        }
+//
+//        IdentityFifty.hunters.forEach {
+//            action.invoke(it.key)
+//        }
+//    }
 
     private fun onlinePlayersAction(action: (Player) -> Unit){
         Bukkit.getOnlinePlayers().forEach {
@@ -77,7 +77,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     }
 
     private fun broadcast(string: String){
-        Bukkit.broadcast(Component.text(string),Server.BROADCAST_CHANNEL_USERS)
+        Bukkit.broadcast(Component.text(IdentityFifty.prefix + string),Server.BROADCAST_CHANNEL_USERS)
     }
 
     private fun runTask(unit: ()->Unit){
@@ -213,18 +213,18 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         if (escapedSurvivor.size > survivorSize/2){
 
             onlinePlayersAction {
-                it.showTitle(Title.title(Component.text("§e§lサバイバーの勝ち！"), Component.text(""), Title.Times.of(
+                it.showTitle(Title.title(Component.text(translate("win_survivor")), Component.text(""), Title.Times.of(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
             }
         } else {
             if (escapedSurvivor.size == survivorSize){
                 onlinePlayersAction {
-                    it.showTitle(Title.title(Component.text("§b§l引き分け！"), Component.text(""), Title.Times.of(
+                    it.showTitle(Title.title(Component.text(translate("draw")), Component.text(""), Title.Times.of(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
                 }
             } else {
                 onlinePlayersAction {
-                    it.showTitle(Title.title(Component.text("§c§lハンターの勝ち！"), Component.text(""), Title.Times.of(
+                    it.showTitle(Title.title(Component.text(translate("win_hunter")), Component.text(""), Title.Times.of(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
                 }
             }
@@ -268,7 +268,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 map.world.spawnParticle(Particle.ELECTRIC_SPARK,e.entity.location,30)
                 survivorData.setHealth(survivorData.getHealth() - onDamage.second)
                 if (survivorData.getHealth() == 1){
-                    broadcast(IdentityFifty.prefix + translate("send_jail",e.entity.name))
+                    broadcast(translate("send_jail",e.entity.name))
                     survivorData.healProcess = 0.0
                     val prisons = map.prisons.filter { it.value.inPlayer.size == 0 }.entries.shuffled()
                     if (prisons.isNotEmpty()){
@@ -344,7 +344,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 sheep.noDamageTicks = 0
-                e.entity.customName = "§f§l羊型発電機§5(§e${sheep.health.toInt()}§f/§b${maxHealth.toInt()}§5)"
+                e.entity.customName = translate("sheep_generator", sheep.health.toInt().toString(), maxHealth.toInt().toString())
             }, 0)
 
             survivorData.cancelGeneratorAttack = true
@@ -380,7 +380,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 cow.noDamageTicks = 0
-                e.entity.customName = "§f§l牛型発電機§5(§e${cow.health.toInt()}§f/§b${maxHealth.toInt()}§5)"
+                e.entity.customName = translate("cow_generator", cow.health.toInt().toString(), maxHealth.toInt().toString())
             }, 0)
 
             survivorData.cancelGeneratorAttack = true
@@ -401,7 +401,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     private val sEvent = SEvent(IdentityFifty.plugin)
     private val survivorSize = IdentityFifty.survivors.size
     private var survivorCount = IdentityFifty.survivors.size
-    private val bossBar = Bukkit.createBossBar("§d残り発電機§f：§c§l${map.generatorGoal}§f個",BarColor.YELLOW,BarStyle.SOLID)
+    private val bossBar = Bukkit.createBossBar(translate("remaining_generator", map.generatorGoal.toString()),BarColor.YELLOW,BarStyle.SOLID)
     val escapedSurvivor = ArrayList<UUID>()
     val deadSurvivor = ArrayList<UUID>()
     private var end = false
@@ -429,7 +429,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
     override fun run() {
 
-        broadcast("ゲームをスタート中...")
+        broadcast(translate("starting_game"))
 
         //新しいリストに入れて初期化+シャッフル
         val survivorSpawnList = ArrayList<Location>(map.survivorSpawnLocations)
@@ -569,7 +569,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     generatorUUID.add(it.uniqueId)
                     it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
                     it.health = data.health.toDouble()
-                    it.customName = "§f§l羊型発電機§5(§e${data.health}§f/§b${data.health}§5)"
+                    it.customName = translate("sheep_generator", it.health.toInt().toString(), data.health.toString())
                     it.noDamageTicks = 0
                     it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER,1)
                 }
@@ -611,11 +611,11 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             e.drops.clear()
             onlinePlayersAction {
                 it.playSound(it.location,Sound.ENTITY_BLAZE_DEATH,2f,1f)
-                it.sendMessage(IdentityFifty.prefix + "§b発電機が壊された！")
+                it.sendTranslateMsg("broken_generator")
             }
             generatorUUID.remove(e.entity.uniqueId)
             remainingGenerator--
-            bossBar.setTitle("§d残り発電機§f：§c§l${remainingGenerator}§f個")
+            bossBar.setTitle(translate("remaining_generator",remainingGenerator.toString()))
             bossBar.progress = remainingGenerator.toDouble() / map.generatorGoal.toDouble()
             IdentityFifty.hunters.forEach {
                 it.value.hunterClass.onFinishedGenerator(e.entity.location,remainingGenerator,Bukkit.getPlayer(it.key)!!)
@@ -648,10 +648,10 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             if (remainingGenerator != 0)return@register
             //残り暗号機が0だったら 一撃死状態にする(45秒)
             bossBar.progress = 1.0
-            bossBar.setTitle("§dゲートを開けよう！")
+            bossBar.setTitle(translate("lets_open_gate"))
             bossBar.color = BarColor.RED
 
-            broadcast("§e§lゲート付近の発電機が開かれた！")
+            broadcast(translate("opened_gate_announce"))
 
             noOne = true
             val cloneTime = noOneCount
@@ -678,7 +678,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         it.isSilent = true
                         it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
                         it.health = data.health.toDouble()
-                        it.customName = "§f§l牛型発電機§5(§e${it.health.toInt()}§f/§b${data.health}§5)"
+                        it.customName = translate("cow_generator", it.health.toInt().toString(), data.health.toString())
                         it.noDamageTicks = 0
                         it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER,1)
                         escapeGeneratorUUID.add(it.uniqueId)
@@ -791,7 +791,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     val helpTimeInitial = helpTime
 
                     //bossbar作成+追加
-                    helperData.helpBossBar = Bukkit.createBossBar("§e救助中...",BarColor.BLUE,BarStyle.SOLID)
+                    helperData.helpBossBar = Bukkit.createBossBar(translate("trying_help", e.player),BarColor.BLUE,BarStyle.SOLID)
                     helperData.helpBossBar.progress = 0.0
                     helperData.helpBossBar.addPlayer(e.player)
 
@@ -870,7 +870,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt() //回復される側の他のサバイバーからの回復時間の遅延(パーセンテージ:0.00~1.00)
 
                 //bossbar作成+追加
-                playerData.healBossBar = Bukkit.createBossBar("§d${playerData.name}§eを回復中...",BarColor.GREEN,BarStyle.SOLID)
+                playerData.healBossBar = Bukkit.createBossBar(translate("trying_heal", e.player, playerData.name),BarColor.GREEN,BarStyle.SOLID)
                 playerData.healBossBar.progress = playerData.healProcess
                 playerData.healBossBar.addPlayer(e.player)
 
@@ -947,7 +947,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 if (!it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER))return@forEach
 
                 val data = IdentityFifty.survivors[e.player.uniqueId]!!
-                data.hatchBossBar = Bukkit.createBossBar("§d逃走中...",BarColor.PURPLE,BarStyle.SOLID)
+                data.hatchBossBar = Bukkit.createBossBar(translate("trying_escape", e.player),BarColor.PURPLE,BarStyle.SOLID)
                 data.hatchBossBar.progress = 0.0
                 data.hatchBossBar.addPlayer(e.player)
                 var hatchProgress = data.hatchTick
@@ -969,7 +969,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                             onlinePlayersAction { online ->
                                 online.playSound(online.location,Sound.ENTITY_FIREWORK_ROCKET_BLAST,1f,1f)
                             }
-                            broadcast(IdentityFifty.prefix + translate("success_escape",e.player.name))
+                            broadcast(translate("success_escape",e.player.name))
                             end()
                             task.cancel()
                         }
@@ -1074,10 +1074,18 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 if (!playerData.onWindow){
                     playerData.onWindow = true
                     e.player.walkSpeed -= 0.15f
+                    playerData.survivorClass.onEnterWindow(e.player)
+                    playerData.talentClasses.values.forEach { clazz ->
+                        clazz.onEnterWindow(e.player)
+                    }
                 }
             } else if (playerData.onWindow){
                 playerData.onWindow = false
                 e.player.walkSpeed += 0.15f
+                playerData.survivorClass.onExitWindow(e.player)
+                playerData.talentClasses.values.forEach { clazz ->
+                    clazz.onExitWindow(e.player)
+                }
             }
 
             if (map.prisons.containsKey(loc)){
@@ -1232,7 +1240,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             onlinePlayersAction {
                 it.playSound(it.location,Sound.ENTITY_FIREWORK_ROCKET_BLAST,1f,1f)
             }
-            broadcast(IdentityFifty.prefix + translate("success_escape",e.player.name))
+            broadcast(translate("success_escape",e.player.name))
             if (survivorCount == 0){
                 end()
                 return@register
@@ -1462,7 +1470,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         deadSurvivor.add(survivor.uuid)
                         survivorCount--
                         p.gameMode = GameMode.SPECTATOR
-                        broadcast("§c§l${survivor.name}§4§lは死んでしまった...")
+                        broadcast(translate("survivor_was_died", survivor.name))
 
                         if (survivorCount == 0){
                             end()
