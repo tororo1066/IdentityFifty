@@ -551,6 +551,14 @@ class IdentityCommand : SCommand("identity","","identity.user") {
 
         registerDebugCommand("identity.op")
 
+        addCommand(SCommandObject()
+            .addArg(SCommandArg("test"))
+            .setPlayerExecutor {
+                it.sender.sendMessage(it.sender.location.block.boundingBox.centerY.toString())
+                it.sender.sendMessage(it.sender.location.block.boundingBox.maxY.toString())
+                it.sender.sendMessage(it.sender.location.block.boundingBox.minY.toString())
+            })
+
     }
 
     private fun setDebug(): SCommandObject = debug().addArg(SCommandArg("set")).addArg(SCommandArg(SCommandArgType.ONLINE_PLAYER).addAlias(

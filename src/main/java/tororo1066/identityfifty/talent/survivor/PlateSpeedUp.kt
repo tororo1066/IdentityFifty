@@ -14,6 +14,7 @@ class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",5,WoundedCowUp::cla
     }
 
     var boost = true
+    var windowBoost = true
 
     override fun onWoodPlate(loc: Location, p: Player) {
         if(boost){
@@ -22,12 +23,20 @@ class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",5,WoundedCowUp::cla
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 boost = true
-            },900)
+            },800)
         }
 
+    }
 
+    override fun onExitWindow(p: Player) {
+        if(windowBoost){
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,2))
+            windowBoost = false
 
-
+            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                windowBoost = true
+            },800)
+        }
     }
 
 

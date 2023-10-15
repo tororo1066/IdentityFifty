@@ -19,7 +19,7 @@ class QuickChatBarData(val uuid: UUID) {
 
     companion object{
         val survivorChats = arrayListOf(
-            NearHunterChat(),
+            NearHunter(),
             SheepGeneratorNow(),
             CowGeneratorNow(),
             HealMe(),

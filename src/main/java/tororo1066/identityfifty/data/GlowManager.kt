@@ -2,12 +2,11 @@ package tororo1066.identityfifty.data
 
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.scheduler.BukkitTask
 import org.inventivetalent.glow.GlowAPI
 import org.inventivetalent.glow.GlowAPI.Color
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.utils.toPlayer
-import java.util.UUID
+import java.util.*
 
 class GlowManager(private val uuid: UUID) {
 

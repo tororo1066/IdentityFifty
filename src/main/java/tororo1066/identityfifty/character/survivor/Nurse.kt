@@ -51,7 +51,7 @@ class Nurse : AbstractSurvivor("nurse") {
         healModifier?.let { data.healTickModify.remove(it) }
         if (healPlayer == p){
             healModifier = UUID.randomUUID()
-            data.healTickModify[healModifier!!] = 2.0
+            data.healTickModify[healModifier!!] = 4.0
         }
         return true
     }
