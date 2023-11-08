@@ -47,9 +47,9 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
                         AllowAction.RECEIVE_SURVIVORS_ACTION)
                     p.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
                 }
-            },1400)
+            },700)
             return@setInteractEvent true
-        }.setInitialCoolDown(2000)
+        }.setInitialCoolDown(1000)
 
         p.inventory.addItem(passiveItem)
         p.inventory.addItem(disguiseSkillItem)

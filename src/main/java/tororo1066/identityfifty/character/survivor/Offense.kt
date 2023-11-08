@@ -16,6 +16,7 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.setPitchL
+import java.util.function.Consumer
 
 class Offense : AbstractSurvivor("offense") {
 
@@ -34,69 +35,60 @@ class Offense : AbstractSurvivor("offense") {
 
         val tackleItem = IdentityFifty.interactManager.createSInteractItem(tackleSkillItem,true).setInteractEvent { e, item ->
             var actionTime = 0
-            var lock: Boolean
+            fun end(){
+                IdentityFifty.util.runTask {
+                    p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (actionTime.toDouble()*1.5).toInt(), 10))
+                }
+                item.setInteractCoolDown(actionTime*14 + 100)
+            }
+
             IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_used",p.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
-            p.teleport(getRayLoc(p.location))
-            Bukkit.getScheduler().runTaskAsynchronously(IdentityFifty.plugin, Runnable {
-                while (true){
-                    if (actionTime >= 60){
-                        break
-                    }
-                    var players: List<Player> = listOf()
-                    lock = true
-                    IdentityFifty.util.runTask {
-                        players = p.location.getNearbyPlayers(1.5).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
-                        lock = false
-                    }
-                    while (lock){
-                        Thread.sleep(1)
-                    }
-                    if (players.isNotEmpty()){
-                        players.forEach {
-                            it.playSound(it.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
-                            it.sendTranslateMsg("rugby_ball_hit_hunter")
-                            p.playSound(p.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
-                            p.sendTranslateMsg("rugby_ball_hit",it.name)
-                            IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_hit",p.name,it.name),
-                                AllowAction.RECEIVE_SURVIVORS_ACTION)
-                            IdentityFifty.stunEffect(it, (actionTime*5-20), (actionTime*5), StunState.OTHER)
-                        }
-                        break
-                    }
+            Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
+                if (actionTime >= 40){
+                    it.cancel()
+                    end()
+                    return@Consumer
+                }
+                val block1 = p.world.rayTraceBlocks(p.location,p.location.setPitchL(0f).direction,1.5)?.hitBlock
+                val block2 = p.world.rayTraceBlocks(p.location.add(0.0,1.0,0.0),p.location.setPitchL(0f).direction,1.5)?.hitBlock
 
-                    val block1 = p.world.rayTraceBlocks(p.location,p.location.setPitchL(0f).direction,1.5)?.hitBlock
-                    val block2 = p.world.rayTraceBlocks(p.location.add(0.0,1.0,0.0),p.location.setPitchL(0f).direction,1.5)?.hitBlock
-
-                    if (block1 != null && !block1.isPassable){
-                        val maxDiff = block1.boundingBox.maxY-block1.boundingBox.minY
-                        if (maxDiff > 0.5){
-                            break
-                        }
+                if (block1 != null && !block1.isPassable){
+                    val maxDiff = block1.boundingBox.maxY-block1.boundingBox.minY
+                    if (maxDiff > 0.5){
+                        it.cancel()
+                        end()
+                        return@Consumer
                     }
-                    if (block2 != null){
-                        if (!block2.isPassable)break
+                }
+                if (block2 != null){
+                    if (!block2.isPassable){
+                        it.cancel()
+                        end()
+                        return@Consumer
                     }
-
-                    lock = true
-                    IdentityFifty.util.runTask {
-                        val loc = p.location.setPitchL(0f)
-                        val vec = loc.add(loc.direction.normalize().multiply(1.5))
-                        p.teleport(getRayLoc(Location(p.world,vec.x, loc.y+1, vec.z, loc.yaw, loc.pitch)))
-                        p.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
-                        lock = false
-                    }
-                    while (lock){
-                        Thread.sleep(1)
-                    }
-                    actionTime++
                 }
 
-                IdentityFifty.util.runTask {
-                    p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (actionTime.toDouble()*1.1).toInt(), 10))
+                p.playSound(p.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
+                p.velocity = p.location.setPitchL(0f).direction.normalize().multiply(1.2).setY(-1)
+                val players = p.location.getNearbyPlayers(1.0).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
+                if (players.isNotEmpty()){
+                    players.forEach { player ->
+                        player.playSound(player.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
+                        player.sendTranslateMsg("rugby_ball_hit_hunter")
+                        p.playSound(p.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
+                        p.sendTranslateMsg("rugby_ball_hit",player.name)
+                        IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_hit",p.name,player.name),
+                            AllowAction.RECEIVE_SURVIVORS_ACTION)
+                        IdentityFifty.stunEffect(player, (actionTime*6-20), (actionTime*6), StunState.OTHER)
+                    }
+                    it.cancel()
+                    end()
+                    return@Consumer
                 }
-                item.setInteractCoolDown(actionTime*10 + 100)
-            })
+
+                actionTime++
+            },0,3)
             return@setInteractEvent true
         }.setInitialCoolDown(100000)
 

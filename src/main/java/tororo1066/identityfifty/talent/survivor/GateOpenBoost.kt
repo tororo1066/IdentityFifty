@@ -10,7 +10,7 @@ import java.util.UUID
 
 class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5,FullCowUp::class.java) {
     override fun lore(): List<String> {
-        return listOf("gate_open_boost_lore_1")
+        return listOf("gate_open_boost_lore_1","gate_open_boost_lore_2")
     }
     var cowbuff = false
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
@@ -32,7 +32,7 @@ class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5,FullCowUp::cla
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
         if (cowbuff){
-            return damage * 1.30
+            return damage * 1.3
         }
         return damage
     }

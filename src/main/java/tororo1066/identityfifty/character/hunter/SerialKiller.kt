@@ -66,8 +66,8 @@ class SerialKiller: AbstractHunter("serialkiller") {
                 if (timer <= 0){
                     if (!damageFlag){
                         val data = IdentityFifty.hunters[p.uniqueId]!!
-                        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), GlowAPI.Color.RED, 140)
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,140,1))
+                        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), GlowAPI.Color.RED, 200)
+                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,200,1))
                         p.sendTranslateMsg("kill_find_failed")
                         IdentityFifty.broadcastSpectators(translate("spec_kill_find_failed",p.name),
                             AllowAction.RECEIVE_HUNTERS_ACTION)

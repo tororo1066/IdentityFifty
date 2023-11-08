@@ -45,7 +45,7 @@ class SurvivorData : PlayerData() {
     var hatchTick = 200
     var heartProcess = 0.0
     var heartProcessRules = arrayListOf(Pair(25.0,0.2), Pair(20.0,0.1), Pair(15.0,0.2), Pair(10.0,0.5))
-    var healSmallHealth = false
+    var healSmallHealth = true
     var canHelpSelf = false
     var canHealSelf = false
 

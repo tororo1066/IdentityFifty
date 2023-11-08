@@ -15,14 +15,17 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
+import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.setPitchL
+import tororo1066.tororopluginapi.utils.toPlayer
 
 class Controller: AbstractSurvivor("controller") {
 
@@ -76,6 +79,11 @@ class Controller: AbstractSurvivor("controller") {
                         p.isInvisible = false
                     }, 10)
                 }, 3)
+            }
+
+            if (latestEntity == null && inPrison(p)){
+                p.sendTranslateMsg("controller_doll_in_prison")
+                return@setInteractEvent false
             }
 
             if (movingNow){
@@ -159,8 +167,11 @@ class Controller: AbstractSurvivor("controller") {
                         it.remove()
                         teleport(p, it.location)
                         latestEntity = null
-
                         sEvent.unregisterAll()
+                        IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
+                            IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
+                            GlowAPI.Color.DARK_PURPLE, 200
+                        )
                         movingNow = false
                         item.setInteractCoolDown(2400)
                     } else if (e.entity == latestEntity?.entity) { //人形が攻撃を受けた場合
@@ -173,6 +184,10 @@ class Controller: AbstractSurvivor("controller") {
                         latestEntity!!.stopDisguise()
                         e.entity.remove()
                         latestEntity = null
+                        IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
+                            IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
+                            GlowAPI.Color.DARK_PURPLE, 200
+                        )
                         item.setInteractCoolDown(2400)
                         IdentityFifty.stunEffect(e.damager as Player, 20, 40, StunState.DAMAGED)
                     }

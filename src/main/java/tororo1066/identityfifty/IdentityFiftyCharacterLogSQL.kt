@@ -1,18 +1,18 @@
 package tororo1066.identityfifty
 
+import tororo1066.tororopluginapi.database.SDBVariable
 import tororo1066.tororopluginapi.mysql.SMySQL
 import tororo1066.tororopluginapi.mysql.ultimate.USQLTable
-import tororo1066.tororopluginapi.mysql.ultimate.USQLVariable
 
 class IdentityFiftyCharacterLogSQL: USQLTable("identity_character_log", SMySQL(IdentityFifty.plugin)) {
 
     companion object {
-        val id = USQLVariable(USQLVariable.Int, autoIncrement = true)
-        val uuid = USQLVariable(USQLVariable.VarChar, length = 36)
-        val mcid = USQLVariable(USQLVariable.VarChar, length = 16, nullable = true)
-        val type = USQLVariable(USQLVariable.VarChar, length = 10)
-        val value = USQLVariable(USQLVariable.VarChar, length = 100)
-        val date = USQLVariable(USQLVariable.DateTime)
+        val id = SDBVariable(SDBVariable.Int, autoIncrement = true)
+        val uuid = SDBVariable(SDBVariable.VarChar, length = 36)
+        val mcid = SDBVariable(SDBVariable.VarChar, length = 16, nullable = true)
+        val type = SDBVariable(SDBVariable.VarChar, length = 10)
+        val value = SDBVariable(SDBVariable.VarChar, length = 100)
+        val date = SDBVariable(SDBVariable.DateTime)
     }
 
     fun insertAll(){

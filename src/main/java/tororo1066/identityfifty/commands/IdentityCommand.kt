@@ -12,6 +12,7 @@ import tororo1066.identityfifty.inventory.*
 import tororo1066.identityfifty.quickchat.QuickChatBarData
 import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
 import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
+import tororo1066.nmsutils.SPlayer
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sCommand.SCommand
@@ -63,6 +64,10 @@ class IdentityCommand : SCommand("identity","","identity.user") {
     init {
         registerSLangCommand(IdentityFifty.plugin,"identity.op")
 
+        addCommand(command().addArg(SCommandArg("test")).setPlayerFunction { sender, _, _, _ ->
+            SPlayer.getSPlayer(sender).move(sender.location.x,sender.location.y,sender.location.z+5.0)
+        })
+
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
             .setPlayerExecutor {
                 if (DiscordClient.enable){
@@ -71,10 +76,14 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                         return@setPlayerExecutor
                     }
                 }
+                val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!.clone()
+                if (IdentityFifty.survivors.filter { filter -> filter.value.survivorClass == abstractSurvivor.javaClass }.isNotEmpty()){
+                    it.sender.sendMessage("§c既に選択されています")
+                    return@setPlayerExecutor
+                }
                 IdentityFifty.hunters.remove(it.sender.uniqueId)
                 IdentityFifty.spectators.remove(it.sender.uniqueId)
                 val saveTalents = IdentityFifty.survivors[it.sender.uniqueId]?.let { it1 -> saveSurvivorTalents(it1) }
-                val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!.clone()
                 val data = createSurvivorData(it.sender)
                 abstractSurvivor.parameters(data)
                 saveTalents?.first?.forEach { clazz ->

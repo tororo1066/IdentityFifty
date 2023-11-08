@@ -137,10 +137,10 @@ class Gambler: AbstractHunter("gambler") {
                 in 1..30 ->{
                     return 1
                 }
-                in 31..70->{
+                in 31..65->{
                     return 2
                 }
-                in 71..85->{
+                in 66..85->{
                     return 3
                 }
                 in 86..100->{

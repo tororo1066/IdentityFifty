@@ -76,7 +76,7 @@ class Marker: AbstractHunter("marker") {
             if (e.entity !is Player)return@register
             val data = IdentityFifty.survivors[e.entity.uniqueId]?:return@register
             update(e.entity.uniqueId, (marks[e.entity.uniqueId]?.first?:0) + 5)
-            data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,140)
+            data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,200)
             e.damage = 0.0
             IdentityFifty.broadcastSpectators(translate("spec_mark_crossbow_hit",p.name,e.entity.name),
                 AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -126,7 +126,7 @@ class Marker: AbstractHunter("marker") {
         val data = IdentityFifty.survivors[healPlayer.uniqueId]?:return
         val players = ArrayList<Player>()
         players.add(p)
-        data.glowManager.glow(players,GlowAPI.Color.RED,140)
+        data.glowManager.glow(players,GlowAPI.Color.RED,200)
         p.sendTranslateMsg("marker_healed_survivor")
         p.playSound(p.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
         healedPlayer.sendTranslateMsg("marker_heal_view")

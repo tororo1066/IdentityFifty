@@ -150,7 +150,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             hatchUUID = null
         }
 
-        //サバイバーハンター両方のパッシブで走らせるタスク終了 現在はDasherが該当
+        //サバイバーハンター両方のパッシブで走らせるタスク終了
         IdentityFifty.survivors.values.forEach {
             val p = it.uuid.toPlayer()
             if (p != null){
@@ -325,7 +325,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             val sheep = e.entity as Sheep
 
             val survivors = sheep.location.getNearbyPlayers(5.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
-            var multiply = 1 - (survivors * 0.15)
+            var multiply = 1 - (survivors * 0.25)
             if (multiply < 0.3) multiply = 0.3
 
             val maxHealth = sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
@@ -361,7 +361,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             val cow = e.entity as Cow
 
             val survivors = cow.location.getNearbyPlayers(5.0).filter { aliveSurvivors().contains(it.uniqueId) && it.uniqueId != p.uniqueId }.size
-            var multiply = 1 - (survivors * 0.15)
+            var multiply = 1 - (survivors * 0.25)
             if (multiply < 0.3) multiply = 0.3
 
             val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
@@ -414,7 +414,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     val survivorTeam = scoreboard.registerNewTeam("Survivor")
     val hunterTeam = scoreboard.registerNewTeam("Hunter")
 
-    fun aliveSurvivors(): List<UUID>{
+    fun aliveSurvivors(): List<UUID> {
         return IdentityFifty.survivors.filter { !escapedSurvivor.contains(it.key) && !deadSurvivor.contains(it.key) }.map { it.key }
     }
 
@@ -930,7 +930,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
 
                     healTime = allPlayerHealTick / healPlayers //回復合計時間 / 回復人数
-                    healTime = (healTime / (1 + (0.3 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.3 * (回復人数 - 1)))
+                    healTime = (healTime / (1 + (0.15 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.3 * (回復人数 - 1)))
                     healTime += playerData.otherPlayerHealDelay
                     healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt()
 
@@ -1487,7 +1487,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                         runTask {
                             taskLivingSurvivor { data ->
                                 if (data.key != p.uniqueId){
-                                    val livingPlayer = Bukkit.getPlayer(data.key)!!
+                                    val livingPlayer = Bukkit.getPlayer(data.key)?:return@taskLivingSurvivor
                                     data.value.survivorClass.onDieOtherSurvivor(p,survivorCount,livingPlayer)
                                     data.value.talentClasses.values.forEach { clazz ->
                                         clazz.onDieOtherSurvivor(p,survivorCount,livingPlayer)

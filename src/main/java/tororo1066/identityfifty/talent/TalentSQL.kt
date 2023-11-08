@@ -5,20 +5,20 @@ import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
 import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
+import tororo1066.tororopluginapi.database.SDBVariable
 import tororo1066.tororopluginapi.mysql.SMySQL
 import tororo1066.tororopluginapi.mysql.ultimate.USQLTable
-import tororo1066.tororopluginapi.mysql.ultimate.USQLVariable
 import java.util.UUID
 
 class TalentSQL: USQLTable("talent", SMySQL(IdentityFifty.plugin)){
 
     companion object{
-        val id = USQLVariable(USQLVariable.Int,autoIncrement = true)
-        val uuid = USQLVariable(USQLVariable.VarChar,36,false,USQLVariable.Index.KEY)
-        val name = USQLVariable(USQLVariable.VarChar,16)
-        val preset_name = USQLVariable(USQLVariable.VarChar,50)
-        val type = USQLVariable(USQLVariable.VarChar,16)
-        val talent_list = USQLVariable(USQLVariable.Text)
+        val id = SDBVariable(SDBVariable.Int,autoIncrement = true)
+        val uuid = SDBVariable(SDBVariable.VarChar,36,false,SDBVariable.Index.KEY)
+        val name = SDBVariable(SDBVariable.VarChar,16)
+        val preset_name = SDBVariable(SDBVariable.VarChar,50)
+        val type = SDBVariable(SDBVariable.VarChar,16)
+        val talent_list = SDBVariable(SDBVariable.Text)
     }
 
     init {
