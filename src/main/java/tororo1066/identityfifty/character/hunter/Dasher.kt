@@ -23,6 +23,7 @@ class Dasher : AbstractHunter("dasher") {
             .addLore(translate("hyper_engine_lore_1"))
             .addLore(translate("hyper_engine_lore_2"))
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { _, _ ->
+            //加速
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
             p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
             IdentityFifty.broadcastSpectators(translate("spec_hyper_engine_used",p.name),AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -32,24 +33,24 @@ class Dasher : AbstractHunter("dasher") {
         var viewing = false
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
-            val specPlayer = p.getTargetEntity(100)
-            if (specPlayer != null){
-                if (IdentityFifty.survivors.containsKey(specPlayer.uniqueId)){
-                    if (!viewing){
+            //サバイバーを見ていると加速
+            val viewPlayer = p.getTargetEntity(100)
+            if (viewPlayer != null){
+                if (IdentityFifty.survivors.containsKey(viewPlayer.uniqueId)){
+                    if (!viewing){ //加速の重複を防ぐ
                         p.walkSpeed += 0.01f
                         viewing = true
                     }
                     return@Runnable
                 }
             }
-            if (viewing){
+            if (viewing){ //加速の解除
                 p.walkSpeed -= 0.01f
                 viewing = false
             }
         },0,2))
 
-        p.inventory.addItem(passiveItem)
-        p.inventory.addItem(firstSkill)
+        p.inventory.addItem(passiveItem, firstSkill)
     }
 
     override fun parameters(data: HunterData): HunterData {
@@ -58,6 +59,7 @@ class Dasher : AbstractHunter("dasher") {
     }
 
 
+    //サバイバーの救助時に加速
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
         p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1,true,false,true))
         p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)

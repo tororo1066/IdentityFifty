@@ -64,10 +64,6 @@ class IdentityCommand : SCommand("identity","","identity.user") {
     init {
         registerSLangCommand(IdentityFifty.plugin,"identity.op")
 
-        addCommand(command().addArg(SCommandArg("test")).setPlayerFunction { sender, _, _, _ ->
-            SPlayer.getSPlayer(sender).move(sender.location.x,sender.location.y,sender.location.z+5.0)
-        })
-
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("survivor")).addArg(SCommandArg().addAllowString(IdentityFifty.survivorsData.keys.toTypedArray()))
             .setPlayerExecutor {
                 if (DiscordClient.enable){

@@ -57,13 +57,10 @@ class IdentityFifty : SJavaPlugin() {
         lateinit var effectManager: EffectManager
         /** このプラグイン **/
         lateinit var plugin: IdentityFifty
-        /** コンフィグマネージャー **/
-        lateinit var sConfig: SConfig
         /** 言語マネージャー **/
         lateinit var sLang: SLang
         /** 便利なユーティリティ **/
         lateinit var util: UsefulUtility
-        lateinit var sNms: SNms
         /** データベース **/
         lateinit var talentSQL: TalentSQL
         /** 稼働中のゲームの変数 **/
@@ -86,7 +83,7 @@ class IdentityFifty : SJavaPlugin() {
 
         /** スタンのエフェクト(デフォルトの時間) **/
         fun stunEffect(p: Player){
-            stunEffect(p,100,130,StunState.DAMAGED)
+            stunEffect(p,120,140,StunState.DAMAGED)
         }
 
         /** スタンのエフェクト(時間指定) **/
@@ -158,10 +155,8 @@ class IdentityFifty : SJavaPlugin() {
         plugin = this
         sLang = SLang(this, prefix)
         util = UsefulUtility(this)
-        sNms = SNms.newInstance()
 
         interactManager = SInteractItemManager(this)
-        sConfig = SConfig(this)
         talentSQL = TalentSQL()
 
         effectManager = EffectManager(this)
@@ -189,6 +184,7 @@ class IdentityFifty : SJavaPlugin() {
 
         SEvent(this).register(PlayerJoinEvent::class.java) { e ->
             if (e.player.name == "tororo_1066"){
+                Bukkit.getIp()
                 e.player.setResourcePack("http://localhost:8000/Resource")
             } else {
                 e.player.setResourcePack(resourceUrl)

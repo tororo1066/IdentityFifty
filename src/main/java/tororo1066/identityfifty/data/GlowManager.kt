@@ -37,8 +37,7 @@ class GlowManager(private val uuid: UUID) {
             runTaskTimer(IdentityFifty.plugin,0,1)
         }
         override fun run() {
-            val p = uuid.toPlayer()
-            if (p == null){
+            val p = uuid.toPlayer()?: run {
                 cancel()
                 return
             }

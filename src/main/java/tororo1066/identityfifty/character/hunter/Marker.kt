@@ -54,6 +54,7 @@ class Marker: AbstractHunter("marker") {
             IdentityFifty.broadcastSpectators(translate("spec_mark_crossbow_used",p.name),
                 AllowAction.RECEIVE_HUNTERS_ACTION)
 
+            //着弾するまでパーティクルを出す
             arrowTask = object : BukkitRunnable() {
                 override fun run() {
                     if (arrow.isDead || arrow.isOnGround){
@@ -83,6 +84,7 @@ class Marker: AbstractHunter("marker") {
         }
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            //視線にいるサバイバーの印の数を表示させる
             val target = p.getTargetEntity(100)
             if (target !is Player || !marks.containsKey(target.uniqueId)){
                 bossbar?.removeAll()
@@ -166,6 +168,6 @@ class Marker: AbstractHunter("marker") {
         return Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
             marks.remove(uuid)
             uuid.toPlayer()?.sendTranslateMsg("mark_remove")
-        }, 1200)
+        }, 1600)
     }
 }

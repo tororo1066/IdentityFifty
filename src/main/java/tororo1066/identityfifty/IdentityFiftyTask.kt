@@ -453,7 +453,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 data.talentClasses.values.forEach { clazz ->
                     clazz.parameters(data)
                 }
-//                data.survivorClass.onStart(p)
             }
 
             IdentityFifty.stunEffect(p)
@@ -471,12 +470,11 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 data.talentClasses.values.forEach { clazz ->
                     clazz.parameters(data)
                 }
-//                data.hunterClass.onStart(p)
             }
             IdentityFifty.stunEffect(p)
         }
 
-        IdentityFifty.spectators.forEach { (uuid, data) ->
+        IdentityFifty.spectators.forEach { (uuid, _) ->
             val p = Bukkit.getPlayer(uuid)!!
             runTask {
                 p.gameMode = GameMode.SPECTATOR
@@ -578,7 +576,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
 
 
-        //チーム参加処理 遅くない...?w
+        //チーム参加処理
         IdentityFifty.survivors.forEach {
             survivorTeam.addEntry(it.value.name)
         }
@@ -646,7 +644,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
             }
             if (remainingGenerator != 0)return@register
-            //残り暗号機が0だったら 一撃死状態にする(45秒)
+            //残り暗号機が0だったら 一撃死状態にする(60秒)
             bossBar.progress = 1.0
             bossBar.setTitle(translate("lets_open_gate"))
             bossBar.color = BarColor.RED
@@ -686,6 +684,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                 }
             }
 
+            //サバイバーが全員生きてたらサバイバー全員を発光させる
             if (IdentityFifty.survivors.size == aliveSurvivors().size){
                 val hunters = IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList()
                 hunters.forEach {
@@ -845,7 +844,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
                 if (playerData.getHealth() >= 5)return@forEach
 
-                //ヘルスが4以上なら特定のキャラ以外処理をしない
+                //ヘルスが4以上なら特定のキャラ以外処理をしない <-今は全員が回復できる
                 if (playerData.getHealth() >= 4 && !helperData.healSmallHealth){
                     return@forEach
                 }
@@ -1001,7 +1000,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     return@register
                 }
                 e.block.location.getNearbyEntitiesByType(ArmorStand::class.java,4.5).forEach {
-                    if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PlateytLoc"),
+                    if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PlateLoc"),
                             PersistentDataType.INTEGER_ARRAY)){
                         e.isCancelled = true
                         return@register
