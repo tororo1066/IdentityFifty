@@ -67,6 +67,7 @@ class Coffin: AbstractSurvivor("coffin") {
                 it.setDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HEAD,EquipmentSlot.LEGS)
                 it.isInvisible = true
                 it.isInvulnerable = true
+                GlowAPI.setGlowing(it, GlowAPI.Color.DARK_RED, Bukkit.getOnlinePlayers())
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     it.isInvulnerable = false
                 }, 60)
@@ -74,7 +75,7 @@ class Coffin: AbstractSurvivor("coffin") {
                 coffinTask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
                     GlowAPI.setGlowing(it,false,Bukkit.getOnlinePlayers())
                     GlowAPI.setGlowing(it, GlowAPI.Color.WHITE, Bukkit.getOnlinePlayers())
-                }, 0, 5)
+                }, 60, 5)
 
                 sEvent.register(EntityDamageByEntityEvent::class.java){ e ->
                     if (e.entity.uniqueId == it.uniqueId){
@@ -107,7 +108,7 @@ class Coffin: AbstractSurvivor("coffin") {
             if (coffin == null){
                 return@setDropEvent
             }
-            if (IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == false){
+            if (!inPrison(p)){
                 return@setDropEvent
             }
 
@@ -136,7 +137,7 @@ class Coffin: AbstractSurvivor("coffin") {
                 }
             }
             p.teleport(coffin!!)
-            p.playSound(p.location, Sound.BLOCK_ENDER_CHEST_OPEN, 2f, 0.5f)
+            p.world.playSound(p.location, Sound.BLOCK_ENDER_CHEST_OPEN, 2f, 0.5f)
 
             coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
             coffin = null

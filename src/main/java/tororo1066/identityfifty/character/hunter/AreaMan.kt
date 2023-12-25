@@ -76,8 +76,7 @@ class AreaMan: AbstractHunter("areaman") {
             return@setInteractEvent true
         }
 
-        p.inventory.addItem(passiveItem)
-        p.inventory.addItem(areaSkillItem)
+        p.inventory.addItem(passiveItem, areaSkillItem)
     }
 
     override fun parameters(data: HunterData): HunterData {
@@ -131,6 +130,7 @@ class AreaMan: AbstractHunter("areaman") {
                         val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
                         data.glowManager.glow(players,GlowAPI.Color.RED,21)
                         p.playSound(p.location,Sound.ENTITY_ARROW_HIT_PLAYER,0.2f,2f)
+                        it.world.playSound(it.location,Sound.ENTITY_ARROW_HIT_PLAYER,0.2f,1f)
                     }
                 })
 

@@ -129,7 +129,7 @@ class Controller: AbstractSurvivor("controller") {
 
                 latestEntity = disguise
 
-                p.playSound(p.location, Sound.ENTITY_SKELETON_DEATH, 1f, 0.5f)
+                p.world.playSound(p.location, Sound.ENTITY_SKELETON_DEATH, 1f, 0.5f)
 
                 sEvent.register(EntityDamageEvent::class.java) { e ->
                     if (e is EntityDamageByEntityEvent)return@register
@@ -172,6 +172,7 @@ class Controller: AbstractSurvivor("controller") {
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
                             GlowAPI.Color.DARK_PURPLE, 200
                         )
+                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         movingNow = false
                         item.setInteractCoolDown(2400)
                     } else if (e.entity == latestEntity?.entity) { //人形が攻撃を受けた場合
@@ -188,6 +189,7 @@ class Controller: AbstractSurvivor("controller") {
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
                             GlowAPI.Color.DARK_PURPLE, 200
                         )
+                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)
                         IdentityFifty.stunEffect(e.damager as Player, 20, 40, StunState.DAMAGED)
                     }

@@ -77,6 +77,10 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
 
     open fun onEnd(p: Player) {}
 
+    open fun scoreboards(p: Player): ArrayList<String> {
+        return arrayListOf()
+    }
+
     abstract fun info(): ArrayList<ItemStack>
 
     public override fun clone(): AbstractSurvivor {

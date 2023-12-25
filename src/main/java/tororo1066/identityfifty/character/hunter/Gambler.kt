@@ -25,8 +25,8 @@ import kotlin.random.nextInt
 class Gambler: AbstractHunter("gambler") {
 
     private fun diceTask(p: Player){
-        IdentityFifty.util.repeatDelay(3,20,{p.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)},{
-            p.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2f, 1f)
+        IdentityFifty.util.repeatDelay(3,20,{p.world.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)},{
+            p.world.playSound(p.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2f, 1f)
             when(Random.nextInt(1..100)){
                 in 1..20->{
                     p.sendTranslateMsg("gamble_dice_action_1")
@@ -127,17 +127,17 @@ class Gambler: AbstractHunter("gambler") {
     }
 
     override fun onAttack(attackPlayer: Player, p: Player, noOne: Boolean): Int {
-        if (Random.nextInt(1..100) <= 30){
+        if (Random.nextInt(1..100) <= 35){
             diceTask(p)
         }
         if (noOne){
             return 4
         } else {
             when(Random.nextInt(1..100)){
-                in 1..30 ->{
+                in 1..25 ->{
                     return 1
                 }
-                in 31..65->{
+                in 26..65->{
                     return 2
                 }
                 in 66..85->{

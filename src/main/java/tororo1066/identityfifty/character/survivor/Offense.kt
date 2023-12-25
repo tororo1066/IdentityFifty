@@ -39,13 +39,13 @@ class Offense : AbstractSurvivor("offense") {
                 IdentityFifty.util.runTask {
                     p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (actionTime.toDouble()*1.5).toInt(), 10))
                 }
-                item.setInteractCoolDown(actionTime*14 + 100)
+                item.setInteractCoolDown(actionTime*18 + 100)
             }
 
             IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_used",p.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
-                if (actionTime >= 40){
+                if (actionTime >= 35){
                     it.cancel()
                     end()
                     return@Consumer
@@ -69,7 +69,7 @@ class Offense : AbstractSurvivor("offense") {
                     }
                 }
 
-                p.playSound(p.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
+                p.world.playSound(p.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
                 p.velocity = p.location.setPitchL(0f).direction.normalize().multiply(1.2).setY(-1)
                 val players = p.location.getNearbyPlayers(1.0).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
                 if (players.isNotEmpty()){

@@ -57,6 +57,11 @@ class DiscordClient: ListenerAdapter(), Listener {
         map = config.getString("map","")!!
 
         Bukkit.getPluginManager().registerEvents(this,IdentityFifty.plugin)
+
+        if (config.getBoolean("autoStart")){
+            enable = true
+            run()
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

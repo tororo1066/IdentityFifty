@@ -38,8 +38,8 @@ class SerialKiller: AbstractHunter("serialkiller") {
             .addLore(translate("kill_find_lore_3"))
 
         val killFindSkillItem = IdentityFifty.interactManager.createSInteractItem(killFindSkill).setInteractEvent { _, _ ->
-            p.playSound(p.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
-            p.playSound(p.location, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f)
+            p.world.playSound(p.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
+            p.world.playSound(p.location, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f)
             IdentityFifty.broadcastSpectators(translate("spec_kill_find_used",p.name),
                 AllowAction.RECEIVE_HUNTERS_ACTION)
             val uuid = UUID.randomUUID()
@@ -71,7 +71,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
                         p.sendTranslateMsg("kill_find_failed")
                         IdentityFifty.broadcastSpectators(translate("spec_kill_find_failed",p.name),
                             AllowAction.RECEIVE_HUNTERS_ACTION)
-                        p.playSound(p.location, Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1f)
+                        p.world.playSound(p.location, Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1f)
                     }
 
                     bossBar.removePlayer(p)

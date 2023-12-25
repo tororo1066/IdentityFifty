@@ -14,7 +14,7 @@ import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
-import java.util.UUID
+import java.util.*
 
 class DisguisePlayer: AbstractSurvivor("disguise") {
 
@@ -38,14 +38,14 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             p.sendTranslateMsg("disguise_skill_start",target.name)
             IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_used",p.name,target.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
-            p.playSound(p.location, Sound.ENTITY_ENDER_DRAGON_HURT, 1f, 1f)
+            p.world.playSound(p.location, Sound.ENTITY_ENDER_DRAGON_HURT, 1f, 1f)
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 if (data.skinModifier.isDisguise()){
                     data.skinModifier.unDisguise()
                     p.sendTranslateMsg("disguise_skill_end")
                     IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_end",p.name),
                         AllowAction.RECEIVE_SURVIVORS_ACTION)
-                    p.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
+                    p.world.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
                 }
             },700)
             return@setInteractEvent true
@@ -69,6 +69,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             p.sendTranslateMsg("disguise_skill_end")
             IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_end",p.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
+            p.world.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
             return Pair(false,0)
         }
         return super.onDamage(damage, toHealth, damager, p)

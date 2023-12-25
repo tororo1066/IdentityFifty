@@ -117,11 +117,15 @@ class Marker: AbstractHunter("marker") {
 
     override fun onAttack(attackPlayer: Player, p: Player, noOne: Boolean): Int {
         if (noOne) return 4
-
         val mark = marks[attackPlayer.uniqueId]?:return 2
+        return 2 + mark.first / 5
+    }
+
+    override fun onFinishedAttack(attackPlayer: Player, result: Int, p: Player) {
+        if (result == 0)return
+
         remove(attackPlayer.uniqueId)
         update(attackPlayer.uniqueId,5)
-        return 2 + mark.first / 5
     }
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {

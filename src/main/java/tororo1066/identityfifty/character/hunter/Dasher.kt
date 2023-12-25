@@ -25,7 +25,7 @@ class Dasher : AbstractHunter("dasher") {
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { _, _ ->
             //加速
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
-            p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
+            p.world.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
             IdentityFifty.broadcastSpectators(translate("spec_hyper_engine_used",p.name),AllowAction.RECEIVE_HUNTERS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(800)

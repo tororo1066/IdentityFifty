@@ -40,7 +40,7 @@ class Fader: AbstractHunter("fader"){
                 //透明解除
                 if (p.getPotionEffect(PotionEffectType.INVISIBILITY) != null){
                     p.world.playSound(p.location,Sound.ENTITY_GHAST_HURT,1f,2f)
-                    p.world.spawnParticle(Particle.SMOKE_LARGE,p.location,100,0.0,1.0,0.0)
+                    p.world.spawnParticle(Particle.SMOKE_LARGE,p.location,150,0.0,1.0,0.0)
                 }
                 p.removePotionEffect(PotionEffectType.INVISIBILITY)
                 val blindness = p.getPotionEffect(PotionEffectType.BLINDNESS)

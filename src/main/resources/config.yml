@@ -8,6 +8,7 @@ mysql:
   db: identity
 discord:
   enabled: false
+  autoStart: false
   token: ???
   commandChannel: ???
   infoChannel: ???
