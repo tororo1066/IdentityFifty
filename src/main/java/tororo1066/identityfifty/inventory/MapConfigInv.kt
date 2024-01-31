@@ -288,7 +288,7 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             items.add(item)
         }
         val item = SItem(Material.EMERALD_BLOCK).setDisplayName("§a§l+追加する")
-        val inputItem = createInputItem(item,Location::class.java,"§b発電機の位置を入力してください",true) { loc, p ->
+        val inputItem = createInputItem(item,Location::class.java,"§b発電機の位置を入力してください", invOpenCancel = true) { loc, p ->
             val data = GeneratorData()
             data.location = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${loc.blockX} ${loc.blockY} ${loc.blockZ}を追加しました")
@@ -322,7 +322,7 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             items.add(item)
         }
         val item = SItem(Material.EMERALD_BLOCK).setDisplayName("§a§l+追加する")
-        val inputItem = createInputItem(item,Location::class.java,"§b発電機の位置を入力してください",true) { loc, p ->
+        val inputItem = createInputItem(item,Location::class.java,"§b発電機の位置を入力してください", invOpenCancel = true) { loc, p ->
             val data = GeneratorData()
             data.location = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${loc.blockX} ${loc.blockY} ${loc.blockZ}を追加しました")
@@ -385,7 +385,7 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             items.add(item)
         }
         val item = SItem(Material.EMERALD_BLOCK).setDisplayName("§a§l+追加する")
-        val inputItem = createInputItem(item,Location::class.java,"§b脱出判定の位置を入力してください",true) { loc, p ->
+        val inputItem = createInputItem(item,Location::class.java,"§b脱出判定の位置を入力してください", invOpenCancel = true) { loc, p ->
             val data = PrisonData()
             data.escapeLoc = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${locToString(loc)}を追加しました")
@@ -424,7 +424,7 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             items.add(item)
         }
         val item = SItem(Material.EMERALD_BLOCK).setDisplayName("§a§l+追加する")
-        val inputItem = createInputItem(item,Location::class.java,"§b板の根本位置を入力してください",true) { loc, p ->
+        val inputItem = createInputItem(item,Location::class.java,"§b板の根本位置を入力してください", invOpenCancel = true) { loc, p ->
             val data = WoodPlateData()
             data.loc = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${loc.blockX} ${loc.blockY} ${loc.blockZ}を追加しました")

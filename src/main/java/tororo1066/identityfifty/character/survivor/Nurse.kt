@@ -5,9 +5,9 @@ import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
@@ -15,18 +15,18 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.toPlayer
-import java.util.UUID
 
 class Nurse : AbstractSurvivor("nurse") {
 
-    var healModifier: UUID? = null
+    private val glowTasks = ArrayList<Int>()
+    private var selfHealCooldown = 0
 
     override fun onStart(p: Player) {
         super.onStart(p)
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("nurse_passive_lore_1"))
             .addLore(translate("nurse_passive_lore_2"))
-        p.inventory.addItem(passiveItem)
+
         val speedUpItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore_1"))
             .addLore(translate("syringe_lore_2"))
@@ -42,17 +42,33 @@ class Nurse : AbstractSurvivor("nurse") {
             IdentityFifty.broadcastSpectators(translate("spec_syringe_used",p.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(1000)
-        p.inventory.addItem(speedUpSkillItem)
+
+        tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            if (selfHealCooldown > 0) selfHealCooldown--
+        },0,20))
+
+        p.inventory.addItem(passiveItem, speedUpSkillItem)
     }
 
     override fun onTryHeal(healPlayer: Player, p: Player): Boolean {
         val data = IdentityFifty.survivors[p.uniqueId]!!
-        healModifier?.let { data.healTickModify.remove(it) }
+        val hunters = IdentityFifty.hunters.values.mapNotNull { it.uuid.toPlayer() }
         if (healPlayer == p){
-            healModifier = UUID.randomUUID()
-            data.healTickModify[healModifier!!] = 4.0
+            if (selfHealCooldown > 0){
+                return false
+            }
+            glowTasks.addAll(data.glowManager.glow(ArrayList(hunters), GlowAPI.Color.GREEN,1000))
         }
         return true
+    }
+
+    override fun onHeal(isCancelled: Boolean, heal: Int, healedPlayer: Player, p: Player) {
+        val data = IdentityFifty.survivors[p.uniqueId]!!
+        if (healedPlayer == p){
+            glowTasks.forEach { data.glowManager.cancelTask(it) }
+            glowTasks.clear()
+            if (!isCancelled) selfHealCooldown = 60
+        }
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {
@@ -60,6 +76,14 @@ class Nurse : AbstractSurvivor("nurse") {
         data.healTick = 140
         data.canHealSelf = true
         return data
+    }
+
+    override fun scoreboards(p: Player): ArrayList<Pair<Int, String>> {
+        return if (selfHealCooldown > 0){
+            arrayListOf(Pair(-1, translate("nurse_scoreboard", selfHealCooldown)))
+        } else {
+            arrayListOf(Pair(-1, translate("nurse_scoreboard_usable")))
+        }
     }
 
     override fun info(): ArrayList<ItemStack> {

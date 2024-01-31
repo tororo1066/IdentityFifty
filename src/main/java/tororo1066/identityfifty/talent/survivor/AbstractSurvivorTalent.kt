@@ -63,6 +63,10 @@ abstract class AbstractSurvivorTalent(val name: String, val unlockCost: Int, var
         return Pair(stun,damage)
     }
 
+    open fun scoreboards(p: Player): ArrayList<Pair<Int, String>>? {
+        return null
+    }
+
     open fun onEnd(p: Player) {}
 
     companion object{

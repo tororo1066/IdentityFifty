@@ -8,5 +8,8 @@ depend:
   - WorldGuard
   - WorldEdit
 
+softdepend:
+  - NMSUtils
+
 commands:
   identity:

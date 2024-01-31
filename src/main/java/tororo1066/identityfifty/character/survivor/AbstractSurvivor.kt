@@ -47,10 +47,10 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
         return true
     }
 
-//    open fun onHeal(heal: Int, toHealth: Int, healedPlayer: Player, p: Player) {}
-//
-//    open fun onGotHeal(healer: ArrayList<Player>, p: Player) {}
-//
+    open fun onHeal(isCancelled: Boolean, heal: Int, healedPlayer: Player, p: Player) {}
+
+    open fun onGotHeal(healer: Collection<Player>, p: Player) {}
+
     open fun onTryGotHelp(helper: Player, p: Player): Boolean {
         return true
     }
@@ -77,8 +77,8 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
 
     open fun onEnd(p: Player) {}
 
-    open fun scoreboards(p: Player): ArrayList<String> {
-        return arrayListOf()
+    open fun scoreboards(p: Player): ArrayList<Pair<Int, String>>? {
+        return null
     }
 
     abstract fun info(): ArrayList<ItemStack>

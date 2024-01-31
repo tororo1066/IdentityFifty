@@ -23,7 +23,7 @@ import kotlin.math.floor
 
 class SerialKiller: AbstractHunter("serialkiller") {
 
-    private var preventDiff = 0
+    private var previousDiff = 0
     private var damageFlag = false
 
     override fun onStart(p: Player) {
@@ -92,14 +92,15 @@ class SerialKiller: AbstractHunter("serialkiller") {
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             val survivors = (IdentityFifty.identityFiftyTask?.aliveSurvivors()?:return@Runnable)
             val sumHealth = survivors.sumOf {
-                IdentityFifty.survivors[it]!!.getHealth()
+                val health = IdentityFifty.survivors[it]!!.getHealth()
+                if (health == 0) 3 else health
             }
             val healthDiff = survivors.size * 5 - sumHealth
 
-            p.walkSpeed -= preventDiff * 0.005f
+            p.walkSpeed -= previousDiff * 0.005f
             p.walkSpeed += healthDiff * 0.005f
 
-            preventDiff = healthDiff
+            previousDiff = healthDiff
 
         },5,5))
 
@@ -132,7 +133,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
             .addLore(translate("serialkiller_passive_lore_1"))
             .addLore(translate("serialkiller_passive_lore_2"))
 
-        val killFindSkill = SItem(Material.STICK).setDisplayName(translate("kill_find")).setCustomModelData(999)
+        val killFindSkill = SItem(Material.STICK).setDisplayName(translate("kill_find")).setCustomModelData(27)
             .addLore(translate("kill_find_lore_1"))
             .addLore(translate("kill_find_lore_2"))
             .addLore(translate("kill_find_lore_3"))

@@ -38,14 +38,14 @@ class Dasher : AbstractHunter("dasher") {
             if (viewPlayer != null){
                 if (IdentityFifty.survivors.containsKey(viewPlayer.uniqueId)){
                     if (!viewing){ //加速の重複を防ぐ
-                        p.walkSpeed += 0.01f
+                        p.walkSpeed += 0.02f
                         viewing = true
                     }
                     return@Runnable
                 }
             }
             if (viewing){ //加速の解除
-                p.walkSpeed -= 0.01f
+                p.walkSpeed -= 0.02f
                 viewing = false
             }
         },0,2))
@@ -61,7 +61,7 @@ class Dasher : AbstractHunter("dasher") {
 
     //サバイバーの救助時に加速
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1,true,false,true))
+        p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,300,1,true,false,true))
         p.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
     }
 

@@ -42,6 +42,10 @@ abstract class AbstractHunter(val name: String): Cloneable {
         return Pair(blindTime, slowTime)
     }
 
+    open fun scoreboards(p: Player): ArrayList<Pair<Int, String>>? {
+        return null
+    }
+
     open fun onEnd(p: Player) {}
 
     abstract fun info(): ArrayList<ItemStack>

@@ -1,7 +1,6 @@
 package tororo1066.identityfifty.character.hunter
 
 import de.slikey.effectlib.EffectType
-import de.slikey.effectlib.effect.ConeEffect
 import de.slikey.effectlib.effect.CylinderEffect
 import de.slikey.effectlib.effect.SphereEffect
 import org.bukkit.*

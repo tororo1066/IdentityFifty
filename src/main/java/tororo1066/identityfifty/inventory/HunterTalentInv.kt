@@ -23,7 +23,7 @@ class HunterTalentInv(val data: HunterData) {
             .addLore(translate("cost_head_point_lore",data.talentCost.toString()))
             .addLore(translate("cost_head_preset_lore"))
             .addLore(translate("cost_head_create_preset_lore"))
-            .setSkullOwner(p.uniqueId),String::class.java,"/<保存名>", ClickType.SHIFT_LEFT) { str, _ ->
+            .setSkullOwner(p.uniqueId),String::class.java,"/<保存名>", clickType = listOf(ClickType.SHIFT_LEFT)) { str, _ ->
             if (str.length > 50){
                 p.sendTranslateMsg("too_long_name")
                 return@createInputItem

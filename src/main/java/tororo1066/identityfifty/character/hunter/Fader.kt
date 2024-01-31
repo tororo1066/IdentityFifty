@@ -20,7 +20,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class Fader: AbstractHunter("fader"){
+
     private val traps = LinkedHashMap<UUID,TrapData>()
+    private var trapCooldown = 40
 
     override fun onStart(p: Player) {
         traps.clear()
@@ -53,8 +55,18 @@ class Fader: AbstractHunter("fader"){
         },0,5))
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
-            if (p.inventory.filter { it != null && it.itemMeta?.persistentDataContainer?.has(NamespacedKey(IdentityFifty.plugin,"glow_trap"),
-                    PersistentDataType.INTEGER) == true }.size < 2){ //トラップを二個以上持っていない時だけ与える
+            if (p.inventory.count { it != null && it.itemMeta?.persistentDataContainer?.has(NamespacedKey(IdentityFifty.plugin,"glow_trap"),
+                    PersistentDataType.INTEGER) == true } + (
+                        if (p.itemOnCursor.itemMeta
+                            ?.persistentDataContainer
+                            ?.has(
+                                NamespacedKey(IdentityFifty.plugin, "glow_trap"),
+                                PersistentDataType.INTEGER
+                            ) == true) 1 else 0) < 2){ //トラップを二個以上持っていない時だけ与える
+                if (trapCooldown > 0) {
+                    trapCooldown--
+                    return@Runnable
+                }
                 val trap = SItem(Material.STICK).setDisplayName(translate("glow_trap"))
                     .setCustomModelData(13)
                     .addLore(translate("glow_trap_lore_1"))
@@ -67,10 +79,10 @@ class Fader: AbstractHunter("fader"){
                     e.item!!.amount -= 1
                     item.delete()
                     if (traps.size >= 2){ //設置済のトラップが2個以上ある場合は一番古いものを削除
-                        val preventTrap = traps.entries.first()
-                        Bukkit.getEntity(preventTrap.key)?.remove()
-                        preventTrap.value.task.cancel()
-                        traps.remove(preventTrap.key)
+                        val previousTrap = traps.entries.first()
+                        Bukkit.getEntity(previousTrap.key)?.remove()
+                        previousTrap.value.task.cancel()
+                        traps.remove(previousTrap.key)
                     }
                     val pLoc = p.location
                     p.playSound(pLoc, Sound.ENTITY_HORSE_ARMOR, 1f, 1f)
@@ -116,8 +128,9 @@ class Fader: AbstractHunter("fader"){
                 }
 
                 p.inventory.addItem(trapSkillItem)
+                trapCooldown = 40
             }
-        },0,800))
+        },0,20))
 
         p.inventory.addItem(passiveItem)
 
@@ -139,6 +152,10 @@ class Fader: AbstractHunter("fader"){
             Bukkit.getEntity(it.uuid)?.remove()
         }
         traps.clear()
+    }
+
+    override fun scoreboards(p: Player): ArrayList<Pair<Int, String>> {
+        return arrayListOf(-1 to translate("glow_trap_cooldown", trapCooldown))
     }
 
 

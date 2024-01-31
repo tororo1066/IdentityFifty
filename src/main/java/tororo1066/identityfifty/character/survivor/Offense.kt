@@ -50,6 +50,7 @@ class Offense : AbstractSurvivor("offense") {
                     end()
                     return@Consumer
                 }
+                var stop = false
                 val block1 = p.world.rayTraceBlocks(p.location,p.location.setPitchL(0f).direction,1.5)?.hitBlock
                 val block2 = p.world.rayTraceBlocks(p.location.add(0.0,1.0,0.0),p.location.setPitchL(0f).direction,1.5)?.hitBlock
 
@@ -57,15 +58,13 @@ class Offense : AbstractSurvivor("offense") {
                     val maxDiff = block1.boundingBox.maxY-block1.boundingBox.minY
                     if (maxDiff > 0.5){
                         it.cancel()
-                        end()
-                        return@Consumer
+                        stop = true
                     }
                 }
                 if (block2 != null){
                     if (!block2.isPassable){
                         it.cancel()
-                        end()
-                        return@Consumer
+                        stop = true
                     }
                 }
 
@@ -82,6 +81,12 @@ class Offense : AbstractSurvivor("offense") {
                             AllowAction.RECEIVE_SURVIVORS_ACTION)
                         IdentityFifty.stunEffect(player, (actionTime*6-20), (actionTime*6), StunState.OTHER)
                     }
+                    it.cancel()
+                    end()
+                    return@Consumer
+                }
+
+                if (stop){
                     it.cancel()
                     end()
                     return@Consumer
@@ -122,18 +127,5 @@ class Offense : AbstractSurvivor("offense") {
             .addLore(translate("rugby_ball_lore_3"))
             .addLore(translate("rugby_ball_lore_4"))
         return arrayListOf(passiveItem,tackleSkillItem)
-    }
-
-    private fun getRayLoc(location: Location): Location {
-        var loc = location
-        while (true){
-            if (loc.y <= 0){
-                return loc
-            }
-            loc = loc.add(0.0,-0.1,0.0)
-            if (!loc.block.isPassable){
-                return loc.add(0.0,0.1,0.0)
-            }
-        }
     }
 }
