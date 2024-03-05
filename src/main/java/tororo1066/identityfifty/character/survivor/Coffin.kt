@@ -43,7 +43,7 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_4"))
             .addLore(translate("coffin_skill_lore_5"))
 
-        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, _ ->
+        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, item ->
             if (inPrison(p)){
                 return@setInteractEvent false
             }
@@ -89,6 +89,7 @@ class Coffin: AbstractSurvivor("coffin") {
                         coffinTask?.cancel()
                         coffinTask = null
                         sEvent.unregisterAll()
+                        item.setInteractCoolDown(1600)
                         p.sendTranslateMsg("coffin_broken")
                         IdentityFifty.broadcastSpectators(translate("spec_coffin_broken",p.name),
                             AllowAction.RECEIVE_SURVIVORS_ACTION)
@@ -153,9 +154,9 @@ class Coffin: AbstractSurvivor("coffin") {
             IdentityFifty.broadcastSpectators(translate("spec_coffin_helped",p.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
 
-            item.setInteractCoolDown(1800)
+            item.setInteractCoolDown(1600)
 
-        }.setInitialCoolDown(1800)
+        }.setInitialCoolDown(1600)
 
         p.inventory.addItem(passiveItem,coffinSkillItem)
     }

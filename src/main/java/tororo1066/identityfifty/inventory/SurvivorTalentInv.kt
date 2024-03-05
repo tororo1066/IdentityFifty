@@ -29,46 +29,58 @@ class SurvivorTalentInv(val data: SurvivorData) {
                 return@createInputItem
             }
 
-            if (IdentityFifty.talentSQL.dumpTalentName(p.uniqueId,"survivor",str)){
-                p.sendTranslateMsg("dump_name")
-                return@createInputItem
+            IdentityFifty.talentSQL.dupeTalentName(p.uniqueId, str, isSurvivor = true).thenAcceptAsync {
+                if (it) {
+                    p.sendTranslateMsg("dupe_name")
+                    return@thenAcceptAsync
+                }
+
+                IdentityFifty.talentSQL.insertTalents(p, str, data.talentClasses.values.toList(), isSurvivor = true).thenAccept { saved ->
+                    if (saved) {
+                        p.sendTranslateMsg("saved_talent")
+                    }
+                }
             }
 
-            IdentityFifty.talentSQL.insertSurvivorTalent(p,str,data.talentClasses.values.toList())
-            p.sendTranslateMsg("saved_talent")
         }.setClickEvent {
             if (it.click != ClickType.LEFT)return@setClickEvent
             val inv = object : LargeSInventory(IdentityFifty.plugin,translate("talent_presets")) {
                 override fun renderMenu(p: Player): Boolean {
-                    val presets = IdentityFifty.talentSQL.getSurvivorTalents(p.uniqueId)
-                    val items = arrayListOf<SInventoryItem>()
-                    presets.forEach { pair ->
-                        items.add(SInventoryItem(Material.DIAMOND_BLOCK)
-                            .setDisplayName(pair.first)
-                            .addLore(translate("talent_remove")).setCanClick(false).setClickEvent second@ { e ->
-                                if (e.click == ClickType.LEFT){
-                                    val costs = pair.second.sumOf { sum -> sum.unlockCost }
-                                    val defaultCosts = SurvivorData().talentCost
-                                    if (defaultCosts < costs){
-                                        p.sendTranslateMsg("not_enough_talent_point")
-                                        return@second
+                    IdentityFifty.talentSQL.getSurvivorTalents(p.uniqueId).thenAccept { presets ->
+                        val items = arrayListOf<SInventoryItem>()
+                        presets.forEach { pair ->
+                            items.add(SInventoryItem(Material.DIAMOND_BLOCK)
+                                .setDisplayName(pair.first)
+                                .addLore(translate("talent_remove")).setCanClick(false).setClickEvent second@ { e ->
+                                    if (e.click == ClickType.LEFT){
+                                        val costs = pair.second.sumOf { sum -> sum.unlockCost }
+                                        val defaultCosts = SurvivorData().talentCost
+                                        if (defaultCosts < costs){
+                                            p.sendTranslateMsg("not_enough_talent_point")
+                                            return@second
+                                        }
+
+                                        data.talentClasses.clear()
+                                        data.talentCost = defaultCosts - costs
+                                        pair.second.forEach { talent ->
+                                            data.talentClasses[talent.javaClass] = talent
+                                        }
+                                        p.closeInventory()
                                     }
 
-                                    data.talentClasses.clear()
-                                    data.talentCost = defaultCosts - costs
-                                    pair.second.forEach { talent ->
-                                        data.talentClasses[talent.javaClass] = talent
+                                    if (e.click == ClickType.SHIFT_LEFT){
+                                        IdentityFifty.talentSQL.removeTalent(p.uniqueId, pair.first, isSurvivor = true).thenAccept { removed ->
+                                            if (removed){
+                                                p.sendTranslateMsg("removed_talent")
+                                                allRenderMenu(p)
+                                            }
+                                        }
                                     }
-                                    p.closeInventory()
-                                }
-
-                                if (e.click == ClickType.SHIFT_LEFT){
-                                    IdentityFifty.talentSQL.removeTalent(p.uniqueId,"survivor",pair.first)
-                                    allRenderMenu(p)
-                                }
-                            })
+                                })
+                        }
+                        setResourceItems(items)
+                        afterRenderMenu()
                     }
-                    setResourceItems(items)
                     return true
                 }
             }

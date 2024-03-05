@@ -40,7 +40,7 @@ class QuickChatBarData(val uuid: UUID) {
             .setCustomData(IdentityFifty.plugin, "close", PersistentDataType.INTEGER, 1)
 
         val functionItem = IdentityFifty.interactManager.createSInteractItem(displayItem, true).setInteractEvent { e, _ ->
-            if (e.action != Action.LEFT_CLICK_AIR && e.action != Action.RIGHT_CLICK_AIR)return@setInteractEvent true
+            if (!e.action.isRightClick)return@setInteractEvent true
 
             val chats = arrayListOf<AbstractQuickChat>()
             var isHunter = false

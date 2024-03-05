@@ -69,8 +69,8 @@ class Offense : AbstractSurvivor("offense") {
                 }
 
                 p.world.playSound(p.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
-                p.velocity = p.location.setPitchL(0f).direction.normalize().multiply(1.2).setY(-1)
-                val players = p.location.getNearbyPlayers(1.0).filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
+                p.velocity = p.location.setPitchL(0f).direction.normalize().multiply(1.0).setY(-1)
+                val players = p.location.getNearbyPlayers(1.0).filter { fil -> IdentityFifty.hunters.containsKey(fil.uniqueId) }
                 if (players.isNotEmpty()){
                     players.forEach { player ->
                         player.playSound(player.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
@@ -101,7 +101,7 @@ class Offense : AbstractSurvivor("offense") {
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {
-        data.otherPlayerHealDelayPercentage = 0.5
+        data.otherPlayerHealDelayPercentage = 0.45
         data.survivorClass = this
         return data
     }

@@ -3,58 +3,129 @@ package tororo1066.identityfifty.talent.hunter
 import org.bukkit.*
 import org.bukkit.Particle.DustOptions
 import org.bukkit.Particle.DustTransition
-import org.bukkit.entity.Cow
-import org.bukkit.entity.Player
-import org.bukkit.entity.Sheep
+import org.bukkit.attribute.AttributeModifier
+import org.bukkit.entity.*
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitTask
+import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.identityfifty.IdentityFiftyTask
+import tororo1066.identityfifty.data.GlowManager
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.LocType
+import tororo1066.tororopluginapi.utils.toLocString
+import java.util.UUID
 
 class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::class.java) {
 
     override fun lore(): List<String> {
-        return listOf("skill_teleport_lore_1","skill_teleport_lore_2")
+        return listOf("skill_teleport_lore_1","skill_teleport_lore_2","skill_teleport_lore_3", "skill_teleport_lore_4")
     }
+
+    companion object {
+        val generatorGlowManager = HashMap<UUID, GlowManager>()
+        val ids = HashMap<UUID, MutableList<Int>>()
+    }
+
+    private var task: BukkitTask? = null
 
     override fun onStart(p: Player) {
         val teleportSkill = SItem(Material.STICK).setDisplayName(translate("skill_teleport")).setCustomModelData(21)
             .addLore(translate("skill_teleport_lore_1"))
             .addLore(translate("skill_teleport_lore_2"))
+            .addLore(translate("skill_teleport_lore_3"))
+            .addLore(translate("skill_teleport_lore_4"))
 
-        val teleportSkillItem = IdentityFifty.interactManager.createSInteractItem(teleportSkill,true).setInteractEvent { _, _ ->
-            val task = IdentityFifty.identityFiftyTask?:return@setInteractEvent false
-            val distances = ArrayList<Pair<Double,Location>>()
-            if (task.remainingGenerator == 0){
-                p.world.getEntitiesByClass(Cow::class.java).filter {
-                    it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER)
-                }.forEach {
-                    distances.add(Pair(it.location.distance(p.location),it.location))
+        var glowing = false
+
+        fun cancelGlowing() {
+            glowing = false
+            generatorGlowManager.forEach { (uuid, manager) ->
+                ids[uuid]?.forEach { manager.cancelTask(it) }
+            }
+            if (p.getPotionEffect(PotionEffectType.BLINDNESS)?.amplifier == 1) {
+                p.removePotionEffect(PotionEffectType.BLINDNESS)
+            }
+            task?.cancel()
+        }
+
+        val teleportSkillItem = IdentityFifty.interactManager.createSInteractItem(teleportSkill, true).setInteractEvent { e, _ ->
+            if (e.action.isLeftClick && glowing) {
+                val ray = p.location
+                for (i in 0 until  400) {
+                    ray.add(ray.direction.multiply(1.5))
+                    val entities = ray.getNearbyEntities(1.5, 1.5, 1.5)
+                        .filter {
+                            it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) ||
+                                    it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"), PersistentDataType.INTEGER) ||
+                                    it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "PrisonLoc"), PersistentDataType.INTEGER_ARRAY)
+                        }
+                        .sortedBy { it.location.distance(p.location) }
+
+                    if (entities.isNotEmpty()) {
+                        cancelGlowing()
+                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 60, 5))
+                        val entity = entities[0]
+                        p.world.spawnParticle(Particle.DUST_COLOR_TRANSITION, entity.location, 100, 0.5, 3.0, 0.5, DustTransition(Color.RED, Color.RED, 1f))
+                        p.world.playSound(entity.location, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.2f, 1f)
+                        p.playSound(p.location, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.2f, 1f)
+
+                        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+                                p.teleport(entity.location)
+                                p.world.playSound(entity.location, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
+                            })
+                        }, 60)
+                        return@setInteractEvent true
+                    }
+
                 }
-            } else {
-                p.world.getEntitiesByClass(Sheep::class.java).filter {
-                    it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER)
-                }.forEach {
-                    distances.add(Pair(it.location.distance(p.location),it.location))
+
+            }
+
+            if (e.action.isRightClick) {
+                if (glowing) {
+                    p.playSound(p.location, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 2f, 1f)
+                    cancelGlowing()
+                } else {
+                    p.playSound(p.location, Sound.ENTITY_MOOSHROOM_CONVERT, 2f, 1f)
+                    glowing = true
+                    p.world.getEntitiesByClasses(Sheep::class.java, Cow::class.java, ArmorStand::class.java).filter {
+                        it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) ||
+                                it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"), PersistentDataType.INTEGER) ||
+                                it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "PrisonLoc"), PersistentDataType.INTEGER_ARRAY)
+                    }.forEach {
+                        val glowManager = generatorGlowManager.getOrPut(it.uniqueId) { GlowManager(it.uniqueId) }
+
+                        val id = ids.getOrPut(it.uniqueId) { mutableListOf() }
+
+                        val glowColor = when(it.type) {
+                            EntityType.SHEEP -> GlowAPI.Color.YELLOW
+                            EntityType.COW -> GlowAPI.Color.BLUE
+                            else -> GlowAPI.Color.RED
+                        }
+                        id.addAll(glowManager.glow(mutableListOf(p), glowColor, 100000))
+                    }
+
+                    task = IdentityFifty.speedModifier(p, 0.0, 999999, AttributeModifier.Operation.ADD_SCALAR)
+                    p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 100000, 1))
                 }
             }
 
-            if (distances.isEmpty()) return@setInteractEvent false
-            val max = distances.maxByOrNull { it.first }?:return@setInteractEvent false
-            p.world.spawnParticle(Particle.DUST_COLOR_TRANSITION,max.second,100,0.5,3.0,0.5,DustTransition(Color.RED,Color.RED,1f))
-            p.world.playSound(max.second, Sound.ENTITY_ENDER_DRAGON_GROWL,1.2f,1f)
-            p.playSound(p.location,Sound.ENTITY_ENDER_DRAGON_GROWL,1.2f,1f)
-
-            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-                Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
-                    p.teleport(max.second)
-                    p.world.playSound(max.second, Sound.ENTITY_ENDERMAN_TELEPORT,1f,1f)
-                })
-            },50)
-
-            return@setInteractEvent true
-        }.setInitialCoolDown(2400)
+            return@setInteractEvent false
+        }.setInitialCoolDown(2000).setInteractCoolDown(1200)
 
         p.inventory.addItem(teleportSkillItem)
+    }
+
+    override fun onEnd(p: Player) {
+        generatorGlowManager.forEach { (uuid, manager) ->
+            ids[uuid]?.forEach { manager.cancelTask(it) }
+        }
+        generatorGlowManager.clear()
+        ids.clear()
     }
 }

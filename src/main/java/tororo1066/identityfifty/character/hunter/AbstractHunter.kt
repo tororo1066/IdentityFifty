@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitTask
+import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.enumClass.StunState
@@ -54,4 +55,7 @@ abstract class AbstractHunter(val name: String): Cloneable {
         return super.clone() as AbstractHunter
     }
 
+    protected fun inPrison(p: Player): Boolean {
+        return IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == true
+    }
 }

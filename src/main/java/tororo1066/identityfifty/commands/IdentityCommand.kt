@@ -73,7 +73,7 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                     }
                 }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[1]]!!.clone()
-                if (IdentityFifty.survivors.filter { filter -> filter.value.survivorClass == abstractSurvivor.javaClass }.isNotEmpty()){
+                if (IdentityFifty.survivors.filter { filter -> filter.value.survivorClass.javaClass == abstractSurvivor.javaClass }.isNotEmpty()){
                     it.sender.sendMessage("§c既に選択されています")
                     return@setPlayerExecutor
                 }
@@ -229,19 +229,38 @@ class IdentityCommand : SCommand("identity","","identity.user") {
 
         addCommand(SCommandObject().addNeedPermission("identity.op")
             .addArg(SCommandArg().addAllowString("start")).addArg(SCommandArg().addAllowString(IdentityFifty.maps.keys.toTypedArray()))
-            .setPlayerExecutor {
+            .setNormalExecutor {
                 val map = IdentityFifty.maps[it.args[1]]!!.clone()
                 if (map.survivorLimit < IdentityFifty.survivors.size) {
                     it.sender.prefixMsg("§cサバイバーは${map.survivorLimit}人までです！")
-                    return@setPlayerExecutor
+                    return@setNormalExecutor
                 }
 
                 if (map.hunterLimit < IdentityFifty.hunters.size) {
                     it.sender.prefixMsg("§cハンターは${map.hunterLimit}人までです！")
-                    return@setPlayerExecutor
+                    return@setNormalExecutor
                 }
 
-                IdentityFifty.identityFiftyTask = IdentityFiftyTask(map)
+                IdentityFifty.identityFiftyTask = IdentityFiftyTask(map, true)
+                IdentityFifty.identityFiftyTask?.start()
+            })
+
+        addCommand(SCommandObject().addNeedPermission("identity.op")
+            .addArg(SCommandArg().addAllowString("start")).addArg(SCommandArg().addAllowString(IdentityFifty.maps.keys.toTypedArray()))
+            .addArg(SCommandArg().addAllowType(SCommandArgType.BOOLEAN).addAlias("リザルトを保存する"))
+            .setNormalExecutor {
+                val map = IdentityFifty.maps[it.args[1]]!!.clone()
+                if (map.survivorLimit < IdentityFifty.survivors.size) {
+                    it.sender.prefixMsg("§cサバイバーは${map.survivorLimit}人までです！")
+                    return@setNormalExecutor
+                }
+
+                if (map.hunterLimit < IdentityFifty.hunters.size) {
+                    it.sender.prefixMsg("§cハンターは${map.hunterLimit}人までです！")
+                    return@setNormalExecutor
+                }
+
+                IdentityFifty.identityFiftyTask = IdentityFiftyTask(map, it.args[2].toBoolean())
                 IdentityFifty.identityFiftyTask?.start()
             })
 
@@ -285,7 +304,7 @@ class IdentityCommand : SCommand("identity","","identity.user") {
         })
 
         addCommand(SCommandObject().addNeedPermission("identity.op")
-            .addArg(SCommandArg().addAllowString("stop")).setPlayerExecutor {
+            .addArg(SCommandArg().addAllowString("stop")).setNormalExecutor {
             IdentityFifty.identityFiftyTask?.end()
             it.sender.sendTranslateMsg("stopped_game")
         })
@@ -554,15 +573,15 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                 it.sender.sendTranslateMsg("set_talent_cost", data.name, data.talentCost.toString())
             })
 
-        registerDebugCommand("identity.op")
-
-        addCommand(SCommandObject()
-            .addArg(SCommandArg("test"))
-            .setPlayerExecutor {
-                it.sender.sendMessage(it.sender.location.block.boundingBox.centerY.toString())
-                it.sender.sendMessage(it.sender.location.block.boundingBox.maxY.toString())
-                it.sender.sendMessage(it.sender.location.block.boundingBox.minY.toString())
+        addCommand(setDebug()
+            .addArg(SCommandArg("resetCooldown"))
+            .setNormalExecutor {
+                val player = it.args[2].toPlayer()?:return@setNormalExecutor
+                val item = IdentityFifty.interactManager.items.entries.find { find -> find.value.equalFunc.invoke(player.inventory.itemInMainHand, find.value) }?: return@setNormalExecutor
+                item.value.setInteractCoolDown(0)
             })
+
+        registerDebugCommand("identity.op")
 
     }
 

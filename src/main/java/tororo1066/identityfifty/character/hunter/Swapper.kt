@@ -70,7 +70,7 @@ class Swapper: AbstractHunter("swapper") {
                         p.sendTranslateMsg("change_color_glowing")
                         it.sendTranslateMsg("change_color_glowing_survivor")
                     }
-                p.walkSpeed -= 0.04f
+                p.walkSpeed -= 0.02f
                 p.sendTranslateMsg("change_color_white")
                 IdentityFifty.broadcastSpectators(translate("spec_change_color_white", p.name),
                     AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -86,7 +86,7 @@ class Swapper: AbstractHunter("swapper") {
                 }
                 data.glowManager.glow(players, GlowAPI.Color.RED, 100)
                 IdentityFifty.stunEffect(p, 100, 100, StunState.OTHER)
-                p.walkSpeed += 0.04f
+                p.walkSpeed += 0.02f
                 p.sendTranslateMsg("change_color_black")
                 IdentityFifty.broadcastSpectators(translate("spec_change_color_black", p.name),
                     AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -155,7 +155,7 @@ class Swapper: AbstractHunter("swapper") {
                 return if (white) {
                     blindTime + 10 to slowTime + 10
                 } else {
-                    blindTime - 40 to slowTime - 40
+                    blindTime - 30 to slowTime - 30
                 }
             }
             else -> {

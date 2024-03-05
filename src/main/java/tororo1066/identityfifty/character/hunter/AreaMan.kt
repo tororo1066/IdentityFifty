@@ -4,6 +4,7 @@ import de.slikey.effectlib.EffectType
 import de.slikey.effectlib.effect.CylinderEffect
 import de.slikey.effectlib.effect.SphereEffect
 import org.bukkit.*
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -48,7 +49,7 @@ class AreaMan: AbstractHunter("areaman") {
             for (i in 1..length){
                 loc.add(loc.direction.multiply(1)).getNearbyPlayers(width.toDouble()).filter { !glowedPlayers.contains(it) }.forEach {
                     val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
-                    data.glowManager.glow(players,GlowAPI.Color.RED,100)
+                    data.glowManager.glow(players,GlowAPI.Color.RED,150)
                     p.playSound(p.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     it.playSound(it.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     glowedPlayers.add(it)
@@ -67,7 +68,7 @@ class AreaMan: AbstractHunter("areaman") {
             }
 
             if (glowedPlayers.isNotEmpty()){
-                p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 40+glowedPlayers.size*40, glowedPlayers.size-1, true, false))
+                IdentityFifty.speedModifier(p,glowedPlayers.size * 0.15,40+glowedPlayers.size*40, AttributeModifier.Operation.ADD_SCALAR)
             }
 
             IdentityFifty.broadcastSpectators(translate("spec_area_skill_used",p.name), AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -86,9 +87,15 @@ class AreaMan: AbstractHunter("areaman") {
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
         val players = IdentityFifty.hunters.mapNotNull { Bukkit.getPlayer(it.key) }.toMutableList()
 
-        dieLocation.getNearbyPlayers(3.0).forEach {
-            val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
-            data.glowManager.glow(players,GlowAPI.Color.PURPLE,140)
+        p.sendTranslateMsg("area_message")
+
+        dieLocation.getNearbyPlayers(3.0).run {
+            if (isNotEmpty()) p.sendTranslateMsg("area_message")
+            forEach {
+                val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
+                data.glowManager.glow(players,GlowAPI.Color.PURPLE,140)
+                it.sendTranslateMsg("area_spec_message",p.name)
+            }
         }
 
         if (remainingGenerator == 0){
@@ -96,6 +103,7 @@ class AreaMan: AbstractHunter("areaman") {
             val player = Bukkit.getPlayer(survivor.key)!!
             player.addPotionEffect(PotionEffect(PotionEffectType.SLOW,120,4))
             survivor.value.glowManager.glow(players,GlowAPI.Color.DARK_RED,300)
+            p.sendTranslateMsg("area_message")
             player.sendTranslateMsg("area_spec_message",p.name)
         }
     }

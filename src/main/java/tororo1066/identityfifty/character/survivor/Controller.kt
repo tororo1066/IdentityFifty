@@ -70,11 +70,12 @@ class Controller: AbstractSurvivor("controller") {
                 }
             }
 
-            fun teleport(p: Player, loc: Location){
+            fun teleport(p: Player, loc: Location, movingNow: Boolean){
                 p.isInvisible = true
                 p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 23, 100, false, false, false))
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     p.teleport(loc)
+                    this.movingNow = movingNow
                     Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                         p.isInvisible = false
                     }, 10)
@@ -93,17 +94,17 @@ class Controller: AbstractSurvivor("controller") {
                 if (latestEntity != null){
                     latestEntity!!.stopDisguise()
                     latestEntity!!.entity.remove()
-                    teleport(p, latestEntity!!.entity.location)
+                    teleport(p, latestEntity!!.entity.location, false)
+                } else {
+                    movingNow = false
                 }
                 saveDisguise(loc)
-                movingNow = false
                 p.playSound(p.location, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
                 return@setInteractEvent true
             }
             IdentityFifty.broadcastSpectators(translate("spec_control_doll_used",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
 
             sEvent.unregisterAll()
-            movingNow = true
             p.world.spawn(p.location, Chicken::class.java) {
                 it.setAI(false)
                 it.isSilent = true
@@ -117,9 +118,9 @@ class Controller: AbstractSurvivor("controller") {
                     val loc = latestEntity!!.entity.location
                     latestEntity!!.stopDisguise()
                     latestEntity!!.entity.remove()
-                    teleport(p, loc)
+                    teleport(p, loc, true)
                 } else {
-                    teleport(p, p.location.setPitchL(0f))
+                    teleport(p, p.location.setPitchL(0f), true)
                 }
 
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
@@ -150,9 +151,8 @@ class Controller: AbstractSurvivor("controller") {
                         p.inventory.setItem(EquipmentSlot.HEAD, null)
                         latestEntity!!.stopDisguise()
                         latestEntity!!.entity.remove()
-                        teleport(p, latestEntity!!.entity.location)
+                        teleport(p, latestEntity!!.entity.location, false)
                         saveDisguise(loc)
-                        movingNow = false
                         Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                             p.damage(1.0, e.damager)
                         }, 5)
@@ -165,7 +165,7 @@ class Controller: AbstractSurvivor("controller") {
                         p.inventory.setItem(EquipmentSlot.HEAD, null)
                         disguise.stopDisguise()
                         it.remove()
-                        teleport(p, it.location)
+                        teleport(p, it.location, false)
                         latestEntity = null
                         sEvent.unregisterAll()
                         IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
@@ -173,7 +173,6 @@ class Controller: AbstractSurvivor("controller") {
                             GlowAPI.Color.DARK_PURPLE, 200
                         )
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
-                        movingNow = false
                         item.setInteractCoolDown(2400)
                     } else if (e.entity == latestEntity?.entity) { //人形が攻撃を受けた場合
                         if (!IdentityFifty.hunters.containsKey(e.damager.uniqueId)){
@@ -234,15 +233,22 @@ class Controller: AbstractSurvivor("controller") {
     override fun onGotHelp(helper: Player, p: Player): ReturnAction {
         val data = IdentityFifty.survivors[p.uniqueId]?:return ReturnAction.RETURN
         if (movingNow){
-            return ReturnAction.RETURN
+            return ReturnAction.CANCEL
         }
 
-        if (helper == p){
-            data.setHealth(2)
+        if (helper.uniqueId == p.uniqueId){
+            data.setHealth(2, true)
             return ReturnAction.CONTINUE
         }
 
         return super.onGotHelp(helper, p)
+    }
+
+    override fun onGoal(p: Player): ReturnAction {
+        if (movingNow){
+            return ReturnAction.CANCEL
+        }
+        return super.onGoal(p)
     }
 
     override fun onDie(p: Player) {

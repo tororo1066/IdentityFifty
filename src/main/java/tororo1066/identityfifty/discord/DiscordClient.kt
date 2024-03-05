@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -27,7 +28,7 @@ class DiscordClient: ListenerAdapter(), Listener {
     val entryPermission: Long
     val opPermission: Long
     val map: String
-    val discordSQL = DiscordMinecraftSQL()
+    val discordSQL = DiscordMinecraftDB()
 
     var thread: Thread? = null
     val himo = HashMap<Int, Pair<UUID,String>>()
@@ -74,7 +75,16 @@ class DiscordClient: ListenerAdapter(), Listener {
                 random = Random.nextInt(100000,999999)
             }
             himo[random] = uuid to e.player.name
-            e.disallow(PlayerLoginEvent.Result.KICK_OTHER, Component.text("${e.player.name}のコード $random"))
+            e.allow()
+            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+                e.player.sendMessage(Component.text("§d${e.player.name}のコード $random(クリックでコピー)").clickEvent(
+                    ClickEvent.copyToClipboard(random.toString())
+                ))
+                e.player.sendMessage("§c10秒後に切断されます...")
+            })
+            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                e.player.kick(Component.text("コードを入力してください"))
+            },200)
             return
         }
         if (!enable)return
@@ -156,7 +166,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                 }
 
                 Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
-                    IdentityFifty.identityFiftyTask = IdentityFiftyTask(IdentityFifty.maps[map]!!.clone())
+                    IdentityFifty.identityFiftyTask = IdentityFiftyTask(IdentityFifty.maps[map]!!.clone(), true)
                     IdentityFifty.identityFiftyTask?.start()
                 })
 

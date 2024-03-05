@@ -67,7 +67,7 @@ class Nurse : AbstractSurvivor("nurse") {
         if (healedPlayer == p){
             glowTasks.forEach { data.glowManager.cancelTask(it) }
             glowTasks.clear()
-            if (!isCancelled) selfHealCooldown = 60
+            if (!isCancelled) selfHealCooldown = 70
         }
     }
 

@@ -31,15 +31,12 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.event.player.PlayerToggleSneakEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.persistence.PersistentDataType
-import org.bukkit.scoreboard.DisplaySlot
-import org.bukkit.scoreboard.Scoreboard
 import org.bukkit.scoreboard.Team
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.character.survivor.AbstractSurvivor
@@ -62,7 +59,7 @@ import java.util.UUID
 import java.util.function.Consumer
 import kotlin.random.Random
 
-class IdentityFiftyTask(val map: MapData) : Thread() {
+class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thread() {
 
 //    private fun allPlayerAction(action: (UUID)->Unit){
 //        IdentityFifty.survivors.forEach {
@@ -81,7 +78,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
     }
 
     private fun broadcast(string: String){
-        Bukkit.broadcast(Component.text(IdentityFifty.prefix + string),Server.BROADCAST_CHANNEL_USERS)
+        Bukkit.broadcast(Component.text(IdentityFifty.PREFIX + string),Server.BROADCAST_CHANNEL_USERS)
     }
 
     private fun runTask(unit: ()->Unit){
@@ -97,14 +94,16 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         }
     }
 
-    //板の処理で使用
-    private fun changeBlockFace(blockFace: BlockFace): BlockFace {
-        return when(blockFace){
-            BlockFace.WEST-> BlockFace.EAST
-            BlockFace.EAST-> BlockFace.WEST
-            BlockFace.NORTH-> BlockFace.SOUTH
-            BlockFace.SOUTH-> BlockFace.NORTH
-            else-> blockFace
+    companion object {
+        //板の処理で使用
+        fun changeBlockFace(blockFace: BlockFace): BlockFace {
+            return when(blockFace){
+                BlockFace.WEST-> BlockFace.EAST
+                BlockFace.EAST-> BlockFace.WEST
+                BlockFace.NORTH-> BlockFace.SOUTH
+                BlockFace.SOUTH-> BlockFace.NORTH
+                else-> blockFace
+            }
         }
     }
 
@@ -196,10 +195,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
         val players = IdentityFifty.survivors.keys + IdentityFifty.hunters.keys
 
-        IdentityFifty.survivors.clear()
-        IdentityFifty.hunters.clear()
-        IdentityFifty.spectators.clear()
-
         Bukkit.getOnlinePlayers().forEach {
             it.walkSpeed = 0.2f
             it.playSound(it.location,Sound.UI_TOAST_CHALLENGE_COMPLETE,0.8f,1f)
@@ -214,11 +209,13 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
         },60)
 
         //人数によって結果を変える
-        if (escapedSurvivor.size > survivorSize/2){
-
+        if (escapedSurvivor.size > survivorSize / 2){
             onlinePlayersAction {
                 it.showTitle(Title.title(Component.text(translate("win_survivor")), Component.text(""), Title.Times.of(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
+            }
+            if (saveResult) {
+                IdentityFifty.characterLogSQL.insertAll(true)
             }
         } else {
             if (escapedSurvivor.size == survivorSize){
@@ -226,14 +223,23 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     it.showTitle(Title.title(Component.text(translate("draw")), Component.text(""), Title.Times.of(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
                 }
+                if (saveResult) {
+                    IdentityFifty.characterLogSQL.insertAll(null)
+                }
             } else {
                 onlinePlayersAction {
                     it.showTitle(Title.title(Component.text(translate("win_hunter")), Component.text(""), Title.Times.of(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
                 }
+                if (saveResult) {
+                    IdentityFifty.characterLogSQL.insertAll(false)
+                }
             }
         }
 
+        IdentityFifty.survivors.clear()
+        IdentityFifty.hunters.clear()
+        IdentityFifty.spectators.clear()
         //スキルアイテムの処理全て削除
         IdentityFifty.interactManager.items.clear()
 
@@ -336,8 +342,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }
         }
 
-        IdentityFifty.characterLogSQL.insertAll()
-
         //牢屋の脱出判定のlocationにアマスタを出す この周囲でシフトすることで救助できる
         map.prisons.forEach {
             runTask {
@@ -390,6 +394,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     stand.isInvulnerable = true
                     stand.isMarker = true
                     stand.isCollidable = false
+                    stand.isSmall = true
                     woodPlateUUID.add(stand.uniqueId)
                 }
 
@@ -965,7 +970,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
                         val onGotHelp = playerData.survivorClass.onGotHelp(helperPlayer,e.player)
                         if (onGotHelp == AbstractSurvivor.ReturnAction.CANCEL){
-                            e.player.teleport(data.spawnLoc)
+                            e.isCancelled = true
                             return@register
                         }
                         if (onGotHelp == AbstractSurvivor.ReturnAction.RETURN){
@@ -1082,9 +1087,13 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                                             }
                                             IdentityFifty.stunEffect(p,modify.first,modify.second,StunState.WOODPLATE)
                                         }
-                                        woodPlateUUID.remove(it.uniqueId)
-                                        it.remove()
-                                        e.player.inventory.setItemInOffHand(SItem(Material.AIR))
+                                        it.persistentDataContainer.remove(NamespacedKey(IdentityFifty.plugin,"PlateLoc"))
+                                        it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"UsedPlate"), PersistentDataType.INTEGER_ARRAY] = intArrayOf(
+                                            plateData.loc.blockX,
+                                            plateData.loc.blockY,
+                                            plateData.loc.blockZ
+                                        )
+                                        e.player.inventory.setItemInOffHand(null)
                                         item.delete()
                                         return@setInteractEvent true
                                     }
@@ -1099,6 +1108,14 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
 
             if (escapedSurvivor.contains(e.player.uniqueId))return@register
             if (!worldGuard.inRegion(e.player,map.goalRegions))return@register
+            val onGoal = data.survivorClass.onGoal(e.player)
+            if (onGoal == AbstractSurvivor.ReturnAction.CANCEL){
+                e.isCancelled = true
+                return@register
+            }
+            if (onGoal == AbstractSurvivor.ReturnAction.RETURN){
+                return@register
+            }
             escapedSurvivor.add(e.player.uniqueId)
             survivorCount--
             data.setHealth(-1,true)
@@ -1353,6 +1370,7 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
             }.start()
         }
 
+        @Suppress("DEPRECATION")//mapを取得する方法がこれしかない
         val bukkitMap = Bukkit.getMap(map.mapId?:-1)
         var mapItem: ItemStack? = null
         if (bukkitMap != null){
@@ -1413,47 +1431,6 @@ class IdentityFiftyTask(val map: MapData) : Thread() {
                     p.spawnParticle(Particle.SPELL_WITCH,p.location,20,0.0,0.5,0.0)
                 }
             }
-//            IdentityFifty.hunters.forEach {
-//                val playerLoc = Bukkit.getPlayer(it.key)!!.location
-//
-//                playerLoc.getNearbyPlayers(25.0).forEach PlayersForEach@ { p ->
-//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-//                    val data = IdentityFifty.survivors[p.uniqueId]!!
-//                    data.heartProcess += 0.2
-//                }
-//
-//                playerLoc.getNearbyPlayers(20.0).forEach PlayersForEach@ { p ->
-//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-//                    val data = IdentityFifty.survivors[p.uniqueId]!!
-//                    data.heartProcess += 0.1
-//                }
-//
-//                playerLoc.getNearbyPlayers(15.0).forEach PlayersForEach@ { p ->
-//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-//                    val data = IdentityFifty.survivors[p.uniqueId]!!
-//                    data.heartProcess += 0.2
-//                }
-//
-//                playerLoc.getNearbyPlayers(10.0).forEach PlayersForEach@ { p ->
-//                    if (!IdentityFifty.survivors.containsKey(p.uniqueId))return@PlayersForEach
-//                    if (escapedSurvivor.contains(p.uniqueId))return@PlayersForEach
-//                    val data = IdentityFifty.survivors[p.uniqueId]!!
-//                    data.heartProcess += 0.5
-//                }
-//
-//            }
-//
-//            IdentityFifty.survivors.forEach { (uuid,data) ->
-//                if (data.heartProcess >= 1.0){
-//                    data.heartProcess = 0.0
-//                    val p = Bukkit.getPlayer(uuid)!!
-//                    p.playSound(p.location,"identity.heart",1f,1f)
-//                    p.spawnParticle(Particle.SPELL_WITCH,p.location,20,0.0,0.5,0.0)
-//                }
-//            }
         },0,10)
 
 

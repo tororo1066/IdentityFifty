@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.data
 
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.inventivetalent.glow.GlowAPI
@@ -7,10 +8,11 @@ import org.inventivetalent.glow.GlowAPI.Color
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GlowManager(private val uuid: UUID) {
 
-    val glowTasks = HashMap<UUID,GlowTask>()
+    private val glowTasks = HashMap<UUID,GlowTask>()
 
     fun glow(visiblePlayers: MutableCollection<Player>, color: Color, duration: Int): List<Int> {
         visiblePlayers.addAll(IdentityFifty.spectators.keys.mapNotNull { it.toPlayer() })
@@ -35,21 +37,25 @@ class GlowManager(private val uuid: UUID) {
     }
 
     fun cancelTask(taskId: Int) {
+        val uuid = ArrayList<UUID>()
         glowTasks.values.forEach {
             if (it.taskId == taskId) {
                 it.cancel()
-                glowTasks.remove(it.visiblePlayer.uniqueId)
+                uuid.add(it.visiblePlayer.uniqueId)
             }
+        }
+        uuid.forEach {
+            glowTasks.remove(it)
         }
     }
 
-    class GlowTask(private val uuid: UUID, val visiblePlayer: Player, private val color: Color, private val duration: Int) : BukkitRunnable() {
+    class GlowTask(private val uuid: UUID, val visiblePlayer: Player, private val color: Color, duration: Int) : BukkitRunnable() {
         var tick = duration
         init {
             runTaskTimer(IdentityFifty.plugin,0,1)
         }
         override fun run() {
-            val p = uuid.toPlayer()?: run {
+            val p = Bukkit.getEntity(uuid)?: run {
                 cancel()
                 return
             }
@@ -71,7 +77,7 @@ class GlowManager(private val uuid: UUID) {
         }
 
         override fun cancel() {
-            val p = uuid.toPlayer()?:return
+            val p = Bukkit.getEntity(uuid)?:return
             GlowAPI.setGlowing(p, false, visiblePlayer)
             if (IdentityFifty.survivors.containsKey(uuid)){
                 IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(p.name)

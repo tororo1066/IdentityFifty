@@ -2,6 +2,8 @@ package tororo1066.identityfifty.character.survivor
 
 import org.bukkit.Material
 import org.bukkit.Sound
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
@@ -66,22 +68,24 @@ class RunAway : AbstractSurvivor("runaway") {
     }
 
     override fun onGotHelp(helper: Player, p: Player): ReturnAction {
-        val data = IdentityFifty.survivors[p.uniqueId]!!
-        if (data.talentClasses.containsKey(GotHelpedSpeedUp::class.java)){
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,120,1))
-        } else {
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
-        }
+//        val data = IdentityFifty.survivors[p.uniqueId]!!
+//        if (data.talentClasses.containsKey(GotHelpedSpeedUp::class.java)){
+//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,120,1))
+//        } else {
+//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
+//        }
+        IdentityFifty.speedModifier(p, 0.4, 100, AttributeModifier.Operation.ADD_SCALAR)
         return super.onGotHelp(helper, p)
     }
 
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
-        val data = IdentityFifty.survivors[p.uniqueId]!!
-        if (data.talentClasses.containsKey(DamagedBoost::class.java)){
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,130,1))
-        } else {
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
-        }
+//        val data = IdentityFifty.survivors[p.uniqueId]!!
+//        if (data.talentClasses.containsKey(DamagedBoost::class.java)){
+//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,130,1))
+//        } else {
+//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
+//        }
+        IdentityFifty.speedModifier(p, 0.4, 100, AttributeModifier.Operation.ADD_SCALAR)
         return Pair(true,damage)
     }
 

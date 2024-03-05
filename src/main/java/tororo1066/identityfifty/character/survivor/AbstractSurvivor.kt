@@ -65,6 +65,10 @@ abstract class AbstractSurvivor(val name: String): Cloneable {
         p.inventory.clear()
     }
 
+    open fun onGoal(p: Player): ReturnAction {
+        return ReturnAction.CONTINUE
+    }
+
     open fun onDieOtherSurvivor(diePlayer: Player, playerNumber: Int,p: Player) {}
 
     open fun sheepGeneratorModify(damage: Double, remainingGenerator: Int, maxHealth: Double, nowHealth: Double, p: Player): Double {

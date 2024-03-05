@@ -22,7 +22,7 @@ import kotlin.collections.ArrayList
 class Fader: AbstractHunter("fader"){
 
     private val traps = LinkedHashMap<UUID,TrapData>()
-    private var trapCooldown = 40
+    private var trapCooldown = 0
 
     override fun onStart(p: Player) {
         traps.clear()
@@ -62,7 +62,7 @@ class Fader: AbstractHunter("fader"){
                             ?.has(
                                 NamespacedKey(IdentityFifty.plugin, "glow_trap"),
                                 PersistentDataType.INTEGER
-                            ) == true) 1 else 0) < 2){ //トラップを二個以上持っていない時だけ与える
+                            ) == true) 1 else 0) < 3){ //トラップを二個以上持っていない時だけ与える
                 if (trapCooldown > 0) {
                     trapCooldown--
                     return@Runnable
@@ -78,7 +78,7 @@ class Fader: AbstractHunter("fader"){
                 val trapSkillItem = IdentityFifty.interactManager.createSInteractItem(trap, true).setInteractEvent { e, item ->
                     e.item!!.amount -= 1
                     item.delete()
-                    if (traps.size >= 2){ //設置済のトラップが2個以上ある場合は一番古いものを削除
+                    if (traps.size >= 3){ //設置済のトラップが2個以上ある場合は一番古いものを削除
                         val previousTrap = traps.entries.first()
                         Bukkit.getEntity(previousTrap.key)?.remove()
                         previousTrap.value.task.cancel()
@@ -99,9 +99,10 @@ class Fader: AbstractHunter("fader"){
                         val task = object : BukkitRunnable(){
 
                             override fun run() {
-                                val players = it.location.getNearbyPlayers(2.0).filter {
+                                val players = it.location.getNearbyPlayers(2.5).filter {
                                     fil-> IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(fil.uniqueId) == true
                                         && !fil.isSneaking
+                                        && !inPrison(fil)
                                 } //半径以内でなおかつしゃがんでいないサバイバー
                                 if (players.isEmpty())return
                                 players.forEach { surP ->
@@ -142,7 +143,15 @@ class Fader: AbstractHunter("fader"){
 //
 //            }
             //心音の反応力を下げる
-            it.heartProcessRules = arrayListOf(Pair(23.0,0.1), Pair(17.0,0.2), Pair(12.0,0.3), Pair(8.0,0.4))
+            it.heartProcessRules.toMutableSet().forEachIndexed { index, (radius, value) ->
+                when (index) {
+                    0 -> it.heartProcessRules[index] = radius - 2.0 to value - 0.1
+                    1 -> it.heartProcessRules[index] = radius - 3.0 to value + 0.1
+                    2 -> it.heartProcessRules[index] = radius - 3.0 to value + 0.1
+                    3 -> it.heartProcessRules[index] = radius - 2.0 to value - 0.1
+                }
+            }
+//            it.heartProcessRules = arrayListOf(Pair(23.0,0.1), Pair(17.0,0.2), Pair(12.0,0.3), Pair(8.0,0.4))
         }
     }
 

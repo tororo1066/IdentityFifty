@@ -6,12 +6,16 @@ import com.sun.net.httpserver.HttpServer
 import de.slikey.effectlib.EffectManager
 import org.bukkit.Bukkit
 import org.bukkit.Particle
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.character.hunter.*
 import tororo1066.identityfifty.character.survivor.*
 import tororo1066.identityfifty.commands.IdentityCommand
@@ -22,10 +26,8 @@ import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.discord.DiscordClient
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
-import tororo1066.identityfifty.talent.TalentSQL
-import tororo1066.nmsutils.SNms
+import tororo1066.identityfifty.talent.TalentSQLV2
 import tororo1066.tororopluginapi.SJavaPlugin
-import tororo1066.tororopluginapi.config.SConfig
 import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -62,7 +64,7 @@ class IdentityFifty : SJavaPlugin() {
         /** 便利なユーティリティ **/
         lateinit var util: UsefulUtility
         /** データベース **/
-        lateinit var talentSQL: TalentSQL
+        lateinit var talentSQL: TalentSQLV2
         /** 稼働中のゲームの変数 **/
         var identityFiftyTask: IdentityFiftyTask? = null
 
@@ -72,9 +74,9 @@ class IdentityFifty : SJavaPlugin() {
 
         val allowSpectatorActions = ArrayList<AllowAction>()
 
-        var loggerMode = true
+        private var loggerMode = true
 
-        const val prefix = "§b[§cIdentity§eFifty§b]§r"
+        const val PREFIX = "§b[§cIdentity§eFifty§b]§r"
 
         /** リソパのurl **/
         var resourceUrl = ""
@@ -82,13 +84,13 @@ class IdentityFifty : SJavaPlugin() {
         var http: HttpServer? = null
 
         /** スタンのエフェクト(デフォルトの時間) **/
-        fun stunEffect(p: Player){
+        fun stunEffect(p: Player) {
             stunEffect(p,120,140,StunState.DAMAGED)
         }
 
         /** スタンのエフェクト(時間指定) **/
-        fun stunEffect(p: Player, blindTime: Int, slowTime: Int, state: StunState){
-            p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),50)
+        fun stunEffect(p: Player, blindTime: Int, slowTime: Int, state: StunState) {
+            p.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),75,1.0,1.0,1.0)
             val data = hunters[p.uniqueId]
             var stunTime = Pair(blindTime,slowTime)
             if (data != null){
@@ -106,17 +108,35 @@ class IdentityFifty : SJavaPlugin() {
             })
         }
 
-        /** prefix付きでメッセージを送信 **/
-        fun CommandSender.prefixMsg(s: String){
-            this.sendMessage(prefix + s)
+        fun speedModifier(p: Player, speed: Double, duration: Int,
+                          type: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER
+        ): BukkitTask {
+            val speedAttribute = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
+            val modifier = AttributeModifier(UUID.randomUUID(), "speed", speed, type)
+            speedAttribute?.addModifier(modifier)
+            return object : BukkitRunnable() {
+                override fun run() {
+                    speedAttribute?.removeModifier(modifier)
+                }
+
+                override fun cancel() {
+                    super.cancel()
+                    speedAttribute?.removeModifier(modifier)
+                }
+            }.runTaskLater(plugin, duration.toLong())
         }
 
-        fun broadcastSpectators(s: String, action: AllowAction){
+        /** prefix付きでメッセージを送信 **/
+        fun CommandSender.prefixMsg(s: String) {
+            this.sendMessage(PREFIX + s)
+        }
+
+        fun broadcastSpectators(s: String, action: AllowAction) {
             spectators.values.filter { it.actions.contains(action) }.forEach {
-                it.uuid.toPlayer()?.sendMessage(prefix + s)
+                it.uuid.toPlayer()?.sendMessage(PREFIX + s)
             }
             if (loggerMode){
-                plugin.logger.info(prefix + s)
+                plugin.logger.info(PREFIX + s)
             }
         }
 
@@ -124,52 +144,52 @@ class IdentityFifty : SJavaPlugin() {
     }
 
     /** クラスのデータを登録する(サバイバー) **/
-    private fun register(abstractSurvivor: AbstractSurvivor){
+    private fun register(abstractSurvivor: AbstractSurvivor) {
         survivorsData[abstractSurvivor.name] = abstractSurvivor
     }
 
     /** クラスのデータを登録する(ハンター) **/
-    private fun register(abstractHunter: AbstractHunter){
+    private fun register(abstractHunter: AbstractHunter) {
         huntersData[abstractHunter.name] = abstractHunter
     }
 
-    private fun register(vararg abstractClass: Any){
-        for (clazz in abstractClass){
-            if (clazz is AbstractSurvivor){
+    private fun register(vararg abstractClass: Any) {
+        for (clazz in abstractClass) {
+            if (clazz is AbstractSurvivor) {
                 register(clazz)
-            }else if (clazz is AbstractHunter){
+            } else if (clazz is AbstractHunter) {
                 register(clazz)
             }
         }
     }
 
     /** クラスのデータを全て登録する **/
-    private fun registerAll(){
+    private fun registerAll() {
         register(Nurse(),Dasher(),RunAway(),Searcher(),Helper(),AreaMan(),
             DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense(),Marker(),
-            Coffin(),SerialKiller(),Controller(),Swapper())
+            Coffin(),SerialKiller(),Controller(),Swapper(),Fixer())
     }
     override fun onStart() {
         saveDefaultConfig()
         
         plugin = this
-        sLang = SLang(this, prefix)
+        sLang = SLang(this, PREFIX)
         util = UsefulUtility(this)
 
         interactManager = SInteractItemManager(this)
-        talentSQL = TalentSQL()
+        talentSQL = TalentSQLV2()
 
         effectManager = EffectManager(this)
         registerAll()
 
-        for (file in File(dataFolder.path + "/map/").listFiles()!!){
+        for (file in File(dataFolder.path + "/map/").listFiles()!!) {
             maps[file.nameWithoutExtension] = MapData.loadFromYml(YamlConfiguration.loadConfiguration(file))
         }
         allowSpectatorActions.addAll(config.getStringList("allowSpectatorActions")
             .map { AllowAction.valueOf(it.uppercase()) })
         IdentityCommand()
 
-        if (config.getBoolean("discord.enabled")){
+        if (config.getBoolean("discord.enabled")) {
             discordClient = DiscordClient()
         }
 
@@ -184,7 +204,6 @@ class IdentityFifty : SJavaPlugin() {
 
         SEvent(this).register(PlayerJoinEvent::class.java) { e ->
             if (e.player.name == "tororo_1066"){
-                Bukkit.getIp()
                 e.player.setResourcePack("http://localhost:8000/Resource")
             } else {
                 e.player.setResourcePack(resourceUrl)

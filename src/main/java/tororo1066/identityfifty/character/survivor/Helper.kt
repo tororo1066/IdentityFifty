@@ -42,7 +42,9 @@ class Helper : AbstractSurvivor("helper") {
             noDamage = true
 
             p.playSound(p.location, Sound.ITEM_TOTEM_USE,1f,1f)
+            nearPlayer.playSound(p.location, Sound.ITEM_TOTEM_USE,1f,1f)
             p.spawnParticle(Particle.TOTEM,p.location,5)
+            nearPlayer.spawnParticle(Particle.TOTEM,p.location,5)
 
             val nearData = IdentityFifty.survivors[nearPlayer.uniqueId]!!
             val pData = IdentityFifty.survivors[p.uniqueId]!!
@@ -55,7 +57,7 @@ class Helper : AbstractSurvivor("helper") {
 
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Consumer {
                 noDamage = false
-            },140)
+            },100)
 
             IdentityFifty.broadcastSpectators(translate("spec_helper_protect_used",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true

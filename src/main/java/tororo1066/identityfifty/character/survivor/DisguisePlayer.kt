@@ -39,7 +39,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_used",p.name,target.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
             p.world.playSound(p.location, Sound.ENTITY_ENDER_DRAGON_HURT, 1f, 1f)
-            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+            tasks.add(Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 if (data.skinModifier.isDisguise()){
                     data.skinModifier.unDisguise()
                     p.sendTranslateMsg("disguise_skill_end")
@@ -47,7 +47,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
                         AllowAction.RECEIVE_SURVIVORS_ACTION)
                     p.world.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
                 }
-            },700)
+            },700))
             return@setInteractEvent true
         }.setInitialCoolDown(1000)
 
