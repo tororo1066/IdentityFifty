@@ -33,7 +33,7 @@ class RunAway : AbstractSurvivor("runaway") {
         .addLore(translate("runaway_passive_lore_3"))
     private val blindSkillItem = SItem(Material.STICK).setDisplayName(translate("camouflage")).setCustomModelData(6)
         .addLore(translate("camouflage_lore_1"))
-        .addLore(translate("camouflage_lore_2" ))
+        .addLore(translate("camouflage_lore_2", blindSkillCoolDown / 20))
 
 
     override fun onStart(p: Player) {

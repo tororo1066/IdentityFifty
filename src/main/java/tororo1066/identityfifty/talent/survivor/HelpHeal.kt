@@ -1,10 +1,10 @@
 package tororo1066.identityfifty.talent.survivor
 
-import jdk.internal.org.jline.keymap.KeyMap
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 
 class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.java) {
@@ -15,7 +15,7 @@ class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.j
     var healPrivilegeCount = 0
 
     override fun onStart(p: Player) {
-        val helpHeal = SItem(Material.STICK).setDisplayName(KeyMap.translate("help_heal")).setCustomModelData(2333)
+        val helpHeal = SItem(Material.STICK).setDisplayName(translate("help_heal")).setCustomModelData(2333)
                 .addLore("help_heal_lore_1")
 
         val helpHealItem = IdentityFifty.interactManager.createSInteractItem(helpHeal, true).setInteractEvent{ _, item ->

@@ -27,6 +27,7 @@ class DamagedDelay : AbstractSurvivorTalent("damaged_delay",5,FullCowUp::class.j
             val data = IdentityFifty.survivors[p.uniqueId]!!
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 data.setHealth(data.getHealth() - damage)
+                p.damage(0.0, damager)
             },400)
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 canUse = true
