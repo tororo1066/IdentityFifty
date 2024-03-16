@@ -30,7 +30,7 @@ class Menace : AbstractHunterTalent("menace",2,HighFootPrints::class.java) {
         val list = arrayListOf<Pair<Int,String>>()
         list.add(-10 to translate("menace_scoreboard"))
         if (menace > 0) {
-            list.add(-11 to translate("menace_scoreboard_cooltime", menace))
+            list.add(-11 to translate("menace_scoreboard_cooldown", menace))
         } else {
             list.add(-11 to translate("menace_scoreboard_usable"))
         }

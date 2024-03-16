@@ -10,7 +10,10 @@ import tororo1066.tororopluginapi.utils.toPlayer
 
 class JailedOtherSurvivorGlow : AbstractSurvivorTalent("jailed_other_survivor_glow", 2, RemainTimeUp::class.java) {
     override fun lore(): List<String> {
-        return listOf("jailed_other_survivor_glow_lore_1")
+        return listOf(
+            "jailed_other_survivor_glow_lore_1",
+            "jailed_other_survivor_glow_lore_2"
+        )
     }
 
     var survivorGlowTask: BukkitTask? = null

@@ -120,8 +120,8 @@ class IdentityFifty : SJavaPlugin() {
                 }
 
                 override fun cancel() {
-                    super.cancel()
                     speedAttribute?.removeModifier(modifier)
+                    super.cancel()
                 }
             }.runTaskLater(plugin, duration.toLong())
         }

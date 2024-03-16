@@ -1,19 +1,21 @@
 package tororo1066.identityfifty.talent.hunter
 
-import jdk.internal.org.jline.keymap.KeyMap.translate
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
-import tororo1066.tororopluginapi.utils.toPlayer
 
 class StunClear : AbstractHunterTalent("stun_clear",5,SurvivorJailedSpeedUp::class.java) {
     override fun lore(): List<String> {
-        return listOf("stun_clear_lore_1","stun_clear_lore_2")
+        return listOf(
+            "stun_clear_lore_1",
+            "stun_clear_lore_2",
+            "stun_clear_lore_3"
+        )
     }
 
     var noImp = false
@@ -26,8 +28,9 @@ class StunClear : AbstractHunterTalent("stun_clear",5,SurvivorJailedSpeedUp::cla
 
     override fun onStart(p: Player) {
         val stunClear = SItem(Material.STICK).setDisplayName(translate("stun_clear")).setCustomModelData(1111)
-                .addLore("stun_clear_lore_1")
-                .addLore("stun_clear_lore_2")
+                .addLore(translate("stun_clear_lore_1"))
+                .addLore(translate("stun_clear_lore_2"))
+                .addLore(translate("stun_clear_lore_3"))
 
 
         val stunClearItem = IdentityFifty.interactManager.createSInteractItem(stunClear,noDump = true).setInteractEvent{ _, _ ->

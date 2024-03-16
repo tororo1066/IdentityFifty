@@ -5,6 +5,8 @@ import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.tororopluginapi.lang.SLang.Companion.translate
+import kotlin.math.floor
 
 class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.java) {
 
@@ -87,5 +89,11 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         return Pair((blindTime * plateBuff).toInt(), (slowTime * plateBuff).toInt())
     }
 
+    override fun scoreboards(p: Player): ArrayList<Pair<Int, String>> {
+        val list = arrayListOf<Pair<Int, String>>()
+        list.add(-15 to translate("action_buff_scoreboard"))
+        list.add(-16 to translate("action_buff_scoreboard_percent", floor(actionPoint * 10.0) / 10.0))
+        return list
+    }
 
 }

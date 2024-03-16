@@ -1,16 +1,13 @@
 package tororo1066.identityfifty.talent.survivor
 
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
-import java.util.function.Consumer
 
-class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",5,WoundedCowUp::class.java,) {
+class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",2,HelpSpeedUp::class.java,) {
     override fun lore(): List<String> {
         return listOf("plate_speed_up_lore_1","plate_speed_up_lore_2")
     }

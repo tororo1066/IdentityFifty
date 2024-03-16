@@ -12,4 +12,4 @@ class RemainTimeUp : AbstractSurvivorTalent("remain_time_up",2,HatchLow::class.j
         return data
     }
 
-}//旧悪あがきのところにhelpspeedup接続
+}

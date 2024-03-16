@@ -7,7 +7,10 @@ import tororo1066.identityfifty.IdentityFifty
 
 class HitPlateGamble : AbstractSurvivorTalent("hit_plate_gamble", 2, PlateSpeedUp::class.java) {
     override fun lore(): List<String> {
-        return listOf("hit_plate_gamble_lore_1")
+        return listOf(
+            "hit_plate_gamble_lore_1",
+            "hit_plate_gamble_lore_2"
+        )
     }
 
     var canUse = true

@@ -11,14 +11,18 @@ import tororo1066.tororopluginapi.utils.setPitchL
 
 class DashUltraSpeed : AbstractSurvivorTalent("dash_ultra_speed", 5, WoundedCowUp::class.java) {
     override fun lore(): List<String> {
-        return listOf("dash_ultra_speed_lore_1")
+        return listOf(
+            "dash_ultra_speed_lore_1",
+            "dash_ultra_speed_lore_2",
+        )
     }
 
     var noDamage = false
     override fun onStart(p: Player) {
         val dashUltraSpeed =
             SItem(Material.STICK).setDisplayName(translate("dash_ultra_speed")).setCustomModelData(3344)
-                .addLore("dash_ultra_speed_lore_1")
+                .addLore(translate("dash_ultra_speed_lore_1"))
+                .addLore(translate("dash_ultra_speed_lore_2"))
 
         val dashUltraSpeedItem =
             IdentityFifty.interactManager.createSInteractItem(dashUltraSpeed, true).setInteractEvent { _, _ ->

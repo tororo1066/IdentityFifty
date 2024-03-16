@@ -16,7 +16,7 @@ class SurvivorHealedStop : AbstractHunterTalent("survivor_healed_stop",2,RemainT
         healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,100,3))
         val radiusPlayer = p.location.getNearbyPlayers(35.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
         if (radiusPlayer.isNotEmpty()){
-            p.sendTranslateMsg("Survivor_Healed_Stop_detected")
+            p.sendTranslateMsg("survivor_healed_stop_detected")
         }
     }
 }
