@@ -160,13 +160,13 @@ class SurvivorTalentInv(val data: SurvivorData) {
             setItem(6,talentItem(LowFootPrints()))
             setItem(22,talentItem(TalentPlane()))
             setItem(18,talentItem(WoundedCowUp()))
-            setItem(2,talentItem(JailedOtherSurvivorGlow()))
+            setItem(2,talentItem(RemainTimeUp()))
             setItem(20,talentItem(HatchLow()))
             setItem(24,talentItem(GotHelpedSpeedUp()))
-            setItem(42,talentItem(RemainTimeUp()))
+            setItem(42,talentItem(FinishedSheepGlow()))
             setItem(26,talentItem(FullCowUp()))
             setItem(40,talentItem(HelpSpeedUp()))
-            setItem(38,talentItem(HighHitPlate()))
+            setItem(38,talentItem(PlateSpeedUp()))
             return true
         }
     }
@@ -180,8 +180,8 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,48,50,51), glass())
             setItems(listOf(26),roadGlass())
-            setItem(25,talentItem(PlateSpeedUp()))
-            setItem(44,talentItem(HitPlateEffect()))
+            setItem(25,talentItem(DashUltraSpeed()))
+            setItem(44,talentItem(HitPlateGamble()))
 
             return true
         }
@@ -196,7 +196,7 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(47,48,50,51,52,53), glass())
             setItems(listOf(18),roadGlass())
-            setItem(19,talentItem(GateOpenBoost()))
+            setItem(19,talentItem(DamagedDelay()))
             setItem(0,talentItem(DamagedBoost()))
 
             return true
@@ -212,9 +212,9 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,48,51,52,53), glass())
             setItems(listOf(22,29,38,40),roadGlass())
-            setItem(20,talentItem(GeneratorHeal()))
+            setItem(20,talentItem(JailedOtherSurvivorGlow()))
             setItem(31,talentItem(FullSheepUp()))
-            setItem(13,talentItem(EachOtherBuff()))
+            setItem(13,talentItem(ActionBuff()))
 
             return true
         }
@@ -229,7 +229,7 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,50,51,52,53), glass())
             setItems(listOf(4,6,15,22),roadGlass())
-            setItem(24,talentItem(FinishedSheepGlow()))
+            setItem(24,talentItem(GateOpenBoost()))
             setItem(13,talentItem(WoundedGeneratorUp()))
             setItem(31,talentItem(HelpHeal()))
 

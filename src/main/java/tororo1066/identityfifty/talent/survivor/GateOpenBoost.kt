@@ -8,7 +8,7 @@ import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import java.util.UUID
 
-class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5,FullCowUp::class.java) {
+class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 2,FinishedSheepGlow::class.java) {
     override fun lore(): List<String> {
         return listOf("gate_open_boost_lore_1","gate_open_boost_lore_2")
     }
@@ -20,7 +20,7 @@ class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5,FullCowUp::cla
             cowbuff = true
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 cowbuff = false
-            },600)
+            },900)
             p.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 100, 2))
             val footprints = UUID.randomUUID()
             data.footprintsModify[footprints] = 0.0
@@ -32,10 +32,10 @@ class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5,FullCowUp::cla
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
         if (cowbuff){
-            return damage * 1.3
+            return damage * 1.2
         }
         return damage
     }
 
 
-}
+}//旧仲直りの位置にFullCowUPを接続

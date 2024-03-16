@@ -6,16 +6,36 @@ import org.bukkit.scheduler.BukkitTask
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
+import tororo1066.tororopluginapi.utils.toPlayer
 
-class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glow",2,HatchLow::class.java) {
+class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glow",2,RemainTimeUp::class.java) {
     override fun lore(): List<String> {
         return listOf("jailed_other_survivor_glow_lore_1")
     }
 
-    var glowtask:BukkitTask? = null
+    var survivorGlowTask:BukkitTask? = null
+    var hunterGlowTask:BukkitTask? = null
 
+    override fun onStart(p: Player) {
+        tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            val playerData = IdentityFifty.survivors[p.uniqueId]!!
+            IdentityFifty.survivors.forEach{ (uuid,data) ->
+                if(uuid == p.uniqueId){
+                    return@forEach
+                }
+                val targetPlayer = Bukkit.getPlayer(uuid)?:return@forEach
+                val health = data.getHealth()
+
+
+                if(health in 2..4){
+                    data.glowManager.glow(mutableListOf(p), GlowAPI.Color.YELLOW,20)
+
+                }
+            }
+        },0,19))
+    }
     override fun onJail(prisonData: PrisonData, p: Player) {
-        glowtask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+        survivorGlowTask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             val players = ArrayList<Player>()
             IdentityFifty.survivors.forEach { (uuid, _) ->
                 val playerInfo = Bukkit.getPlayer(uuid)?:return@forEach
@@ -26,20 +46,39 @@ class JailedOtherSurvivorGlow :AbstractSurvivorTalent("jailed_other_survivor_glo
                 data.glowManager.glow(players,GlowAPI.Color.BLUE,100)
             }
         },0,5)
+
+        hunterGlowTask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            if (IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(p.uniqueId) == false){
+                return@Runnable
+            }
+            val players = p.location.getNearbyPlayers(20.0)
+                    .filter { it != p && IdentityFifty.hunters.containsKey(it.uniqueId)}
+            players.forEach {
+                val data = IdentityFifty.hunters[it.uniqueId]?:return@forEach
+                data.glowManager.glow(IdentityFifty.survivors.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList(),GlowAPI.Color.RED,9)
+            }
+
+        },5,5)
     }
 
     override fun onGotHelp(helper: Player, p: Player) {
-        glowtask?.cancel()
-        glowtask = null
+        survivorGlowTask?.cancel()
+        survivorGlowTask = null
+        hunterGlowTask?.cancel()
+        hunterGlowTask = null
     }
 
     override fun onDie(p: Player) {
-        glowtask?.cancel()
-        glowtask = null
+        survivorGlowTask?.cancel()
+        survivorGlowTask = null
+        hunterGlowTask?.cancel()
+        hunterGlowTask = null
     }
 
     override fun onEnd(p: Player) {
-        glowtask?.cancel()
-        glowtask = null
+        survivorGlowTask?.cancel()
+        survivorGlowTask = null
+        hunterGlowTask?.cancel()
+        hunterGlowTask = null
     }
 }

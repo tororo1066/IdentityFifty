@@ -2,7 +2,7 @@ package tororo1066.identityfifty.talent.survivor
 
 import tororo1066.identityfifty.data.SurvivorData
 
-class RemainTimeUp : AbstractSurvivorTalent("remain_time_up",2,GotHelpedSpeedUp::class.java) {
+class RemainTimeUp : AbstractSurvivorTalent("remain_time_up",2,HatchLow::class.java) {
     override fun lore(): List<String> {
         return listOf("remain_time_up_lore_1")
     }
@@ -12,4 +12,4 @@ class RemainTimeUp : AbstractSurvivorTalent("remain_time_up",2,GotHelpedSpeedUp:
         return data
     }
 
-}
+}//旧悪あがきのところにhelpspeedup接続

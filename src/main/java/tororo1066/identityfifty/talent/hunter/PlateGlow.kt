@@ -13,7 +13,7 @@ class PlateGlow: AbstractHunterTalent("plate_glow",2,HelpSpeedDown::class.java) 
 
     override fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int, Int> {
         val data = IdentityFifty.survivors[usedPlayer.uniqueId]?:return Pair(blindTime, slowTime)
-        data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,60)
+        data.glowManager.glow(mutableListOf(p),GlowAPI.Color.RED,100)
         return super.onDamagedWoodPlate(usedPlayer, loc, blindTime, slowTime, p)
     }
 }

@@ -9,6 +9,6 @@ class NoOneUp: AbstractHunterTalent("no_one_up",5,StunTimeDown::class.java) {
     }
 
     override fun onStart(p: Player) {
-        (IdentityFifty.identityFiftyTask?:return).noOneCount += 60
+        (IdentityFifty.identityFiftyTask?:return).noOneCount += 70
     }
 }

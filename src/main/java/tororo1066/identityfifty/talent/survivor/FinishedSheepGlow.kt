@@ -7,7 +7,7 @@ import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import java.util.UUID
 
-class FinishedSheepGlow :AbstractSurvivorTalent("finished_sheep_glow",2,RemainTimeUp::class.java) {
+class FinishedSheepGlow :AbstractSurvivorTalent("finished_sheep_glow",2,GotHelpedSpeedUp::class.java) {
     override fun lore(): List<String> {
         return listOf("finished_sheep_glow_lore_1")
     }

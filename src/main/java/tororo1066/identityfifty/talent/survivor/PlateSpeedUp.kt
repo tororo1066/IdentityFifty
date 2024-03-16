@@ -5,55 +5,42 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.IdentityFifty
-import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import java.util.function.Consumer
 
-class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",5,WoundedCowUp::class.java,) {
+class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",2,HelpSpeedUp::class.java,) {
     override fun lore(): List<String> {
         return listOf("plate_speed_up_lore_1","plate_speed_up_lore_2")
     }
 
-    private var boostCoolTime = 0
-    private var windowBoostCoolTime = 0
+    var boost = true
+    var windowBoost = true
 
     override fun onWoodPlate(loc: Location, p: Player) {
-        if (boostCoolTime <= 0) {
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,2))
+        if(boost){
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,1))
+            boost = false
 
-            boostCoolTime = 40
-            IdentityFifty.util.repeatDelay(amount = 40, repeatTick = 20, delayTick = 20, unit = {
-                boostCoolTime--
-            })
+            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                boost = true
+            },800)
         }
+
     }
+
+
 
     override fun onExitWindow(p: Player) {
-        if (windowBoostCoolTime <= 0) {
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,2))
 
-            windowBoostCoolTime = 40
-            IdentityFifty.util.repeatDelay(amount = 40, repeatTick = 20, delayTick = 20, unit = {
-                windowBoostCoolTime--
-            })
+        if(windowBoost){
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,1))
+            windowBoost = false
+
+            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                windowBoost = true
+            },800)
         }
     }
 
-    override fun scoreboards(p: Player): ArrayList<Pair<Int, String>> {
-        val list = arrayListOf(-10 to translate("plate_speed_up_scoreboard"))
-        if (boostCoolTime > 0) {
-            list.add(-11 to translate("plate_speed_up_scoreboard_plate", boostCoolTime))
-        } else {
-            list.add(-11 to translate("plate_speed_up_scoreboard_plate_usable"))
-        }
-
-        if (windowBoostCoolTime > 0) {
-            list.add(-12 to translate("plate_speed_up_scoreboard_window", windowBoostCoolTime))
-        } else {
-            list.add(-12 to translate("plate_speed_up_scoreboard_window_usable"))
-        }
-
-        return list
-    }
+//woundedcowupに接続
 }
