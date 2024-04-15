@@ -1,6 +1,7 @@
 package tororo1066.identityfifty.character.hunter
 
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.boss.BarColor
@@ -9,7 +10,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.enumClass.AllowAction
@@ -66,7 +66,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
                 if (timer <= 0){
                     if (!damageFlag){
                         val data = IdentityFifty.hunters[p.uniqueId]!!
-                        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), GlowAPI.Color.RED, 200)
+                        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), ChatColor.RED, 200)
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,200,1))
                         p.sendTranslateMsg("kill_find_failed")
                         IdentityFifty.broadcastSpectators(translate("spec_kill_find_failed",p.name),
@@ -109,12 +109,12 @@ class SerialKiller: AbstractHunter("serialkiller") {
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
         val data = IdentityFifty.hunters[p.uniqueId]!!
-        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(), GlowAPI.Color.RED, 100)
+        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(), ChatColor.RED, 100)
     }
 
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
         val data = IdentityFifty.hunters[p.uniqueId]!!
-        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(), GlowAPI.Color.RED, 100)
+        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(), ChatColor.RED, 100)
     }
 
     override fun onFinishedAttack(attackPlayer: Player, result: Int, p: Player) {

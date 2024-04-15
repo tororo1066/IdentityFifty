@@ -180,7 +180,8 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,48,50,51), glass())
             setItems(listOf(26),roadGlass())
-            setItem(25,talentItem(DashUltraSpeed()))
+//            setItem(25,talentItem(DashUltraSpeed()))
+            setItem(25, talentItem(HideFromHunter()))
             setItem(44,talentItem(HitPlateGamble()))
 
             return true

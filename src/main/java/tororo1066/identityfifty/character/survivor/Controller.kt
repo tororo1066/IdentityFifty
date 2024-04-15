@@ -1,10 +1,7 @@
 package tororo1066.identityfifty.character.survivor
 
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Chicken
 import org.bukkit.entity.Player
@@ -15,7 +12,6 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
@@ -170,7 +166,7 @@ class Controller: AbstractSurvivor("controller") {
                         sEvent.unregisterAll()
                         IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
-                            GlowAPI.Color.DARK_PURPLE, 200
+                            ChatColor.DARK_PURPLE, 200
                         )
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)
@@ -186,7 +182,7 @@ class Controller: AbstractSurvivor("controller") {
                         latestEntity = null
                         IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
-                            GlowAPI.Color.DARK_PURPLE, 200
+                            ChatColor.DARK_PURPLE, 200
                         )
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)

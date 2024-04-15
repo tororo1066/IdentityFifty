@@ -13,12 +13,7 @@ import org.bukkit.block.data.type.Stairs
 import org.bukkit.block.data.type.Stairs.Shape
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
-import org.bukkit.entity.ArmorStand
-import org.bukkit.entity.Arrow
-import org.bukkit.entity.Cow
-import org.bukkit.entity.EntityType
-import org.bukkit.entity.Player
-import org.bukkit.entity.Sheep
+import org.bukkit.entity.*
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockCanBuildEvent
@@ -27,18 +22,12 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
-import org.bukkit.event.player.PlayerDropItemEvent
-import org.bukkit.event.player.PlayerInteractEvent
-import org.bukkit.event.player.PlayerJoinEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerSwapHandItemsEvent
-import org.bukkit.event.player.PlayerToggleSneakEvent
+import org.bukkit.event.player.*
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scoreboard.Team
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.character.survivor.AbstractSurvivor
 import tororo1066.identityfifty.data.GeneratorData
 import tororo1066.identityfifty.data.MapData
@@ -508,7 +497,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             if (remainingGenerator != 0)return@register
             //残り暗号機が0だったら 一撃死状態にする(60秒)
             bossBar.progress = 1.0
-            bossBar.setTitle(translate("lets_open_gate"))
+            bossBar.setTitle(translate("lets_open_gate_no_one"))
             bossBar.color = BarColor.RED
 
             broadcast(translate("opened_gate_announce"))
@@ -520,6 +509,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 if (noOneCount <= 0){
                     noOne = false
                     bossBar.progress = 0.0
+                    bossBar.setTitle(translate("lets_open_gate"))
                     it.cancel()
                 }
                 bossBar.progress = noOneCount.toDouble() / cloneTime.toDouble()
@@ -554,7 +544,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 }
                 IdentityFifty.survivors.values.forEach {
                     it.uuid.toPlayer()?.sendTranslateMsg("survivor_all_glowed_for_survivor")
-                    it.glowManager.glow(hunters,GlowAPI.Color.RED,200)
+                    it.glowManager.glow(hunters,ChatColor.RED,200)
                 }
             }
 
@@ -749,7 +739,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                         playerData.setHealth(playerData.getHealth() + 2)
                         healAmount = playerData.getHealth() - healAmount
                         IdentityFifty.broadcastSpectators(translate("spec_healed_survivor",
-                                playerData.healingPlayers.values.joinToString(",") { data -> data.name }, playerData.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
+                                healingPlayers.values.joinToString(",") { data -> data.name }, playerData.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
                         runTask {
                             playerData.survivorClass.onGotHeal(healingPlayers.mapNotNull { map -> map.key.toPlayer() }, it)
                             healingPlayers.values.forEach { data ->
@@ -1093,7 +1083,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                                             plateData.loc.blockY,
                                             plateData.loc.blockZ
                                         )
-                                        e.player.inventory.setItemInOffHand(null)
+                                        e.player.inventory.setItemInOffHand(ItemStack(Material.AIR))
                                         item.delete()
                                         return@setInteractEvent true
                                     }
@@ -1351,6 +1341,12 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 }
             }
         }
+
+        Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+            IdentityFifty.survivors.keys.plus(IdentityFifty.hunters.keys).plus(IdentityFifty.spectators.keys).forEach {
+                it.toPlayer()?.performCommand("identity playerlist")
+            }
+        })
 
         sleep(3000)
 

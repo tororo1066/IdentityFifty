@@ -1,6 +1,7 @@
 package tororo1066.identityfifty.commands
 
 import org.bukkit.Bukkit
+import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
@@ -227,6 +228,36 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                 it.sender.sendTranslateMsg("unregistered_other", p.name)
         })
 
+        addCommand(SCommandObject()
+            .addArg(SCommandArg().addAllowString("entry")).setPlayerExecutor {
+                if (!DiscordClient.enable || !DiscordClient.enableTalent) {
+                    it.sender.sendMessage("§cこのコマンドは無効化されています")
+                    return@setPlayerExecutor
+                }
+
+                if (DiscordClient.entries.contains(it.sender.uniqueId)){
+                    it.sender.sendMessage("§c既にエントリーしています")
+                    return@setPlayerExecutor
+                }
+
+                DiscordClient.entries.add(it.sender.uniqueId)
+                it.sender.sendMessage("§aエントリーしました")
+            }
+        )
+
+        addCommand(SCommandObject().addNeedPermission("identity.op")
+            .addArg(SCommandArg().addAllowString("as")).addArg(SCommandArg().addAllowString("entry"))
+            .addArg(SCommandArg().addAllowType(SCommandArgType.ONLINE_PLAYER)).setNormalExecutor {
+                val p = Bukkit.getPlayer(it.args[2])!!
+                if (DiscordClient.entries.contains(p.uniqueId)){
+                    it.sender.sendMessage("§c既にエントリーしています")
+                    return@setNormalExecutor
+                }
+                DiscordClient.entries.add(p.uniqueId)
+                it.sender.sendMessage("§aエントリーさせました")
+            }
+        )
+
         addCommand(SCommandObject().addNeedPermission("identity.op")
             .addArg(SCommandArg().addAllowString("start")).addArg(SCommandArg().addAllowString(IdentityFifty.maps.keys.toTypedArray()))
             .setNormalExecutor {
@@ -267,12 +298,20 @@ class IdentityCommand : SCommand("identity","","identity.user") {
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("playerlist")).setPlayerExecutor {
             it.sender.sendMessage("§b${translate("survivor")}")
             IdentityFifty.survivors.forEach { data ->
-                it.sender.sendMessage("§e${data.value.name} §d???")
+                if (IdentityFifty.survivors.containsKey(it.sender.uniqueId) || IdentityFifty.spectators.containsKey(it.sender.uniqueId)) {
+                    it.sender.sendMessage("§e${data.value.name} §d${translate(data.value.survivorClass.name)}")
+                } else {
+                    it.sender.sendMessage("§e${data.value.name} §d???")
+                }
             }
 
             it.sender.sendMessage("§c${translate("hunter")}")
             IdentityFifty.hunters.forEach { data ->
-                it.sender.sendMessage("§e${data.value.name} §d???")
+                if (IdentityFifty.hunters.containsKey(it.sender.uniqueId) || IdentityFifty.spectators.containsKey(it.sender.uniqueId)) {
+                    it.sender.sendMessage("§e${data.value.name} §d${translate(data.value.hunterClass.name)}")
+                } else {
+                    it.sender.sendMessage("§e${data.value.name} §d???")
+                }
             }
         })
 
@@ -323,6 +362,10 @@ class IdentityCommand : SCommand("identity","","identity.user") {
         })
 
         addCommand(SCommandObject().addArg(SCommandArg("talent")).setPlayerExecutor {
+            if (DiscordClient.enable && !DiscordClient.enableTalent) {
+                it.sender.sendMessage("§cこのコマンドは無効化されています")
+                return@setPlayerExecutor
+            }
             if (IdentityFifty.survivors.containsKey(it.sender.uniqueId)){
                 val data = IdentityFifty.survivors[it.sender.uniqueId]!!
                 SurvivorTalentInv(data).Center().open(it.sender)
@@ -579,6 +622,15 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                 val player = it.args[2].toPlayer()?:return@setNormalExecutor
                 val item = IdentityFifty.interactManager.items.entries.find { find -> find.value.equalFunc.invoke(player.inventory.itemInMainHand, find.value) }?: return@setNormalExecutor
                 item.value.setInteractCoolDown(0)
+            })
+
+        addCommand(setDebug()
+            .addArg(SCommandArg("resetAttributes"))
+            .setNormalExecutor {
+                val player = it.args[2].toPlayer()?:return@setNormalExecutor
+                player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!.modifiers.forEach { modifier ->
+                    player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!.removeModifier(modifier)
+                }
             })
 
         registerDebugCommand("identity.op")

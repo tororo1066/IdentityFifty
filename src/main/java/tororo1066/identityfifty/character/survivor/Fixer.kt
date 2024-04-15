@@ -11,8 +11,7 @@ import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitRunnable
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.SurvivorData
@@ -38,6 +37,8 @@ class Fixer: AbstractSurvivor("fixer") {
         .addLore(translate("fix_plate_lore_3"))
         .addLore(translate("fix_plate_lore_4"))
 
+    private val slowTasks = ArrayList<BukkitRunnable>()
+
     override fun onStart(p: Player) {
         super.onStart(p)
 
@@ -55,7 +56,9 @@ class Fixer: AbstractSurvivor("fixer") {
                 p.sendTranslateMsg("fix_plate_no_plate")
                 return@setInteractEvent false
             }
-            item.setInteractCoolDown(fixPlateCoolDown)
+            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+                item.setInteractCoolDown(fixPlateCoolDown)
+            })
             val plateLoc = plate.persistentDataContainer.get(
                 NamespacedKey(IdentityFifty.plugin, "UsedPlate"),
                 PersistentDataType.INTEGER_ARRAY
@@ -73,7 +76,7 @@ class Fixer: AbstractSurvivor("fixer") {
             val bossBar = Bukkit.createBossBar(translate("fix_plate_bossbar"), BarColor.BLUE, BarStyle.SOLID)
             bossBar.progress = 0.0
             bossBar.addPlayer(p)
-            val slow = IdentityFifty.speedModifier(p, -0.6, 999999, AttributeModifier.Operation.ADD_SCALAR)
+            val slow = IdentityFifty.speedModifier(p, -0.8, 999999, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
 
                 if (p.location.distance(plate.location) > 3.0) {
@@ -112,6 +115,7 @@ class Fixer: AbstractSurvivor("fixer") {
                     p.world.playSound(p.location, Sound.BLOCK_ANVIL_USE, 2f, 1f)
                     bossBar.removeAll()
                     slow.cancel()
+                    slowTasks.add(IdentityFifty.speedModifier(p, -0.05, 999999, AttributeModifier.Operation.ADD_NUMBER))
                     it.cancel()
                     return@Consumer
                 }
@@ -138,6 +142,11 @@ class Fixer: AbstractSurvivor("fixer") {
         p: Player
     ): Pair<Int, Int> {
         return blindTime to slowTime + 20
+    }
+
+    override fun onEnd(p: Player) {
+        slowTasks.forEach { it.cancel() }
+        slowTasks.clear()
     }
 
     override fun info(): ArrayList<ItemStack> {

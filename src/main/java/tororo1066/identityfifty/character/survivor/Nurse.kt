@@ -1,13 +1,13 @@
 package tororo1066.identityfifty.character.survivor
 
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
@@ -57,7 +57,8 @@ class Nurse : AbstractSurvivor("nurse") {
             if (selfHealCooldown > 0){
                 return false
             }
-            glowTasks.addAll(data.glowManager.glow(ArrayList(hunters), GlowAPI.Color.GREEN,1000))
+            glowTasks.addAll(data.glowManager.glow(ArrayList(hunters), ChatColor.GREEN,1000))
+            hunters.forEach { it.sendTranslateMsg("nurse_healing") }
         }
         return true
     }

@@ -9,15 +9,13 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.UUID
 
 class Fader: AbstractHunter("fader"){
 
@@ -35,6 +33,7 @@ class Fader: AbstractHunter("fader"){
             //半径20ブロック以内にサバイバーがいないと透明化+盲目+加速
             val radiusPlayer = p.location.getNearbyPlayers(20.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
             if (radiusPlayer.isEmpty()){
+                p.isSprinting = false
                 p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,200,0,true,false,true))
                 p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,200,0,true,false,true))
                 p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,200,2,true,false,true))
@@ -47,7 +46,6 @@ class Fader: AbstractHunter("fader"){
                 p.removePotionEffect(PotionEffectType.INVISIBILITY)
                 val blindness = p.getPotionEffect(PotionEffectType.BLINDNESS)
                 if (blindness != null && blindness.amplifier != 3){ //盲目の強さ3は解除しない(逃亡者のスキルなど)
-                    p.isSprinting = false
                     p.removePotionEffect(PotionEffectType.BLINDNESS)
                 }
                 p.removePotionEffect(PotionEffectType.SPEED)
@@ -96,6 +94,7 @@ class Fader: AbstractHunter("fader"){
                         it.isInvisible = true
                         it.isInvulnerable = true
                         it.isMarker = true
+                        it.isSmall = true
                         val task = object : BukkitRunnable(){
 
                             override fun run() {
@@ -111,7 +110,7 @@ class Fader: AbstractHunter("fader"){
                                     p.sendTranslateMsg("glow_trap_hit")
                                     surP.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
                                     surP.sendTranslateMsg("glow_trap_hit_survivor")
-                                    data.glowManager.glow(mutableListOf(p),GlowAPI.Color.DARK_RED,240)
+                                    data.glowManager.glow(mutableListOf(p),ChatColor.DARK_RED,240)
                                     IdentityFifty.broadcastSpectators(translate("spec_glow_trap_hit",surP.name),
                                         AllowAction.RECEIVE_HUNTERS_ACTION)
                                 }

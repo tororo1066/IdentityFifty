@@ -1,9 +1,9 @@
 package tororo1066.identityfifty.talent.survivor
 
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.tororopluginapi.utils.toPlayer
@@ -30,7 +30,7 @@ class JailedOtherSurvivorGlow : AbstractSurvivorTalent("jailed_other_survivor_gl
 
 
                 if (health in 2..4) {
-                    data.glowManager.glow(mutableListOf(p), GlowAPI.Color.YELLOW, 20)
+                    data.glowManager.glow(mutableListOf(p), ChatColor.YELLOW, 20)
                 }
             }
         }, 0, 19))
@@ -45,9 +45,9 @@ class JailedOtherSurvivorGlow : AbstractSurvivorTalent("jailed_other_survivor_gl
             }
             IdentityFifty.survivors.forEach { (uuid, data) ->
                 Bukkit.getPlayer(uuid) ?: return@forEach
-                data.glowManager.glow(players, GlowAPI.Color.BLUE, 100)
+                data.glowManager.glow(players, ChatColor.BLUE, 100)
             }
-        }, 0, 5)
+        }, 0, 99)
 
         hunterGlowTask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             if (IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(p.uniqueId) == false) {
@@ -59,7 +59,7 @@ class JailedOtherSurvivorGlow : AbstractSurvivorTalent("jailed_other_survivor_gl
                 val data = IdentityFifty.hunters[it.uniqueId] ?: return@forEach
                 data.glowManager.glow(
                     IdentityFifty.survivors.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList(),
-                    GlowAPI.Color.RED,
+                    ChatColor.RED,
                     9
                 )
             }

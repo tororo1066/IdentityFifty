@@ -18,7 +18,7 @@ class RemainTimeDown: AbstractHunterTalent("remain_time_down",2,LowHitPlate::cla
 
     override fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {
         val data = IdentityFifty.survivors[survivor.uniqueId]!!
-        data.remainingTime -= 7
+        data.remainingTime -= 4
     }
 }
 

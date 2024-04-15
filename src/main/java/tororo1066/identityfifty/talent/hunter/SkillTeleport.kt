@@ -1,22 +1,17 @@
 package tororo1066.identityfifty.talent.hunter
 
 import org.bukkit.*
-import org.bukkit.Particle.DustOptions
 import org.bukkit.Particle.DustTransition
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.*
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.scheduler.BukkitTask
-import org.inventivetalent.glow.GlowAPI
+import org.bukkit.scheduler.BukkitRunnable
 import tororo1066.identityfifty.IdentityFifty
-import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.GlowManager
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
-import tororo1066.tororopluginapi.utils.LocType
-import tororo1066.tororopluginapi.utils.toLocString
 import java.util.UUID
 
 class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::class.java) {
@@ -30,7 +25,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
         val ids = HashMap<UUID, MutableList<Int>>()
     }
 
-    private var task: BukkitTask? = null
+    private var task: BukkitRunnable? = null
 
     override fun onStart(p: Player) {
         val teleportSkill = SItem(Material.STICK).setDisplayName(translate("skill_teleport")).setCustomModelData(21)
@@ -103,9 +98,9 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
                         val id = ids.getOrPut(it.uniqueId) { mutableListOf() }
 
                         val glowColor = when(it.type) {
-                            EntityType.SHEEP -> GlowAPI.Color.YELLOW
-                            EntityType.COW -> GlowAPI.Color.BLUE
-                            else -> GlowAPI.Color.RED
+                            EntityType.SHEEP -> ChatColor.YELLOW
+                            EntityType.COW -> ChatColor.BLUE
+                            else -> ChatColor.RED
                         }
                         id.addAll(glowManager.glow(mutableListOf(p), glowColor, 100000))
                     }

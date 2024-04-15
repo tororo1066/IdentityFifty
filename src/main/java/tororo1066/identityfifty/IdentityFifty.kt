@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
-import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.character.hunter.*
 import tororo1066.identityfifty.character.survivor.*
 import tororo1066.identityfifty.commands.IdentityCommand
@@ -27,6 +26,7 @@ import tororo1066.identityfifty.discord.DiscordClient
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.identityfifty.talent.TalentSQLV2
+import tororo1066.nmsutils.SNms
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
@@ -35,9 +35,7 @@ import tororo1066.tororopluginapi.sItem.SInteractItemManager
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.io.File
 import java.net.InetSocketAddress
-import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import java.util.UUID
 
 class IdentityFifty : SJavaPlugin() {
 
@@ -65,6 +63,7 @@ class IdentityFifty : SJavaPlugin() {
         lateinit var util: UsefulUtility
         /** データベース **/
         lateinit var talentSQL: TalentSQLV2
+        lateinit var sNms: SNms
         /** 稼働中のゲームの変数 **/
         var identityFiftyTask: IdentityFiftyTask? = null
 
@@ -110,20 +109,28 @@ class IdentityFifty : SJavaPlugin() {
 
         fun speedModifier(p: Player, speed: Double, duration: Int,
                           type: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER
-        ): BukkitTask {
+        ): BukkitRunnable {
             val speedAttribute = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
-            val modifier = AttributeModifier(UUID.randomUUID(), "speed", speed, type)
+            val uuid = UUID.randomUUID()
+            val modifier = AttributeModifier(uuid, uuid.toString(), speed, type)
+            fun removeModifier() {
+                speedAttribute?:return
+                speedAttribute.removeModifier(modifier)
+            }
             speedAttribute?.addModifier(modifier)
             return object : BukkitRunnable() {
+                init {
+                    runTaskLater(plugin, duration.toLong())
+                }
                 override fun run() {
-                    speedAttribute?.removeModifier(modifier)
+                    removeModifier()
                 }
 
                 override fun cancel() {
-                    speedAttribute?.removeModifier(modifier)
+                    removeModifier()
                     super.cancel()
                 }
-            }.runTaskLater(plugin, duration.toLong())
+            }
         }
 
         /** prefix付きでメッセージを送信 **/
@@ -175,6 +182,7 @@ class IdentityFifty : SJavaPlugin() {
         plugin = this
         sLang = SLang(this, PREFIX)
         util = UsefulUtility(this)
+        sNms = getSNms()
 
         interactManager = SInteractItemManager(this)
         talentSQL = TalentSQLV2()

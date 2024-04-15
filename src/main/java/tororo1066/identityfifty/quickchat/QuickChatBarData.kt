@@ -1,11 +1,10 @@
 package tororo1066.identityfifty.quickchat
 
+import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
-import org.bukkit.event.block.Action
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.quickchat.survivor.*
@@ -13,11 +12,13 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SInteractItem
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.toPlayer
-import java.util.*
+import java.util.UUID
 
 class QuickChatBarData(val uuid: UUID) {
 
-    companion object{
+    var latestChat: AbstractQuickChat? = null
+
+    companion object {
         val survivorChats = arrayListOf(
             NearHunter(),
             SheepGeneratorNow(),
@@ -35,12 +36,53 @@ class QuickChatBarData(val uuid: UUID) {
         uuid.toPlayer()?.inventory?.setItem(8, getChatBarItem())
     }
 
+    fun survivorChat(chat: AbstractQuickChat){
+        latestChat = chat
+        IdentityFifty.survivors.keys.mapNotNull { it.toPlayer() }.forEach {
+            it.sendMessage("§7[§f${uuid.toPlayer()?.name}§7] -> §r${chat.message}")
+            it.playSound(it.location, Sound.ITEM_BOOK_PAGE_TURN, 1f, 2f)
+        }
+
+        IdentityFifty.broadcastSpectators("§7[§f${uuid.toPlayer()?.name}§7] -> §r${chat.message}",
+            AllowAction.RECEIVE_SURVIVORS_CHAT)
+
+        val data = IdentityFifty.survivors[uuid]
+        data?.glowManager?.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(),
+            ChatColor.WHITE, 80)
+    }
+
+    fun hunterChat(chat: AbstractQuickChat){
+        latestChat = chat
+        IdentityFifty.hunters.keys.mapNotNull { it.toPlayer() }.forEach {
+            it.sendMessage("§7[§f${uuid.toPlayer()?.name}§7] -> §r${chat.message}")
+            it.playSound(it.location, Sound.ITEM_BOOK_PAGE_TURN, 1f, 2f)
+        }
+
+        IdentityFifty.broadcastSpectators("§7[§f${uuid.toPlayer()?.name}§7] -> §r${chat.message}",
+            AllowAction.RECEIVE_HUNTERS_CHAT)
+
+        val data = IdentityFifty.hunters[uuid]
+        data?.glowManager?.glow(IdentityFifty.hunters.mapNotNull { it.key.toPlayer() }.toMutableList(),
+            ChatColor.WHITE, 80)
+    }
+
     fun getChatBarItem(): SInteractItem {
         val displayItem = SItem(Material.BOOK).setDisplayName(translate("quick_chat"))
+            .addLore(translate("quick_chat_lore_1"))
+            .addLore(translate("quick_chat_lore_2"))
             .setCustomData(IdentityFifty.plugin, "close", PersistentDataType.INTEGER, 1)
 
         val functionItem = IdentityFifty.interactManager.createSInteractItem(displayItem, true).setInteractEvent { e, _ ->
-            if (!e.action.isRightClick)return@setInteractEvent true
+            if (e.action.isLeftClick) {
+                latestChat?.let {
+                    if (IdentityFifty.survivors.containsKey(e.player.uniqueId)){
+                        survivorChat(it)
+                    } else if (IdentityFifty.hunters.containsKey(e.player.uniqueId)) {
+                        hunterChat(it)
+                    }
+                }
+                return@setInteractEvent true
+            }
 
             val chats = arrayListOf<AbstractQuickChat>()
             var isHunter = false
@@ -84,30 +126,10 @@ class QuickChatBarData(val uuid: UUID) {
                     SItem(Material.PAPER).setDisplayName(chat.message),
                     true).setInteractEvent chat@ { _, _ ->
                         if (isHunter){
-                            IdentityFifty.hunters.keys.mapNotNull { it.toPlayer() }.forEach {
-                                it.sendMessage("§7[§f${e.player.name}§7] -> §r${chat.message}")
-                                it.playSound(it.location, Sound.ITEM_BOOK_PAGE_TURN, 1f, 2f)
-                            }
-
-                            IdentityFifty.broadcastSpectators("§7[§f${e.player.name}§7] -> §r${chat.message}",
-                                AllowAction.RECEIVE_HUNTERS_CHAT)
-
-                            val data = IdentityFifty.hunters[e.player.uniqueId]
-                            data?.glowManager?.glow(IdentityFifty.hunters.mapNotNull { it.key.toPlayer() }.toMutableList(),
-                                GlowAPI.Color.WHITE, 80)
+                            hunterChat(chat)
                             returnItems()
                         } else {
-                            IdentityFifty.survivors.keys.mapNotNull { it.toPlayer() }.forEach {
-                                it.sendMessage("§7[§f${e.player.name}§7] -> §r${chat.message}")
-                                it.playSound(it.location, Sound.ITEM_BOOK_PAGE_TURN, 1f, 2f)
-                            }
-
-                            IdentityFifty.broadcastSpectators("§7[§f${e.player.name}§7] -> §r${chat.message}",
-                                AllowAction.RECEIVE_SURVIVORS_CHAT)
-
-                            val data = IdentityFifty.survivors[e.player.uniqueId]
-                            data?.glowManager?.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(),
-                                GlowAPI.Color.WHITE, 80)
+                            survivorChat(chat)
                             returnItems()
                         }
                         return@chat true
@@ -127,7 +149,7 @@ class QuickChatBarData(val uuid: UUID) {
             }
 
             return@setInteractEvent true
-        }.setInitialCoolDown(100)
+        }.setInitialCoolDown(150)
 
         return functionItem
     }

@@ -68,24 +68,12 @@ class RunAway : AbstractSurvivor("runaway") {
     }
 
     override fun onGotHelp(helper: Player, p: Player): ReturnAction {
-//        val data = IdentityFifty.survivors[p.uniqueId]!!
-//        if (data.talentClasses.containsKey(GotHelpedSpeedUp::class.java)){
-//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,120,1))
-//        } else {
-//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
-//        }
-        IdentityFifty.speedModifier(p, 0.4, 100, AttributeModifier.Operation.ADD_SCALAR)
+        IdentityFifty.speedModifier(p, 0.4, 100, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
         return super.onGotHelp(helper, p)
     }
 
     override fun onDamage(damage: Int, toHealth: Int, damager: Player, p: Player): Pair<Boolean, Int> {
-//        val data = IdentityFifty.survivors[p.uniqueId]!!
-//        if (data.talentClasses.containsKey(DamagedBoost::class.java)){
-//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,130,1))
-//        } else {
-//            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,100,1))
-//        }
-        IdentityFifty.speedModifier(p, 0.4, 100, AttributeModifier.Operation.ADD_SCALAR)
+        IdentityFifty.speedModifier(p, 0.4, 100, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
         return Pair(true,damage)
     }
 

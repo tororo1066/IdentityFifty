@@ -1,16 +1,12 @@
 package tororo1066.identityfifty.character.survivor
 
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.Sound
+import org.bukkit.*
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.bukkit.scheduler.BukkitTask
 import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
@@ -27,7 +23,6 @@ class Coffin: AbstractSurvivor("coffin") {
 
     private var coffin: Location? = null
     private var coffinUUID: UUID? = null
-    private var coffinTask: BukkitTask? = null
     private val sEvent = SEvent(IdentityFifty.plugin)
 
     override fun onStart(p: Player) {
@@ -52,8 +47,6 @@ class Coffin: AbstractSurvivor("coffin") {
                 coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
                 coffin = null
                 coffinUUID = null
-                coffinTask?.cancel()
-                coffinTask = null
                 sEvent.unregisterAll()
             }
 
@@ -69,13 +62,10 @@ class Coffin: AbstractSurvivor("coffin") {
                 it.isInvulnerable = true
                 GlowAPI.setGlowing(it, GlowAPI.Color.DARK_RED, Bukkit.getOnlinePlayers())
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    GlowAPI.setGlowing(it, GlowAPI.Color.WHITE, Bukkit.getOnlinePlayers())
                     it.isInvulnerable = false
                 }, 60)
                 it.setItem(EquipmentSlot.HEAD, SItem(Material.STICK).setCustomModelData(16))
-                coffinTask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
-                    GlowAPI.setGlowing(it,false,Bukkit.getOnlinePlayers())
-                    GlowAPI.setGlowing(it, GlowAPI.Color.WHITE, Bukkit.getOnlinePlayers())
-                }, 60, 5)
 
                 sEvent.register(EntityDamageByEntityEvent::class.java){ e ->
                     if (e.entity.uniqueId == it.uniqueId){
@@ -86,8 +76,6 @@ class Coffin: AbstractSurvivor("coffin") {
                         e.entity.remove()
                         coffin = null
                         coffinUUID = null
-                        coffinTask?.cancel()
-                        coffinTask = null
                         sEvent.unregisterAll()
                         item.setInteractCoolDown(1600)
                         p.sendTranslateMsg("coffin_broken")
@@ -143,8 +131,6 @@ class Coffin: AbstractSurvivor("coffin") {
             coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
             coffin = null
             coffinUUID = null
-            coffinTask?.cancel()
-            coffinTask = null
             sEvent.unregisterAll()
 
             IdentityFifty.hunters.forEach {
@@ -176,8 +162,6 @@ class Coffin: AbstractSurvivor("coffin") {
         coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
         coffin = null
         coffinUUID = null
-        coffinTask?.cancel()
-        coffinTask = null
         sEvent.unregisterAll()
     }
 

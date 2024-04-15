@@ -1,12 +1,9 @@
 package tororo1066.identityfifty.character.hunter
 
-import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.Sound
-import org.bukkit.attribute.Attribute
-import org.bukkit.attribute.AttributeModifier
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -16,7 +13,6 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.LeatherArmorMeta
 import org.bukkit.potion.PotionEffectType
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.enumClass.AllowAction
@@ -26,8 +22,6 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.toPlayer
-import java.util.*
-import kotlin.collections.ArrayList
 
 class Swapper: AbstractHunter("swapper") {
 
@@ -64,9 +58,9 @@ class Swapper: AbstractHunter("swapper") {
                     .sortedBy { p.location.distance(it.location) }
                     .firstOrNull { IdentityFifty.survivors.containsKey(it.uniqueId) }?.let {
                         val data = IdentityFifty.survivors[it.uniqueId]!!
-                        data.glowManager.glow(mutableSetOf(p), GlowAPI.Color.PURPLE, 200)
+                        data.glowManager.glow(mutableSetOf(p), ChatColor.LIGHT_PURPLE, 200)
                         val hunterData = IdentityFifty.hunters[p.uniqueId]!!
-                        hunterData.glowManager.glow(mutableSetOf(it), GlowAPI.Color.PURPLE, 200)
+                        hunterData.glowManager.glow(mutableSetOf(it), ChatColor.LIGHT_PURPLE, 200)
                         p.sendTranslateMsg("change_color_glowing")
                         it.sendTranslateMsg("change_color_glowing_survivor")
                     }
@@ -80,11 +74,12 @@ class Swapper: AbstractHunter("swapper") {
                 val data = IdentityFifty.hunters[p.uniqueId]!!
                 IdentityFifty.survivors.values.forEach {
                     val player = it.uuid.toPlayer() ?: return@forEach
+                    if (inPrison(player))return@forEach
                     players.add(player)
-                    it.glowManager.glow(mutableSetOf(p), GlowAPI.Color.RED, 100)
+                    it.glowManager.glow(mutableSetOf(p), ChatColor.RED, 100)
                     player.sendTranslateMsg("change_color_glowing_survivor")
                 }
-                data.glowManager.glow(players, GlowAPI.Color.RED, 100)
+                data.glowManager.glow(players, ChatColor.RED, 100)
                 IdentityFifty.stunEffect(p, 100, 100, StunState.OTHER)
                 p.walkSpeed += 0.02f
                 p.sendTranslateMsg("change_color_black")

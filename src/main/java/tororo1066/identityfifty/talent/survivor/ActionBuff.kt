@@ -3,7 +3,7 @@ package tororo1066.identityfifty.talent.survivor
 import org.bukkit.Location
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitTask
+import org.bukkit.scheduler.BukkitRunnable
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import kotlin.math.floor
@@ -14,7 +14,7 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         return listOf("action_buff_lore_1", "action_buff_lore_2")
     }
 
-    var task: BukkitTask? = null
+    var task: BukkitRunnable? = null
     var actionPoint = 0.0
 
     fun addActionPoint(point: Double) {
@@ -34,12 +34,11 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
 
     override fun onEnterWindow(p: Player) {
         //actionPoint += 1
-
         task = IdentityFifty.speedModifier(
             p,
             (0.15 * (actionPoint / 100)),
             Int.MAX_VALUE,
-            AttributeModifier.Operation.ADD_SCALAR
+            AttributeModifier.Operation.MULTIPLY_SCALAR_1
         )
     }
 
