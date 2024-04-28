@@ -14,6 +14,7 @@ import org.bukkit.block.data.type.Stairs.Shape
 import org.bukkit.boss.BarColor
 import org.bukkit.boss.BarStyle
 import org.bukkit.entity.*
+import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockCanBuildEvent
@@ -36,6 +37,7 @@ import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.identityfifty.map.IdentityFiftyMapRenderer
 import tororo1066.nmsutils.SPlayer
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.SStr.Companion.toSStr
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
@@ -200,7 +202,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
         //人数によって結果を変える
         if (escapedSurvivor.size > survivorSize / 2){
             onlinePlayersAction {
-                it.showTitle(Title.title(Component.text(translate("win_survivor")), Component.text(""), Title.Times.of(
+                it.showTitle(Title.title(Component.text(translate("win_survivor")), Component.text(""), Title.Times.times(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
             }
             if (saveResult) {
@@ -209,7 +211,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
         } else {
             if (escapedSurvivor.size == survivorSize){
                 onlinePlayersAction {
-                    it.showTitle(Title.title(Component.text(translate("draw")), Component.text(""), Title.Times.of(
+                    it.showTitle(Title.title(Component.text(translate("draw")), Component.text(""), Title.Times.times(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
                 }
                 if (saveResult) {
@@ -217,7 +219,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 }
             } else {
                 onlinePlayersAction {
-                    it.showTitle(Title.title(Component.text(translate("win_hunter")), Component.text(""), Title.Times.of(
+                    it.showTitle(Title.title(Component.text(translate("win_hunter")), Component.text(""), Title.Times.times(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
                 }
                 if (saveResult) {
@@ -442,6 +444,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
         sEvent.register(PlayerJoinEvent::class.java) { e ->
             bossBar.addPlayer(e.player)
+            SPlayer.getSPlayer(e.player).initGlowTeam("never")
         }
 
         //腹減る必要がないからcancel
@@ -544,7 +547,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 }
                 IdentityFifty.survivors.values.forEach {
                     it.uuid.toPlayer()?.sendTranslateMsg("survivor_all_glowed_for_survivor")
-                    it.glowManager.glow(hunters,ChatColor.RED,200)
+                    it.glowManager.glow(hunters, GlowColor.RED,200)
                 }
             }
 
@@ -1280,6 +1283,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
         sEvent.register(PlayerInteractEvent::class.java) { e ->
             if (e.hand == EquipmentSlot.OFF_HAND)return@register
+            if (e.useInteractedBlock() == Event.Result.DEFAULT)return@register
             if (IdentityFifty.hunters.containsKey(e.player.uniqueId)){
                 if (!e.action.isLeftClick)return@register
                 if (e.hasBlock()){
@@ -1344,7 +1348,10 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
         Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
             IdentityFifty.survivors.keys.plus(IdentityFifty.hunters.keys).plus(IdentityFifty.spectators.keys).forEach {
-                it.toPlayer()?.performCommand("identity playerlist")
+                it.toPlayer()?.run {
+                    performCommand("identity playerlist")
+                    SPlayer.getSPlayer(this).initGlowTeam("never")
+                }
             }
         })
 
@@ -1353,20 +1360,19 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
         fun titleTask(p: Player, action: ()->Unit){
             Thread {
                 for (i in 5 downTo 1){
-                    p.showTitle(Title.title(Component.text("§e--------§f§l${i}§e--------"), Component.text(""), Title.Times.of(
+                    p.showTitle(Title.title(Component.text("§e--------§f§l${i}§e--------"), Component.text(""), Title.Times.times(
                         Duration.ZERO,Duration.ofSeconds(1),Duration.ZERO)))
                     p.playSound(p.location, Sound.UI_BUTTON_CLICK,1f,2f)
                     sleep(1000)
                 }
 
-                p.showTitle(Title.title(Component.text("§c§lSTART!"), Component.text(""), Title.Times.of(
+                p.showTitle(Title.title(Component.text("§c§lSTART!"), Component.text(""), Title.Times.times(
                     Duration.ZERO,Duration.ofSeconds(2),Duration.ofSeconds(1))))
                 p.playSound(p.location,Sound.ENTITY_WITHER_SPAWN,0.7f,1f)
                 runTask(action)
             }.start()
         }
 
-        @Suppress("DEPRECATION")//mapを取得する方法がこれしかない
         val bukkitMap = Bukkit.getMap(map.mapId?:-1)
         var mapItem: ItemStack? = null
         if (bukkitMap != null){

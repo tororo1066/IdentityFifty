@@ -1,7 +1,6 @@
 package tororo1066.identityfifty.character.survivor
 
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -9,6 +8,7 @@ import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -40,7 +40,7 @@ class Searcher : AbstractSurvivor("searcher") {
             }
             IdentityFifty.hunters.forEach { (uuid, data) ->
                 Bukkit.getPlayer(uuid)?:return@forEach
-                data.glowManager.glow(players, ChatColor.RED,240)
+                data.glowManager.glow(players, GlowColor.RED,240)
             }
             IdentityFifty.broadcastSpectators(translate("spec_search_lens_used",p.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
@@ -56,7 +56,7 @@ class Searcher : AbstractSurvivor("searcher") {
                 .filter { it != p && IdentityFifty.hunters.containsKey(it.uniqueId)}
             players.forEach {
                 val data = IdentityFifty.hunters[it.uniqueId]?:return@forEach
-                data.glowManager.glow(IdentityFifty.survivors.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList(),ChatColor.RED,8)
+                data.glowManager.glow(IdentityFifty.survivors.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList(),GlowColor.RED,8)
             }
 
         },5,5))

@@ -13,6 +13,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.enumClass.AllowAction
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -48,7 +49,7 @@ class AreaMan: AbstractHunter("areaman") {
             for (i in 1..length){
                 loc.add(loc.direction.multiply(1)).getNearbyPlayers(width.toDouble()).filter { !glowedPlayers.contains(it) }.forEach {
                     val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
-                    data.glowManager.glow(players,ChatColor.RED,150)
+                    data.glowManager.glow(players,GlowColor.RED,150)
                     p.playSound(p.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     it.playSound(it.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     glowedPlayers.add(it)
@@ -92,7 +93,7 @@ class AreaMan: AbstractHunter("areaman") {
             if (isNotEmpty()) p.sendTranslateMsg("area_message")
             forEach {
                 val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
-                data.glowManager.glow(players,ChatColor.DARK_PURPLE,140)
+                data.glowManager.glow(players,GlowColor.DARK_PURPLE,140)
                 it.sendTranslateMsg("area_spec_message",p.name)
             }
         }
@@ -101,7 +102,7 @@ class AreaMan: AbstractHunter("areaman") {
             val survivor = IdentityFifty.survivors.filter { IdentityFifty.identityFiftyTask?.deadSurvivor?.contains(it.key) == false && it.value.getHealth() != 0 }.entries.random()
             val player = Bukkit.getPlayer(survivor.key)!!
             player.addPotionEffect(PotionEffect(PotionEffectType.SLOW,120,4))
-            survivor.value.glowManager.glow(players,ChatColor.DARK_RED,300)
+            survivor.value.glowManager.glow(players,GlowColor.DARK_RED,300)
             p.sendTranslateMsg("area_message")
             player.sendTranslateMsg("area_spec_message",p.name)
         }
@@ -134,7 +135,7 @@ class AreaMan: AbstractHunter("areaman") {
                 Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
                     loc.getNearbyPlayers(20.0,7.0).forEach {
                         val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
-                        data.glowManager.glow(players,ChatColor.RED,21)
+                        data.glowManager.glow(players,GlowColor.RED,21)
                         p.playSound(p.location,Sound.ENTITY_ARROW_HIT_PLAYER,0.2f,2f)
                         it.world.playSound(it.location,Sound.ENTITY_ARROW_HIT_PLAYER,0.2f,1f)
                     }

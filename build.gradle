@@ -37,15 +37,14 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api 'tororo1066:tororopluginapi:618cad4'
-    compileOnly 'tororo1066:base:618cad4'
+    api 'tororo1066:tororopluginapi:0af4424'
+    compileOnly 'tororo1066:base:0af4424'
     implementation 'com.elmakers.mine.bukkit:EffectLib:9.4'
     compileOnly 'LibsDisguises:LibsDisguises:10.0.31'
     api 'org.apache.httpcomponents.client5:httpclient5:5.2-beta1'
     implementation 'net.dv8tion:JDA:5.0.0-beta.10'
-    compileOnly 'com.github.InventivetalentDev:GlowAPI:1.5.6-SNAPSHOT'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens

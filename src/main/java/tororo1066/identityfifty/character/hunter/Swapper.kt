@@ -1,6 +1,5 @@
 package tororo1066.identityfifty.character.hunter
 
-import org.bukkit.ChatColor
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -17,6 +16,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -58,9 +58,9 @@ class Swapper: AbstractHunter("swapper") {
                     .sortedBy { p.location.distance(it.location) }
                     .firstOrNull { IdentityFifty.survivors.containsKey(it.uniqueId) }?.let {
                         val data = IdentityFifty.survivors[it.uniqueId]!!
-                        data.glowManager.glow(mutableSetOf(p), ChatColor.LIGHT_PURPLE, 200)
+                        data.glowManager.glow(mutableSetOf(p), GlowColor.LIGHT_PURPLE, 200)
                         val hunterData = IdentityFifty.hunters[p.uniqueId]!!
-                        hunterData.glowManager.glow(mutableSetOf(it), ChatColor.LIGHT_PURPLE, 200)
+                        hunterData.glowManager.glow(mutableSetOf(it), GlowColor.LIGHT_PURPLE, 200)
                         p.sendTranslateMsg("change_color_glowing")
                         it.sendTranslateMsg("change_color_glowing_survivor")
                     }
@@ -76,10 +76,10 @@ class Swapper: AbstractHunter("swapper") {
                     val player = it.uuid.toPlayer() ?: return@forEach
                     if (inPrison(player))return@forEach
                     players.add(player)
-                    it.glowManager.glow(mutableSetOf(p), ChatColor.RED, 100)
+                    it.glowManager.glow(mutableSetOf(p), GlowColor.RED, 100)
                     player.sendTranslateMsg("change_color_glowing_survivor")
                 }
-                data.glowManager.glow(players, ChatColor.RED, 100)
+                data.glowManager.glow(players, GlowColor.RED, 100)
                 IdentityFifty.stunEffect(p, 100, 100, StunState.OTHER)
                 p.walkSpeed += 0.02f
                 p.sendTranslateMsg("change_color_black")

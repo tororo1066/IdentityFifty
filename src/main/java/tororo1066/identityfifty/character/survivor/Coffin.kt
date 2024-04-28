@@ -1,13 +1,15 @@
 package tororo1066.identityfifty.character.survivor
 
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
@@ -60,11 +62,11 @@ class Coffin: AbstractSurvivor("coffin") {
                 it.setDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HEAD,EquipmentSlot.LEGS)
                 it.isInvisible = true
                 it.isInvulnerable = true
-                GlowAPI.setGlowing(it, GlowAPI.Color.DARK_RED, Bukkit.getOnlinePlayers())
-                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-                    GlowAPI.setGlowing(it, GlowAPI.Color.WHITE, Bukkit.getOnlinePlayers())
-                    it.isInvulnerable = false
-                }, 60)
+//                GlowAPI.setGlowing(it, GlowAPI.Color.DARK_RED, Bukkit.getOnlinePlayers())
+//                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+//                    GlowAPI.setGlowing(it, GlowAPI.Color.WHITE, Bukkit.getOnlinePlayers())
+//                    it.isInvulnerable = false
+//                }, 60)
                 it.setItem(EquipmentSlot.HEAD, SItem(Material.STICK).setCustomModelData(16))
 
                 sEvent.register(EntityDamageByEntityEvent::class.java){ e ->

@@ -1,10 +1,10 @@
 package tororo1066.identityfifty.data
 
-import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-import org.inventivetalent.glow.GlowAPI
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.nmsutils.SEntity
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 
@@ -12,7 +12,7 @@ class GlowManager(private val uuid: UUID) {
 
     private val glowTasks = HashMap<UUID,GlowTask>()
 
-    fun glow(visiblePlayers: MutableCollection<Player>, color: ChatColor, duration: Int): List<Int> {
+    fun glow(visiblePlayers: MutableCollection<Player>, color: GlowColor, duration: Int): List<Int> {
         visiblePlayers.addAll(IdentityFifty.spectators.keys.mapNotNull { it.toPlayer() })
         val tasks = ArrayList<Int>()
         visiblePlayers.forEach {
@@ -21,7 +21,7 @@ class GlowManager(private val uuid: UUID) {
         return tasks
     }
 
-    private fun glowTask(visiblePlayer: Player, color: ChatColor, duration: Int): Int {
+    private fun glowTask(visiblePlayer: Player, color: GlowColor, duration: Int): Int {
         glowTasks[visiblePlayer.uniqueId]?.let {
             if (it.tick <= duration) {
                 it.cancel()
@@ -47,12 +47,10 @@ class GlowManager(private val uuid: UUID) {
         }
     }
 
-    class GlowTask(private val p: Player, val visiblePlayer: Player, color: ChatColor, duration: Int) : BukkitRunnable() {
+    class GlowTask(private val p: Player, val visiblePlayer: Player, color: GlowColor, duration: Int) : BukkitRunnable() {
         var tick = duration
-        val glowAPIColor = GlowAPI.Color.valueOf(color.name)
         init {
-//            SPlayer.getSPlayer(p).sendTeam(color, listOf(visiblePlayer))
-//            SPlayer.getSPlayer(p).sendGlow(true, listOf(visiblePlayer))
+            SEntity.getSEntity(p)!!.sendGlow(true, listOf(visiblePlayer), color)
             runTaskTimer(IdentityFifty.plugin,0,1)
         }
         override fun run() {
@@ -61,14 +59,6 @@ class GlowManager(private val uuid: UUID) {
                 return
             }
             if (tick <= 0) {
-                GlowAPI.setGlowing(p, glowAPIColor, "never", "never", visiblePlayer)
-                if (IdentityFifty.survivors.containsKey(p.uniqueId)){
-                    IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(p.name)
-                }
-
-                if (IdentityFifty.hunters.containsKey(p.uniqueId)){
-                    IdentityFifty.identityFiftyTask?.hunterTeam?.addEntry(p.name)
-                }
                 cancel()
                 return
             }
@@ -77,7 +67,7 @@ class GlowManager(private val uuid: UUID) {
         }
 
         override fun cancel() {
-            GlowAPI.setGlowing(p, false, visiblePlayer)
+            SEntity.getSEntity(p)!!.sendGlow(false, listOf(visiblePlayer))
             if (IdentityFifty.survivors.containsKey(p.uniqueId)){
                 IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(p.name)
             }

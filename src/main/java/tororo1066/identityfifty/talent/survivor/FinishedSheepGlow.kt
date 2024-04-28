@@ -1,10 +1,10 @@
 package tororo1066.identityfifty.talent.survivor
 
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.nmsutils.items.GlowColor
 
 class FinishedSheepGlow :AbstractSurvivorTalent("finished_sheep_glow",2,GotHelpedSpeedUp::class.java) {
     override fun lore(): List<String> {
@@ -15,7 +15,7 @@ class FinishedSheepGlow :AbstractSurvivorTalent("finished_sheep_glow",2,GotHelpe
         if (remainingGenerator == 0){
             IdentityFifty.hunters.forEach { (uuid, data)  ->
                 Bukkit.getPlayer(uuid)?:return@forEach
-                data.glowManager.glow(mutableListOf(p), ChatColor.RED,100)
+                data.glowManager.glow(mutableListOf(p), GlowColor.RED,100)
             }
 
         }

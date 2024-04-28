@@ -10,6 +10,7 @@ import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.GlowManager
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 import java.util.UUID
@@ -98,9 +99,9 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
                         val id = ids.getOrPut(it.uniqueId) { mutableListOf() }
 
                         val glowColor = when(it.type) {
-                            EntityType.SHEEP -> ChatColor.YELLOW
-                            EntityType.COW -> ChatColor.BLUE
-                            else -> ChatColor.RED
+                            EntityType.SHEEP -> GlowColor.YELLOW
+                            EntityType.COW -> GlowColor.BLUE
+                            else -> GlowColor.RED
                         }
                         id.addAll(glowManager.glow(mutableListOf(p), glowColor, 100000))
                     }

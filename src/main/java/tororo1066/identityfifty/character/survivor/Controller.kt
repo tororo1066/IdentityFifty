@@ -1,7 +1,10 @@
 package tororo1066.identityfifty.character.survivor
 
 import me.libraryaddict.disguise.disguisetypes.PlayerDisguise
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Chicken
 import org.bukkit.entity.Player
@@ -16,6 +19,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -166,7 +170,7 @@ class Controller: AbstractSurvivor("controller") {
                         sEvent.unregisterAll()
                         IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
-                            ChatColor.DARK_PURPLE, 200
+                            GlowColor.DARK_PURPLE, 200
                         )
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)
@@ -182,7 +186,7 @@ class Controller: AbstractSurvivor("controller") {
                         latestEntity = null
                         IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
-                            ChatColor.DARK_PURPLE, 200
+                            GlowColor.DARK_PURPLE, 200
                         )
                         p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)

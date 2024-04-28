@@ -1,6 +1,5 @@
 package tororo1066.identityfifty.character.hunter
 
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
@@ -15,6 +14,7 @@ import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.enumClass.AllowAction
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -32,7 +32,7 @@ class Gambler: AbstractHunter("gambler") {
                     p.sendTranslateMsg("gamble_dice_action_1")
                     val players = IdentityFifty.hunters.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList()
                     IdentityFifty.survivors.values.forEach {
-                        it.glowManager.glow(players, ChatColor.RED, 300)
+                        it.glowManager.glow(players, GlowColor.RED, 300)
                     }
                     IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_1",p.name),
                         AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -41,7 +41,7 @@ class Gambler: AbstractHunter("gambler") {
                     p.sendTranslateMsg("gamble_dice_action_2")
                     val players = IdentityFifty.survivors.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList()
                     IdentityFifty.hunters.values.forEach {
-                        it.glowManager.glow(players, ChatColor.RED, 200)
+                        it.glowManager.glow(players, GlowColor.RED, 200)
                     }
                     players.forEach {
                         it.sendTranslateMsg("gamble_dice_action_2_survivors")

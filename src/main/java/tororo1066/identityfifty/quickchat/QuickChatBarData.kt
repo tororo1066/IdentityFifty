@@ -1,6 +1,5 @@
 package tororo1066.identityfifty.quickchat
 
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.inventory.ItemStack
@@ -8,6 +7,7 @@ import org.bukkit.persistence.PersistentDataType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.quickchat.survivor.*
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SInteractItem
 import tororo1066.tororopluginapi.sItem.SItem
@@ -48,7 +48,7 @@ class QuickChatBarData(val uuid: UUID) {
 
         val data = IdentityFifty.survivors[uuid]
         data?.glowManager?.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(),
-            ChatColor.WHITE, 80)
+            GlowColor.WHITE, 80)
     }
 
     fun hunterChat(chat: AbstractQuickChat){
@@ -63,7 +63,7 @@ class QuickChatBarData(val uuid: UUID) {
 
         val data = IdentityFifty.hunters[uuid]
         data?.glowManager?.glow(IdentityFifty.hunters.mapNotNull { it.key.toPlayer() }.toMutableList(),
-            ChatColor.WHITE, 80)
+            GlowColor.WHITE, 80)
     }
 
     fun getChatBarItem(): SInteractItem {

@@ -1,7 +1,6 @@
 package tororo1066.identityfifty.character.survivor
 
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -11,6 +10,7 @@ import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -57,7 +57,7 @@ class Nurse : AbstractSurvivor("nurse") {
             if (selfHealCooldown > 0){
                 return false
             }
-            glowTasks.addAll(data.glowManager.glow(ArrayList(hunters), ChatColor.GREEN,1000))
+            glowTasks.addAll(data.glowManager.glow(ArrayList(hunters), GlowColor.GREEN,1000))
             hunters.forEach { it.sendTranslateMsg("nurse_healing") }
         }
         return true

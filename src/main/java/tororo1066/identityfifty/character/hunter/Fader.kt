@@ -12,6 +12,7 @@ import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.enumClass.AllowAction
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -110,7 +111,7 @@ class Fader: AbstractHunter("fader"){
                                     p.sendTranslateMsg("glow_trap_hit")
                                     surP.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
                                     surP.sendTranslateMsg("glow_trap_hit_survivor")
-                                    data.glowManager.glow(mutableListOf(p),ChatColor.DARK_RED,240)
+                                    data.glowManager.glow(mutableListOf(p),GlowColor.DARK_RED,240)
                                     IdentityFifty.broadcastSpectators(translate("spec_glow_trap_hit",surP.name),
                                         AllowAction.RECEIVE_HUNTERS_ACTION)
                                 }

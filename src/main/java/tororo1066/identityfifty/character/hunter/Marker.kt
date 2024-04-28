@@ -16,6 +16,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.enumClass.AllowAction
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -76,7 +77,7 @@ class Marker: AbstractHunter("marker") {
             if (e.entity !is Player)return@register
             val data = IdentityFifty.survivors[e.entity.uniqueId]?:return@register
             update(e.entity.uniqueId, (marks[e.entity.uniqueId]?.first?:0) + 5)
-            data.glowManager.glow(mutableListOf(p),ChatColor.RED,150)
+            data.glowManager.glow(mutableListOf(p),GlowColor.RED,150)
             e.damage = 0.0
             IdentityFifty.broadcastSpectators(translate("spec_mark_crossbow_hit",p.name,e.entity.name),
                 AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -131,7 +132,7 @@ class Marker: AbstractHunter("marker") {
         val data = IdentityFifty.survivors[healPlayer.uniqueId]?:return
         val players = ArrayList<Player>()
         players.add(p)
-        data.glowManager.glow(players,ChatColor.RED,200)
+        data.glowManager.glow(players,GlowColor.RED,200)
         p.sendTranslateMsg("marker_healed_survivor")
         p.playSound(p.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
         healedPlayer.sendTranslateMsg("marker_heal_view")
