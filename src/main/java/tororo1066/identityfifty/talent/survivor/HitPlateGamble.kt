@@ -7,21 +7,18 @@ import tororo1066.identityfifty.IdentityFifty
 
 class HitPlateGamble : AbstractSurvivorTalent("hit_plate_gamble", 2, PlateSpeedUp::class.java) {
     override fun lore(): List<String> {
-        return listOf(
-            "hit_plate_gamble_lore_1",
-            "hit_plate_gamble_lore_2"
-        )
+        return listOf("hit_plate_gamble_lore_1")
     }
 
-    var canUse = true
+    //var canUse = true
 
-    override fun onDamage(damage: Int, toHealth: Int, stun: Boolean, damager: Player, p: Player): Pair<Boolean, Int> {
-        canUse = false
-        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-            canUse = true
-        }, 200)
-        return Pair(stun, damage)
-    }
+    //override fun onDamage(damage: Int, toHealth: Int, stun: Boolean, damager: Player, p: Player): Pair<Boolean, Int> {
+        //canUse = false
+        //Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+            //canUse = true
+        //}, 200)
+        //return Pair(stun, damage)
+    //}
 
     override fun onHitWoodPlate(
         hittedPlayer: Player,
@@ -30,10 +27,6 @@ class HitPlateGamble : AbstractSurvivorTalent("hit_plate_gamble", 2, PlateSpeedU
         slowTime: Int,
         p: Player
     ): Pair<Int, Int> {
-        return if (canUse) {
-            Pair(blindTime, slowTime + 60)
-        } else {
-            Pair(blindTime, slowTime - 60)
-        }
+        return   Pair(blindTime + 10, slowTime + 20)
     }
 }

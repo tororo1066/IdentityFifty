@@ -28,7 +28,7 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
     }
 
     override fun onDamage(damage: Int, toHealth: Int, stun: Boolean, damager: Player, p: Player): Pair<Boolean, Int> {
-        addActionPoint(-75.0)
+        addActionPoint(-100.0)
         return super.onDamage(damage, toHealth, stun, damager, p)
     }
 
@@ -53,27 +53,27 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         nowHealth: Double,
         p: Player
     ): Double {
-        addActionPoint(damage * 0.03)
-        val buff = 1 + (0.20 * (actionPoint / 100))
+        addActionPoint(damage * 0.04)
+        val buff = 1 + (0.125 * (actionPoint / 100))
         return damage * buff
     }
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
-        addActionPoint(damage * 0.03)
-        val buff = 1 + (0.20 * (actionPoint / 100))
+        addActionPoint(damage * 0.04)
+        val buff = 1 + (0.125 * (actionPoint / 100))
         return damage * buff
     }
 
     override fun onHelp(helpedPlayer: Player, p: Player) {
-        addActionPoint(10.0)
-    }
-
-    override fun onGotHelp(helper: Player, p: Player) {
         addActionPoint(20.0)
     }
 
+    override fun onGotHelp(helper: Player, p: Player) {
+        addActionPoint(40.0)
+    }
+
     override fun onWoodPlate(loc: Location, p: Player) {
-        addActionPoint(5.0)
+        addActionPoint(10.0)
     }
 
     override fun onHitWoodPlate(
@@ -83,8 +83,8 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         slowTime: Int,
         p: Player
     ): Pair<Int, Int> {
-        addActionPoint(15.0)
-        val plateBuff = 1 + (0.20 * (actionPoint / 100))
+        addActionPoint(20.0)
+        val plateBuff = 1 + (0.15 * (actionPoint / 100))
         return Pair((blindTime * plateBuff).toInt(), (slowTime * plateBuff).toInt())
     }
 
