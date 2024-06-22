@@ -1,5 +1,7 @@
 package tororo1066.identityfifty.data
 
+import org.bukkit.Bukkit
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import tororo1066.identityfifty.IdentityFifty
@@ -24,12 +26,15 @@ class GlowManager(private val uuid: UUID) {
     private fun glowTask(visiblePlayer: Player, color: GlowColor, duration: Int): Int {
         glowTasks[visiblePlayer.uniqueId]?.let {
             if (it.tick <= duration) {
-                it.cancel()
+//                it.cancel()
+                it.changeColor(color)
+                it.changeDuration(duration)
+                return it.taskId
             } else {
                 return -1
             }
         }
-        val task = GlowTask(uuid.toPlayer()?:return -1,visiblePlayer,color,duration)
+        val task = GlowTask(Bukkit.getEntity(uuid)?:return -1,visiblePlayer,color,duration)
         glowTasks[visiblePlayer.uniqueId] = task
         return task.taskId
     }
@@ -47,14 +52,24 @@ class GlowManager(private val uuid: UUID) {
         }
     }
 
-    class GlowTask(private val p: Player, val visiblePlayer: Player, color: GlowColor, duration: Int) : BukkitRunnable() {
+    inner class GlowTask(private val entity: Entity, val visiblePlayer: Player, var color: GlowColor, duration: Int) : BukkitRunnable() {
         var tick = duration
+        fun changeColor(color: GlowColor) {
+            if (this.color == color) return
+            SEntity.getSEntity(entity).setTeam(color.name, listOf(visiblePlayer))
+            this.color = color
+        }
+
+        fun changeDuration(duration: Int) {
+            tick = duration
+        }
+
         init {
-            SEntity.getSEntity(p)!!.sendGlow(true, listOf(visiblePlayer), color)
+            SEntity.getSEntity(entity).sendGlow(true, listOf(visiblePlayer), color)
             runTaskTimer(IdentityFifty.plugin,0,1)
         }
         override fun run() {
-            if (p.player == null || visiblePlayer.player == null) {
+            if (entity.isDead || visiblePlayer.player == null) {
                 cancel()
                 return
             }
@@ -67,15 +82,16 @@ class GlowManager(private val uuid: UUID) {
         }
 
         override fun cancel() {
-            SEntity.getSEntity(p)!!.sendGlow(false, listOf(visiblePlayer))
-            if (IdentityFifty.survivors.containsKey(p.uniqueId)){
-                IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(p.name)
+            SEntity.getSEntity(entity).sendGlow(false, listOf(visiblePlayer))
+            if (IdentityFifty.survivors.containsKey(entity.uniqueId)){
+                IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(entity.name)
             }
 
-            if (IdentityFifty.hunters.containsKey(p.uniqueId)){
-                IdentityFifty.identityFiftyTask?.hunterTeam?.addEntry(p.name)
+            if (IdentityFifty.hunters.containsKey(entity.uniqueId)){
+                IdentityFifty.identityFiftyTask?.hunterTeam?.addEntry(entity.name)
             }
             super.cancel()
+            glowTasks.remove(visiblePlayer.uniqueId)
         }
     }
 

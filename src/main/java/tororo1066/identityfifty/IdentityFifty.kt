@@ -26,7 +26,9 @@ import tororo1066.identityfifty.discord.DiscordClient
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.identityfifty.talent.TalentSQLV2
+import tororo1066.nmsutils.PacketListener
 import tororo1066.nmsutils.SNms
+import tororo1066.tororopluginapi.Proxy
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
@@ -64,6 +66,8 @@ class IdentityFifty : SJavaPlugin() {
         /** データベース **/
         lateinit var talentSQL: TalentSQLV2
         lateinit var sNms: SNms
+        lateinit var packetListener: PacketListener
+        const val CHANNEL_NAME = "identityfifty"
         /** 稼働中のゲームの変数 **/
         var identityFiftyTask: IdentityFiftyTask? = null
 
@@ -183,6 +187,7 @@ class IdentityFifty : SJavaPlugin() {
         sLang = SLang(this, PREFIX)
         util = UsefulUtility(this)
         sNms = getSNms()
+        packetListener = Proxy(this, "tororo1066.nmsutils").getProxy(PacketListener::class.java)
 
         interactManager = SInteractItemManager(this)
         talentSQL = TalentSQLV2()

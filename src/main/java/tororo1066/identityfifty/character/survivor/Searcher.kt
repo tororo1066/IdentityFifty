@@ -50,11 +50,12 @@ class Searcher : AbstractSurvivor("searcher") {
         p.inventory.addItem(searchSkill)
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
-            if (IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(p.uniqueId) == false){
+            val player = p.player?:return@Runnable
+            if (IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(player.uniqueId) == false){
                 return@Runnable
             }
-            val players = p.location.getNearbyPlayers(12.0)
-                .filter { it != p && IdentityFifty.hunters.containsKey(it.uniqueId)}
+            val players = player.location.getNearbyPlayers(12.0)
+                .filter { it != player && IdentityFifty.hunters.containsKey(it.uniqueId)}
             players.forEach {
                 val data = IdentityFifty.hunters[it.uniqueId]?:return@forEach
                 data.glowManager.glow(IdentityFifty.survivors.map { map -> map.key.toPlayer() }.filterNotNull().toMutableList(),GlowColor.RED,8)

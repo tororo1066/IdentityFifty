@@ -445,6 +445,11 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
         sEvent.register(PlayerJoinEvent::class.java) { e ->
             bossBar.addPlayer(e.player)
             SPlayer.getSPlayer(e.player).initGlowTeam("never")
+            IdentityFifty.packetListener.injectPlayer(IdentityFifty.CHANNEL_NAME, e.player)
+        }
+
+        sEvent.register(PlayerQuitEvent::class.java) { e ->
+            IdentityFifty.packetListener.removePlayer(IdentityFifty.CHANNEL_NAME, e.player)
         }
 
         //腹減る必要がないからcancel
@@ -1230,7 +1235,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     prisonPlayers += data.inPlayer.size
                 }
                 if (IdentityFifty.survivors.size.toDouble() / 3.0 <= prisonPlayers){
-                    e.damage = e.damage * 1.2
+                    e.damage *= 1.2
                 }
 
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
@@ -1266,7 +1271,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     prisonPlayers += data.inPlayer.size
                 }
                 if (IdentityFifty.survivors.size.toDouble() / 3.0 <= prisonPlayers){
-                    e.damage = e.damage * 1.2
+                    e.damage *= 1.2
                 }
 
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
@@ -1351,6 +1356,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 it.toPlayer()?.run {
                     performCommand("identity playerlist")
                     SPlayer.getSPlayer(this).initGlowTeam("never")
+                    IdentityFifty.packetListener.injectPlayer(IdentityFifty.CHANNEL_NAME, this)
                 }
             }
         })

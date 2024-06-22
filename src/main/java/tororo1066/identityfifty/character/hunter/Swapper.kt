@@ -77,7 +77,7 @@ class Swapper: AbstractHunter("swapper") {
                     val survivor = it.uuid.toPlayer() ?: return@forEach
                     if (inPrison(survivor))return@forEach
                     players.add(survivor)
-                    it.glowManager.glow(mutableSetOf(survivor), GlowColor.RED, 100)
+                    it.glowManager.glow(mutableSetOf(player), GlowColor.RED, 100)
                     survivor.sendTranslateMsg("change_color_glowing_survivor")
                 }
                 data.glowManager.glow(players, GlowColor.RED, 100)
