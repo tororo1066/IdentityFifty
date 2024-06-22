@@ -21,12 +21,9 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
         return listOf("skill_teleport_lore_1","skill_teleport_lore_2","skill_teleport_lore_3", "skill_teleport_lore_4")
     }
 
-    companion object {
-        val generatorGlowManager = HashMap<UUID, GlowManager>()
-        val ids = HashMap<UUID, MutableList<Int>>()
-    }
-
     private var task: BukkitRunnable? = null
+    private val generatorGlowManager = HashMap<UUID, GlowManager>()
+    private val ids = HashMap<UUID, MutableList<Int>>()
 
     override fun onStart(p: Player) {
         val teleportSkill = SItem(Material.STICK).setDisplayName(translate("skill_teleport")).setCustomModelData(21)

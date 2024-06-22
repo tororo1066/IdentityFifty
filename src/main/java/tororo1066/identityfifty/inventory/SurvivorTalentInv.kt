@@ -182,7 +182,7 @@ class SurvivorTalentInv(val data: SurvivorData) {
             setItems(listOf(26),roadGlass())
 //            setItem(25,talentItem(DashUltraSpeed()))
             setItem(25, talentItem(HideFromHunter()))
-            setItem(44,talentItem(HitPlateGamble()))
+            setItem(44,talentItem(HighHitPlate()))
 
             return true
         }
