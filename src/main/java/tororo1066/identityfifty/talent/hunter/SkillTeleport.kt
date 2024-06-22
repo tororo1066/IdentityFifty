@@ -72,6 +72,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
                         Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                             Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
                                 p.teleport(entity.location)
+                                p.removePotionEffect(PotionEffectType.BLINDNESS)
                                 p.world.playSound(entity.location, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
                             })
                         }, 60)
@@ -106,7 +107,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
                         id.addAll(glowManager.glow(mutableListOf(p), glowColor, 100000))
                     }
 
-                    task = IdentityFifty.speedModifier(p, 0.0, 999999, AttributeModifier.Operation.ADD_SCALAR)
+                    task = IdentityFifty.speedModifier(p, -10.0, 999999, AttributeModifier.Operation.ADD_SCALAR)
                     p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 100000, 1))
                 }
             }

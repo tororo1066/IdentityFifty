@@ -6,6 +6,7 @@ import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import java.util.UUID
 
 class HideFromHunter: AbstractSurvivorTalent("hide_from_hunter", 5, WoundedCowUp::class.java) {
@@ -44,11 +45,11 @@ class HideFromHunter: AbstractSurvivorTalent("hide_from_hunter", 5, WoundedCowUp
 
     override fun scoreboards(p: Player): ArrayList<Pair<Int, String>> {
         val list = arrayListOf<Pair<Int, String>>()
-        list.add(-15 to "hide_from_hunter_scoreboard")
+        list.add(-15 to translate("hide_from_hunter_scoreboard"))
         if (cooldown > 0) {
-            list.add(-16 to "hide_from_hunter_scoreboard_cooldown")
+            list.add(-16 to translate("hide_from_hunter_scoreboard_cooldown", cooldown))
         } else {
-            list.add(-16 to "hide_from_hunter_scoreboard_usable")
+            list.add(-16 to translate("hide_from_hunter_scoreboard_usable"))
         }
         return list
     }
