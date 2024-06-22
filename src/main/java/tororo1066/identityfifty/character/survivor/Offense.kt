@@ -34,15 +34,16 @@ class Offense : AbstractSurvivor("offense") {
 
 
         val tackleItem = IdentityFifty.interactManager.createSInteractItem(tackleSkillItem,true).setInteractEvent { e, item ->
+            val player = e.player
             var actionTime = 0
             fun end(){
                 IdentityFifty.util.runTask {
-                    p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (actionTime.toDouble()*1.5).toInt(), 10))
+                    player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (actionTime.toDouble()*1.5).toInt(), 10))
                 }
                 item.setInteractCoolDown(actionTime*18 + 100)
             }
 
-            IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_used",p.name),
+            IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_used",player.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
                 if (actionTime >= 35){
@@ -51,8 +52,8 @@ class Offense : AbstractSurvivor("offense") {
                     return@Consumer
                 }
                 var stop = false
-                val block1 = p.world.rayTraceBlocks(p.location,p.location.setPitchL(0f).direction,1.5)?.hitBlock
-                val block2 = p.world.rayTraceBlocks(p.location.add(0.0,1.0,0.0),p.location.setPitchL(0f).direction,1.5)?.hitBlock
+                val block1 = player.world.rayTraceBlocks(player.location,player.location.setPitchL(0f).direction,1.5)?.hitBlock
+                val block2 = player.world.rayTraceBlocks(player.location.add(0.0,1.0,0.0),player.location.setPitchL(0f).direction,1.5)?.hitBlock
 
                 if (block1 != null && !block1.isPassable){
                     val maxDiff = block1.boundingBox.maxY-block1.boundingBox.minY
@@ -68,16 +69,16 @@ class Offense : AbstractSurvivor("offense") {
                     }
                 }
 
-                p.world.playSound(p.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
-                p.velocity = p.location.setPitchL(0f).direction.normalize().multiply(1.0).setY(-1)
-                val players = p.location.getNearbyPlayers(1.0).filter { fil -> IdentityFifty.hunters.containsKey(fil.uniqueId) }
+                player.world.playSound(player.location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 1f)
+                player.velocity = player.location.setPitchL(0f).direction.normalize().multiply(1.0).setY(-1)
+                val players = player.location.getNearbyPlayers(1.0).filter { fil -> IdentityFifty.hunters.containsKey(fil.uniqueId) }
                 if (players.isNotEmpty()){
                     players.forEach { player ->
                         player.playSound(player.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
                         player.sendTranslateMsg("rugby_ball_hit_hunter")
-                        p.playSound(p.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
-                        p.sendTranslateMsg("rugby_ball_hit",player.name)
-                        IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_hit",p.name,player.name),
+                        player.playSound(player.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
+                        player.sendTranslateMsg("rugby_ball_hit",player.name)
+                        IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_hit",player.name,player.name),
                             AllowAction.RECEIVE_SURVIVORS_ACTION)
                         IdentityFifty.stunEffect(player, (actionTime*6-20), (actionTime*6), StunState.OTHER)
                     }

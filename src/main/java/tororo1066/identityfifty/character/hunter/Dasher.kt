@@ -22,30 +22,32 @@ class Dasher : AbstractHunter("dasher") {
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("hyper_engine")).setCustomModelData(4)
             .addLore(translate("hyper_engine_lore_1"))
             .addLore(translate("hyper_engine_lore_2"))
-        val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { _, _ ->
+        val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, _ ->
             //加速
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
-            p.world.playSound(p.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
-            IdentityFifty.broadcastSpectators(translate("spec_hyper_engine_used",p.name),AllowAction.RECEIVE_HUNTERS_ACTION)
+            val player = e.player
+            player.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
+            player.world.playSound(player.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
+            IdentityFifty.broadcastSpectators(translate("spec_hyper_engine_used",player.name),AllowAction.RECEIVE_HUNTERS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(800)
 
         var viewing = false
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            val player = p.player?:return@Runnable
             //サバイバーを見ていると加速
-            val viewPlayer = p.getTargetEntity(100)
+            val viewPlayer = player.getTargetEntity(100)
             if (viewPlayer != null){
                 if (IdentityFifty.survivors.containsKey(viewPlayer.uniqueId)){
                     if (!viewing){ //加速の重複を防ぐ
-                        p.walkSpeed += 0.02f
+                        player.walkSpeed += 0.02f
                         viewing = true
                     }
                     return@Runnable
                 }
             }
             if (viewing){ //加速の解除
-                p.walkSpeed -= 0.02f
+                player.walkSpeed -= 0.02f
                 viewing = false
             }
         },0,2))

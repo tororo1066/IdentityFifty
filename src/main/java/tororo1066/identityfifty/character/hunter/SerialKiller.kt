@@ -37,10 +37,11 @@ class SerialKiller: AbstractHunter("serialkiller") {
             .addLore(translate("kill_find_lore_2"))
             .addLore(translate("kill_find_lore_3"))
 
-        val killFindSkillItem = IdentityFifty.interactManager.createSInteractItem(killFindSkill).setInteractEvent { _, _ ->
-            p.world.playSound(p.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
-            p.world.playSound(p.location, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f)
-            IdentityFifty.broadcastSpectators(translate("spec_kill_find_used",p.name),
+        val killFindSkillItem = IdentityFifty.interactManager.createSInteractItem(killFindSkill).setInteractEvent { e, _ ->
+            val player = e.player
+            player.world.playSound(player.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
+            player.world.playSound(player.location, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f)
+            IdentityFifty.broadcastSpectators(translate("spec_kill_find_used",player.name),
                 AllowAction.RECEIVE_HUNTERS_ACTION)
             val uuid = UUID.randomUUID()
             IdentityFifty.survivors.values.forEach {
@@ -56,7 +57,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
             damageFlag = false
             val bossBar = Bukkit.createBossBar(translate("kill_find_remaining_time","30"),BarColor.RED,BarStyle.SOLID)
             bossBar.progress = 1.0
-            bossBar.addPlayer(p)
+            bossBar.addPlayer(player)
             var timer = 600
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
                 if (IdentityFifty.identityFiftyTask == null){
@@ -65,16 +66,16 @@ class SerialKiller: AbstractHunter("serialkiller") {
                 }
                 if (timer <= 0){
                     if (!damageFlag){
-                        val data = IdentityFifty.hunters[p.uniqueId]!!
+                        val data = IdentityFifty.hunters[player.uniqueId]!!
                         data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), GlowColor.RED, 200)
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,200,1))
-                        p.sendTranslateMsg("kill_find_failed")
-                        IdentityFifty.broadcastSpectators(translate("spec_kill_find_failed",p.name),
+                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW,200,1))
+                        player.sendTranslateMsg("kill_find_failed")
+                        IdentityFifty.broadcastSpectators(translate("spec_kill_find_failed",player.name),
                             AllowAction.RECEIVE_HUNTERS_ACTION)
-                        p.world.playSound(p.location, Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1f)
+                        player.world.playSound(player.location, Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1f)
                     }
 
-                    bossBar.removePlayer(p)
+                    bossBar.removePlayer(player)
 
                     it.cancel()
                 }
@@ -90,6 +91,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
         }.setInitialCoolDown(1100)
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
+            val player = p.player?:return@Runnable
             val survivors = (IdentityFifty.identityFiftyTask?.aliveSurvivors()?:return@Runnable)
             val sumHealth = survivors.sumOf {
                 val health = IdentityFifty.survivors[it]!!.getHealth()
@@ -97,8 +99,8 @@ class SerialKiller: AbstractHunter("serialkiller") {
             }
             val healthDiff = survivors.size * 5 - sumHealth
 
-            p.walkSpeed -= previousDiff * 0.005f
-            p.walkSpeed += healthDiff * 0.005f
+            player.walkSpeed -= previousDiff * 0.005f
+            player.walkSpeed += healthDiff * 0.005f
 
             previousDiff = healthDiff
 

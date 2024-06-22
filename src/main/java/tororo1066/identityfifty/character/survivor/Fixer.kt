@@ -42,18 +42,19 @@ class Fixer: AbstractSurvivor("fixer") {
     override fun onStart(p: Player) {
         super.onStart(p)
 
-        val fixPlateSkill = IdentityFifty.interactManager.createSInteractItem(fixPlateItem, true).setInteractEvent { _, item ->
+        val fixPlateSkill = IdentityFifty.interactManager.createSInteractItem(fixPlateItem, true).setInteractEvent { e, item ->
+            val player = e.player
             val task = IdentityFifty.identityFiftyTask?:return@setInteractEvent false
-            val plate = p.location.getNearbyEntitiesByType(ArmorStand::class.java, 3.0)
+            val plate = player.location.getNearbyEntitiesByType(ArmorStand::class.java, 3.0)
                 .filter {
                     it.persistentDataContainer.has(
                         NamespacedKey(IdentityFifty.plugin, "UsedPlate"),
                         PersistentDataType.INTEGER_ARRAY
                     )
-                }.minByOrNull { it.location.distance(p.location) }
+                }.minByOrNull { it.location.distance(player.location) }
 
             if (plate == null) {
-                p.sendTranslateMsg("fix_plate_no_plate")
+                player.sendTranslateMsg("fix_plate_no_plate")
                 return@setInteractEvent false
             }
             Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
@@ -75,11 +76,11 @@ class Fixer: AbstractSurvivor("fixer") {
             val actionInit = action
             val bossBar = Bukkit.createBossBar(translate("fix_plate_bossbar"), BarColor.BLUE, BarStyle.SOLID)
             bossBar.progress = 0.0
-            bossBar.addPlayer(p)
-            val slow = IdentityFifty.speedModifier(p, -0.8, 999999, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+            bossBar.addPlayer(player)
+            val slow = IdentityFifty.speedModifier(player, -0.8, 999999, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
 
-                if (p.location.distance(plate.location) > 3.0) {
+                if (player.location.distance(plate.location) > 3.0) {
                     bossBar.removeAll()
                     slow.cancel()
                     item.setInteractCoolDown(0)
@@ -112,10 +113,10 @@ class Fixer: AbstractSurvivor("fixer") {
                         plateLoc
                     )
                     plate.persistentDataContainer.remove(NamespacedKey(IdentityFifty.plugin, "UsedPlate"))
-                    p.world.playSound(p.location, Sound.BLOCK_ANVIL_USE, 2f, 1f)
+                    player.world.playSound(player.location, Sound.BLOCK_ANVIL_USE, 2f, 1f)
                     bossBar.removeAll()
                     slow.cancel()
-                    slowTasks.add(IdentityFifty.speedModifier(p, -0.05, 999999, AttributeModifier.Operation.ADD_NUMBER))
+                    slowTasks.add(IdentityFifty.speedModifier(player, -0.05, 999999, AttributeModifier.Operation.ADD_NUMBER))
                     it.cancel()
                     return@Consumer
                 }

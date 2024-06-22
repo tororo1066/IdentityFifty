@@ -45,13 +45,14 @@ class Marker: AbstractHunter("marker") {
 
 
 
-        val crossBowSkillItem = IdentityFifty.interactManager.createSInteractItem(crossBowSkill,true).setInteractEvent { e, item ->
-            val arrow = p.launchProjectile(Arrow::class.java)
-            p.world.playSound(p.location, Sound.ENTITY_ARROW_SHOOT,1f,1f)
+        val crossBowSkillItem = IdentityFifty.interactManager.createSInteractItem(crossBowSkill,true).setInteractEvent { e, _ ->
+            val player = e.player
+            val arrow = player.launchProjectile(Arrow::class.java)
+            player.world.playSound(player.location, Sound.ENTITY_ARROW_SHOOT,1f,1f)
             arrow.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"marker"),
                 PersistentDataType.INTEGER,1)
 
-            IdentityFifty.broadcastSpectators(translate("spec_mark_crossbow_used",p.name),
+            IdentityFifty.broadcastSpectators(translate("spec_mark_crossbow_used",player.name),
                 AllowAction.RECEIVE_HUNTERS_ACTION)
 
             //着弾するまでパーティクルを出す
@@ -75,17 +76,19 @@ class Marker: AbstractHunter("marker") {
             if (e.damager !is Arrow)return@register
             if (!e.damager.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"marker"),PersistentDataType.INTEGER))return@register
             if (e.entity !is Player)return@register
+            val player = (e.damager as Arrow).shooter as Player
             val data = IdentityFifty.survivors[e.entity.uniqueId]?:return@register
             update(e.entity.uniqueId, (marks[e.entity.uniqueId]?.first?:0) + 5)
-            data.glowManager.glow(mutableListOf(p),GlowColor.RED,150)
+            data.glowManager.glow(mutableListOf(player),GlowColor.RED,150)
             e.damage = 0.0
-            IdentityFifty.broadcastSpectators(translate("spec_mark_crossbow_hit",p.name,e.entity.name),
+            IdentityFifty.broadcastSpectators(translate("spec_mark_crossbow_hit",player.name,e.entity.name),
                 AllowAction.RECEIVE_HUNTERS_ACTION)
         }
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             //視線にいるサバイバーの印の数を表示させる
-            val target = p.getTargetEntity(100)
+            val player = p.player?:return@Runnable
+            val target = player.getTargetEntity(100)
             if (target !is Player || !marks.containsKey(target.uniqueId)){
                 bossbar?.removeAll()
                 bossbar = null
@@ -95,7 +98,7 @@ class Marker: AbstractHunter("marker") {
             bossbar?.removeAll()
             bossbar = Bukkit.createBossBar(translate("marker_bossbar",target.name,mark.toString()), BarColor.GREEN, BarStyle.SOLID)
             bossbar!!.progress = (mark / 10.0)
-            bossbar!!.addPlayer(p)
+            bossbar!!.addPlayer(player)
         },0,5))
     }
 

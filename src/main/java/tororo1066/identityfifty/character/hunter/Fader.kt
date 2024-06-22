@@ -32,31 +32,33 @@ class Fader: AbstractHunter("fader"){
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
             //半径20ブロック以内にサバイバーがいないと透明化+盲目+加速
-            val radiusPlayer = p.location.getNearbyPlayers(20.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
+            val player = p.player?:return@Runnable
+            val radiusPlayer = player.location.getNearbyPlayers(20.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
             if (radiusPlayer.isEmpty()){
-                p.isSprinting = false
-                p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,200,0,true,false,true))
-                p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,200,0,true,false,true))
-                p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,200,2,true,false,true))
+                player.isSprinting = false
+                player.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY,200,0,true,false,true))
+                player.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,200,0,true,false,true))
+                player.addPotionEffect(PotionEffect(PotionEffectType.SPEED,200,2,true,false,true))
             } else {
                 //透明解除
-                if (p.getPotionEffect(PotionEffectType.INVISIBILITY) != null){
-                    p.world.playSound(p.location,Sound.ENTITY_GHAST_HURT,1f,2f)
-                    p.world.spawnParticle(Particle.SMOKE_LARGE,p.location,150,0.0,1.0,0.0)
+                if (player.getPotionEffect(PotionEffectType.INVISIBILITY) != null){
+                    player.world.playSound(player.location,Sound.ENTITY_GHAST_HURT,1f,2f)
+                    player.world.spawnParticle(Particle.SMOKE_LARGE,player.location,150,0.0,1.0,0.0)
                 }
-                p.removePotionEffect(PotionEffectType.INVISIBILITY)
-                val blindness = p.getPotionEffect(PotionEffectType.BLINDNESS)
+                player.removePotionEffect(PotionEffectType.INVISIBILITY)
+                val blindness = player.getPotionEffect(PotionEffectType.BLINDNESS)
                 if (blindness != null && blindness.amplifier != 3){ //盲目の強さ3は解除しない(逃亡者のスキルなど)
-                    p.removePotionEffect(PotionEffectType.BLINDNESS)
+                    player.removePotionEffect(PotionEffectType.BLINDNESS)
                 }
-                p.removePotionEffect(PotionEffectType.SPEED)
+                player.removePotionEffect(PotionEffectType.SPEED)
             }
         },0,5))
 
         tasks.add(Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable {
-            if (p.inventory.count { it != null && it.itemMeta?.persistentDataContainer?.has(NamespacedKey(IdentityFifty.plugin,"glow_trap"),
+            val player = p.player?:return@Runnable
+            if (player.inventory.count { it != null && it.itemMeta?.persistentDataContainer?.has(NamespacedKey(IdentityFifty.plugin,"glow_trap"),
                     PersistentDataType.INTEGER) == true } + (
-                        if (p.itemOnCursor.itemMeta
+                        if (player.itemOnCursor.itemMeta
                             ?.persistentDataContainer
                             ?.has(
                                 NamespacedKey(IdentityFifty.plugin, "glow_trap"),
@@ -75,6 +77,7 @@ class Fader: AbstractHunter("fader"){
                     .addLore(translate("glow_trap_lore_5"))
                     .setCustomData(IdentityFifty.plugin,"glow_trap", PersistentDataType.INTEGER, 1)
                 val trapSkillItem = IdentityFifty.interactManager.createSInteractItem(trap, true).setInteractEvent { e, item ->
+                    val itemPlayer = e.player
                     e.item!!.amount -= 1
                     item.delete()
                     if (traps.size >= 3){ //設置済のトラップが2個以上ある場合は一番古いものを削除
@@ -83,8 +86,8 @@ class Fader: AbstractHunter("fader"){
                         previousTrap.value.task.cancel()
                         traps.remove(previousTrap.key)
                     }
-                    val pLoc = p.location
-                    p.playSound(pLoc, Sound.ENTITY_HORSE_ARMOR, 1f, 1f)
+                    val pLoc = itemPlayer.location
+                    itemPlayer.playSound(pLoc, Sound.ENTITY_HORSE_ARMOR, 1f, 1f)
                     pLoc.world.spawn(pLoc, ArmorStand::class.java) {
                         it.persistentDataContainer.set(
                             NamespacedKey(IdentityFifty.plugin,"glow_trap"),
@@ -100,18 +103,18 @@ class Fader: AbstractHunter("fader"){
 
                             override fun run() {
                                 val players = it.location.getNearbyPlayers(2.5).filter {
-                                    fil-> IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(fil.uniqueId) == true
+                                    fil -> IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(fil.uniqueId) == true
                                         && !fil.isSneaking
                                         && !inPrison(fil)
                                 } //半径以内でなおかつしゃがんでいないサバイバー
                                 if (players.isEmpty())return
                                 players.forEach { surP ->
                                     val data = IdentityFifty.survivors[surP.uniqueId]?:return@forEach
-                                    p.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
-                                    p.sendTranslateMsg("glow_trap_hit")
-                                    surP.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
+                                    itemPlayer.playSound(itemPlayer.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
+                                    itemPlayer.sendTranslateMsg("glow_trap_hit")
+                                    surP.playSound(itemPlayer.location, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
                                     surP.sendTranslateMsg("glow_trap_hit_survivor")
-                                    data.glowManager.glow(mutableListOf(p),GlowColor.DARK_RED,240)
+                                    data.glowManager.glow(mutableListOf(itemPlayer),GlowColor.DARK_RED,240)
                                     IdentityFifty.broadcastSpectators(translate("spec_glow_trap_hit",surP.name),
                                         AllowAction.RECEIVE_HUNTERS_ACTION)
                                 }
@@ -123,12 +126,12 @@ class Fader: AbstractHunter("fader"){
 
                         traps[it.uniqueId] = TrapData(it.uniqueId,task)
                     }
-                    IdentityFifty.broadcastSpectators(translate("spec_glow_trap_used",p.name),
+                    IdentityFifty.broadcastSpectators(translate("spec_glow_trap_used",itemPlayer.name),
                         AllowAction.RECEIVE_HUNTERS_ACTION)
                     return@setInteractEvent true
                 }
 
-                p.inventory.addItem(trapSkillItem)
+                player.inventory.addItem(trapSkillItem)
                 trapCooldown = 40
             }
         },0,20))

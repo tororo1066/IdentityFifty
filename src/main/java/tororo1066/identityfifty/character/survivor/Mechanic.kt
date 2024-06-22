@@ -25,16 +25,17 @@ class Mechanic: AbstractSurvivor("mechanic") {
             .addLore(translate("slow_timer_lore_1"))
             .addLore(translate("slow_timer_lore_2"))
 
-        val slowSkillItem = IdentityFifty.interactManager.createSInteractItem(slowSkill,true).setInteractEvent { _, _ ->
+        val slowSkillItem = IdentityFifty.interactManager.createSInteractItem(slowSkill,true).setInteractEvent { e, _ ->
+            val player = e.player
             IdentityFifty.util.repeatDelay(3,7) {
-                p.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
+                player.playSound(player.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
             }
-            p.location.getNearbyPlayers(10.0).forEach {
-                if (it == p)return@forEach
-                it.playSound(p.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
+            player.location.getNearbyPlayers(10.0).forEach {
+                if (it == player)return@forEach
+                it.playSound(player.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
                 it.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 60, 2, false))
             }
-            IdentityFifty.broadcastSpectators(translate("spec_slow_timer_used",p.name),
+            IdentityFifty.broadcastSpectators(translate("spec_slow_timer_used",player.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(1200)

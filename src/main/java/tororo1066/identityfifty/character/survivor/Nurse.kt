@@ -30,16 +30,17 @@ class Nurse : AbstractSurvivor("nurse") {
         val speedUpItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore_1"))
             .addLore(translate("syringe_lore_2"))
-        val speedUpSkillItem = IdentityFifty.interactManager.createSInteractItem(speedUpItem,true).setInteractEvent { _, _ ->
-            val data = IdentityFifty.survivors[p.uniqueId]!!
+        val speedUpSkillItem = IdentityFifty.interactManager.createSInteractItem(speedUpItem,true).setInteractEvent { e, _ ->
+            val player = e.player
+            val data = IdentityFifty.survivors[player.uniqueId]!!
             if (data.getHealth() <= 2){
-                p.sendTranslateMsg("nurse_syringe_cant_use")
+                player.sendTranslateMsg("nurse_syringe_cant_use")
                 return@setInteractEvent false
             }
-            p.world.playSound(p.location,Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
+            player.world.playSound(player.location,Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE,1f,1f)
             data.setHealth(data.getHealth() - 1)
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
-            IdentityFifty.broadcastSpectators(translate("spec_syringe_used",p.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
+            player.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
+            IdentityFifty.broadcastSpectators(translate("spec_syringe_used",player.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
         }.setInitialCoolDown(1000)
 

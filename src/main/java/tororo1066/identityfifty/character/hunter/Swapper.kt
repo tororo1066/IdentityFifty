@@ -49,61 +49,63 @@ class Swapper: AbstractHunter("swapper") {
             .addLore(translate("change_color_lore_5"))
             .addLore(translate("change_color_lore_6"))
 
-        val changeColorSkillItem = IdentityFifty.interactManager.createSInteractItem(changeColorSkill).setInteractEvent { _, _ ->
+        val changeColorSkillItem = IdentityFifty.interactManager.createSInteractItem(changeColorSkill).setInteractEvent { e, _ ->
+            val player = e.player
             white = !white
 
             if (white) {
-                p.world.playSound(p.location, Sound.BLOCK_BELL_USE, 0.7f, 2f)
-                p.location.getNearbyPlayers(30.0)
-                    .sortedBy { p.location.distance(it.location) }
+                player.world.playSound(player.location, Sound.BLOCK_BELL_USE, 0.7f, 2f)
+                player.location.getNearbyPlayers(30.0)
+                    .sortedBy { player.location.distance(it.location) }
                     .firstOrNull { IdentityFifty.survivors.containsKey(it.uniqueId) }?.let {
                         val data = IdentityFifty.survivors[it.uniqueId]!!
-                        data.glowManager.glow(mutableSetOf(p), GlowColor.LIGHT_PURPLE, 200)
-                        val hunterData = IdentityFifty.hunters[p.uniqueId]!!
+                        data.glowManager.glow(mutableSetOf(player), GlowColor.LIGHT_PURPLE, 200)
+                        val hunterData = IdentityFifty.hunters[player.uniqueId]!!
                         hunterData.glowManager.glow(mutableSetOf(it), GlowColor.LIGHT_PURPLE, 200)
-                        p.sendTranslateMsg("change_color_glowing")
+                        player.sendTranslateMsg("change_color_glowing")
                         it.sendTranslateMsg("change_color_glowing_survivor")
                     }
-                p.walkSpeed -= 0.02f
-                p.sendTranslateMsg("change_color_white")
-                IdentityFifty.broadcastSpectators(translate("spec_change_color_white", p.name),
+                player.walkSpeed -= 0.02f
+                player.sendTranslateMsg("change_color_white")
+                IdentityFifty.broadcastSpectators(translate("spec_change_color_white", player.name),
                     AllowAction.RECEIVE_HUNTERS_ACTION)
             } else {
-                p.world.playSound(p.location, Sound.ENTITY_IRON_GOLEM_DEATH, 0.7f, 1.5f)
+                player.world.playSound(player.location, Sound.ENTITY_IRON_GOLEM_DEATH, 0.7f, 1.5f)
                 val players = ArrayList<Player>()
-                val data = IdentityFifty.hunters[p.uniqueId]!!
+                val data = IdentityFifty.hunters[player.uniqueId]!!
                 IdentityFifty.survivors.values.forEach {
-                    val player = it.uuid.toPlayer() ?: return@forEach
-                    if (inPrison(player))return@forEach
-                    players.add(player)
-                    it.glowManager.glow(mutableSetOf(p), GlowColor.RED, 100)
-                    player.sendTranslateMsg("change_color_glowing_survivor")
+                    val survivor = it.uuid.toPlayer() ?: return@forEach
+                    if (inPrison(survivor))return@forEach
+                    players.add(survivor)
+                    it.glowManager.glow(mutableSetOf(survivor), GlowColor.RED, 100)
+                    survivor.sendTranslateMsg("change_color_glowing_survivor")
                 }
                 data.glowManager.glow(players, GlowColor.RED, 100)
-                IdentityFifty.stunEffect(p, 100, 100, StunState.OTHER)
-                p.walkSpeed += 0.02f
-                p.sendTranslateMsg("change_color_black")
-                IdentityFifty.broadcastSpectators(translate("spec_change_color_black", p.name),
+                IdentityFifty.stunEffect(player, 100, 100, StunState.OTHER)
+                player.walkSpeed += 0.02f
+                player.sendTranslateMsg("change_color_black")
+                IdentityFifty.broadcastSpectators(translate("spec_change_color_black", player.name),
                     AllowAction.RECEIVE_HUNTERS_ACTION)
             }
-            p.inventory.helmet = generateCap(white)
+            player.inventory.helmet = generateCap(white)
             return@setInteractEvent true
         }.setInitialCoolDown(400)
 
         sEvent.register(PlayerInteractEvent::class.java) { e ->
             if (e.player.uniqueId != p.uniqueId || e.hand != EquipmentSlot.HAND || !e.action.isLeftClick)return@register
-            val entity = e.player.getTargetEntity(if (white) 5 else 3)
+            val player = e.player
+            val entity = player.getTargetEntity(if (white) 5 else 3)
             if (entity == null) {
                 if (!white) {
-                    val defaultTarget = e.player.getTargetEntity(4)
+                    val defaultTarget = player.getTargetEntity(4)
                     if (defaultTarget is LivingEntity) {
-                        val data = IdentityFifty.hunters[p.uniqueId]!!
+                        val data = IdentityFifty.hunters[player.uniqueId]!!
                         if (data.disableSwingSlow){
                             return@register
                         }
                         e.isCancelled = true
-                        e.player.playSound(e.player.location,Sound.ENTITY_PLAYER_ATTACK_SWEEP,1f,1f)
-                        IdentityFifty.stunEffect(e.player, 0, 20, StunState.AIRSWING)
+                        player.playSound(player.location,Sound.ENTITY_PLAYER_ATTACK_SWEEP,1f,1f)
+                        IdentityFifty.stunEffect(player, 0, 20, StunState.AIRSWING)
                         return@register
                     }
                 }
@@ -111,10 +113,10 @@ class Swapper: AbstractHunter("swapper") {
             }
             if (entity !is LivingEntity)return@register
             if (entity is Player) e.isCancelled = true
-            if (p.getPotionEffect(PotionEffectType.SLOW_DIGGING)?.amplifier == 200) {
+            if (player.getPotionEffect(PotionEffectType.SLOW_DIGGING)?.amplifier == 200) {
                 return@register
             }
-            entity.damage(1.0, e.player)
+            entity.damage(1.0, player)
         }
 
         sEvent.register(InventoryClickEvent::class.java) { e ->

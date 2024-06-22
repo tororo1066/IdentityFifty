@@ -29,25 +29,26 @@ class Helper : AbstractSurvivor("helper") {
             .addLore(translate("helper_protect_lore_2"))
             .addLore(translate("helper_protect_lore_3"))
 
-        val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { _, _ ->
-            if (inPrison(p))return@setInteractEvent false
-            val nearPlayer = p.location.getNearbyPlayers(8.0).firstOrNull {
+        val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { e, _ ->
+            val player = e.player
+            if (inPrison(player))return@setInteractEvent false
+            val nearPlayer = player.location.getNearbyPlayers(8.0).firstOrNull {
                 IdentityFifty.identityFiftyTask?.aliveSurvivors()
-                    ?.contains(it.uniqueId) == true && it.uniqueId != p.uniqueId && !inPrison(it)
+                    ?.contains(it.uniqueId) == true && it.uniqueId != player.uniqueId && !inPrison(it)
             }
             if (nearPlayer == null){
-                p.sendTranslateMsg("helper_protect_cant_use")
+                player.sendTranslateMsg("helper_protect_cant_use")
                 return@setInteractEvent false
             }
             noDamage = true
 
-            p.playSound(p.location, Sound.ITEM_TOTEM_USE,1f,1f)
-            nearPlayer.playSound(p.location, Sound.ITEM_TOTEM_USE,1f,1f)
-            p.spawnParticle(Particle.TOTEM,p.location,5)
-            nearPlayer.spawnParticle(Particle.TOTEM,p.location,5)
+            player.playSound(player.location, Sound.ITEM_TOTEM_USE,1f,1f)
+            nearPlayer.playSound(player.location, Sound.ITEM_TOTEM_USE,1f,1f)
+            player.spawnParticle(Particle.TOTEM,player.location,5)
+            nearPlayer.spawnParticle(Particle.TOTEM,player.location,5)
 
             val nearData = IdentityFifty.survivors[nearPlayer.uniqueId]!!
-            val pData = IdentityFifty.survivors[p.uniqueId]!!
+            val pData = IdentityFifty.survivors[player.uniqueId]!!
 
             val nearPlayerHealth = nearData.getHealth()
             val pPlayerHealth = pData.getHealth()
@@ -59,7 +60,7 @@ class Helper : AbstractSurvivor("helper") {
                 noDamage = false
             },100)
 
-            IdentityFifty.broadcastSpectators(translate("spec_helper_protect_used",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+            IdentityFifty.broadcastSpectators(translate("spec_helper_protect_used",player.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
 
         }.setInitialCoolDown(600)

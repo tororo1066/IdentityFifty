@@ -48,12 +48,13 @@ class Controller: AbstractSurvivor("controller") {
             .addLore(translate("control_doll_lore_4"))
             .setCustomModelData(26)
 
-        val controllerSkillItem = IdentityFifty.interactManager.createSInteractItem(controllerSkill,true).setInteractEvent { _, item ->
+        val controllerSkillItem = IdentityFifty.interactManager.createSInteractItem(controllerSkill,true).setInteractEvent { e, item ->
+            val player = e.player
             fun saveDisguise(loc: Location){
-                p.world.spawn(loc, Chicken::class.java) { chicken ->
+                player.world.spawn(loc, Chicken::class.java) { chicken ->
                     chicken.setAI(false)
                     chicken.isSilent = true
-                    val saveDisguise = PlayerDisguise(p)
+                    val saveDisguise = PlayerDisguise(player)
                         .setEntity(chicken)
                         .setNameVisible(false)
                     saveDisguise.isSelfDisguiseVisible = false
@@ -82,33 +83,33 @@ class Controller: AbstractSurvivor("controller") {
                 }, 3)
             }
 
-            if (latestEntity == null && inPrison(p)){
-                p.sendTranslateMsg("controller_doll_in_prison")
+            if (latestEntity == null && inPrison(player)){
+                player.sendTranslateMsg("controller_doll_in_prison")
                 return@setInteractEvent false
             }
 
             if (movingNow){
-                IdentityFifty.broadcastSpectators(translate("spec_control_doll_end",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
-                val loc = p.location
-                p.inventory.setItem(EquipmentSlot.HEAD, null)
+                IdentityFifty.broadcastSpectators(translate("spec_control_doll_end",player.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                val loc = player.location
+                player.inventory.setItem(EquipmentSlot.HEAD, null)
                 if (latestEntity != null){
                     latestEntity!!.stopDisguise()
                     latestEntity!!.entity.remove()
-                    teleport(p, latestEntity!!.entity.location, false)
+                    teleport(player, latestEntity!!.entity.location, false)
                 } else {
                     movingNow = false
                 }
                 saveDisguise(loc)
-                p.playSound(p.location, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
+                player.playSound(player.location, Sound.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
                 return@setInteractEvent true
             }
-            IdentityFifty.broadcastSpectators(translate("spec_control_doll_used",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+            IdentityFifty.broadcastSpectators(translate("spec_control_doll_used",player.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
 
             sEvent.unregisterAll()
-            p.world.spawn(p.location, Chicken::class.java) {
+            player.world.spawn(player.location, Chicken::class.java) {
                 it.setAI(false)
                 it.isSilent = true
-                val disguise = PlayerDisguise(p)
+                val disguise = PlayerDisguise(player)
                     .setEntity(it)
                     .setNameVisible(false)
                 disguise.isSelfDisguiseVisible = false
@@ -118,19 +119,19 @@ class Controller: AbstractSurvivor("controller") {
                     val loc = latestEntity!!.entity.location
                     latestEntity!!.stopDisguise()
                     latestEntity!!.entity.remove()
-                    teleport(p, loc, true)
+                    teleport(player, loc, true)
                 } else {
-                    teleport(p, p.location.setPitchL(0f), true)
+                    teleport(player, player.location.setPitchL(0f), true)
                 }
 
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-                    p.inventory.setItem(EquipmentSlot.HEAD, SItem(Material.LEATHER_HELMET)
+                    player.inventory.setItem(EquipmentSlot.HEAD, SItem(Material.LEATHER_HELMET)
                         .setEnchantment(Enchantment.BINDING_CURSE,1))
                 }, 23)
 
                 latestEntity = disguise
 
-                p.world.playSound(p.location, Sound.ENTITY_SKELETON_DEATH, 1f, 0.5f)
+                player.world.playSound(player.location, Sound.ENTITY_SKELETON_DEATH, 1f, 0.5f)
 
                 sEvent.register(EntityDamageEvent::class.java) { e ->
                     if (e is EntityDamageByEntityEvent)return@register
@@ -147,48 +148,48 @@ class Controller: AbstractSurvivor("controller") {
                             e.isCancelled = true
                             return@register
                         }
-                        val loc = p.location
-                        p.inventory.setItem(EquipmentSlot.HEAD, null)
+                        val loc = player.location
+                        player.inventory.setItem(EquipmentSlot.HEAD, null)
                         latestEntity!!.stopDisguise()
                         latestEntity!!.entity.remove()
-                        teleport(p, latestEntity!!.entity.location, false)
+                        teleport(player, latestEntity!!.entity.location, false)
                         saveDisguise(loc)
                         Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-                            p.damage(1.0, e.damager)
+                            player.damage(1.0, e.damager)
                         }, 5)
-                    } else if (e.entity == p && movingNow){ //操作中で尚且つ、人形が攻撃を受けた場合
+                    } else if (e.entity == player && movingNow){ //操作中で尚且つ、人形が攻撃を受けた場合
                         if (!IdentityFifty.hunters.containsKey(e.damager.uniqueId)){
                             e.isCancelled = true
                             return@register
                         }
-                        IdentityFifty.broadcastSpectators(translate("spec_control_doll_broken",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
-                        p.inventory.setItem(EquipmentSlot.HEAD, null)
+                        IdentityFifty.broadcastSpectators(translate("spec_control_doll_broken",player.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                        player.inventory.setItem(EquipmentSlot.HEAD, null)
                         disguise.stopDisguise()
                         it.remove()
-                        teleport(p, it.location, false)
+                        teleport(player, it.location, false)
                         latestEntity = null
                         sEvent.unregisterAll()
-                        IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
+                        IdentityFifty.survivors[player.uniqueId]!!.glowManager.glow(
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
                             GlowColor.DARK_PURPLE, 200
                         )
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
+                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)
                     } else if (e.entity == latestEntity?.entity) { //人形が攻撃を受けた場合
                         if (!IdentityFifty.hunters.containsKey(e.damager.uniqueId)){
                             e.isCancelled = true
                             return@register
                         }
-                        IdentityFifty.broadcastSpectators(translate("spec_control_doll_broken",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                        IdentityFifty.broadcastSpectators(translate("spec_control_doll_broken",player.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
                         e.damage = 0.0
                         latestEntity!!.stopDisguise()
                         e.entity.remove()
                         latestEntity = null
-                        IdentityFifty.survivors[p.uniqueId]!!.glowManager.glow(
+                        IdentityFifty.survivors[player.uniqueId]!!.glowManager.glow(
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
                             GlowColor.DARK_PURPLE, 200
                         )
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
+                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)
                         IdentityFifty.stunEffect(e.damager as Player, 20, 40, StunState.DAMAGED)
                     }

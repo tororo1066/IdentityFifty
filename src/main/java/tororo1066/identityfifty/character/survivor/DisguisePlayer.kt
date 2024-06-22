@@ -14,7 +14,7 @@ import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
-import java.util.*
+import java.util.UUID
 
 class DisguisePlayer: AbstractSurvivor("disguise") {
 
@@ -29,23 +29,24 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             .addLore(translate("disguise_skill_lore_2"))
             .addLore(translate("disguise_skill_lore_3"))
 
-        val disguiseSkillItem = IdentityFifty.interactManager.createSInteractItem(disguiseSkill,true).setInteractEvent { _, _ ->
-            val target = p.getTargetEntity(4)?:return@setInteractEvent false
+        val disguiseSkillItem = IdentityFifty.interactManager.createSInteractItem(disguiseSkill,true).setInteractEvent { e, _ ->
+            val player = e.player
+            val target = player.getTargetEntity(4)?:return@setInteractEvent false
             if (target !is Player)return@setInteractEvent false
             if (!IdentityFifty.survivors.containsKey(target.uniqueId))return@setInteractEvent false
-            val data = IdentityFifty.survivors[p.uniqueId]!!
+            val data = IdentityFifty.survivors[player.uniqueId]!!
             data.skinModifier.disguise(target)
-            p.sendTranslateMsg("disguise_skill_start",target.name)
-            IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_used",p.name,target.name),
+            player.sendTranslateMsg("disguise_skill_start",target.name)
+            IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_used",player.name,target.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
-            p.world.playSound(p.location, Sound.ENTITY_ENDER_DRAGON_HURT, 1f, 1f)
+            player.world.playSound(player.location, Sound.ENTITY_ENDER_DRAGON_HURT, 1f, 1f)
             tasks.add(Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                 if (data.skinModifier.isDisguise()){
                     data.skinModifier.unDisguise()
-                    p.sendTranslateMsg("disguise_skill_end")
-                    IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_end",p.name),
+                    player.sendTranslateMsg("disguise_skill_end")
+                    IdentityFifty.broadcastSpectators(translate("spec_disguise_skill_end",player.name),
                         AllowAction.RECEIVE_SURVIVORS_ACTION)
-                    p.world.playSound(p.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
+                    player.world.playSound(player.location, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, 1f, 1f)
                 }
             },700))
             return@setInteractEvent true

@@ -11,9 +11,11 @@ import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.identityfifty.data.GlowManager
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
@@ -25,6 +27,8 @@ class Coffin: AbstractSurvivor("coffin") {
 
     private var coffin: Location? = null
     private var coffinUUID: UUID? = null
+    private var coffinGlowManager: GlowManager? = null
+    private var coffinGlowTask: Int = -1
     private val sEvent = SEvent(IdentityFifty.plugin)
 
     override fun onStart(p: Player) {
@@ -40,8 +44,9 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_4"))
             .addLore(translate("coffin_skill_lore_5"))
 
-        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { _, item ->
-            if (inPrison(p)){
+        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { e, item ->
+            val player = e.player
+            if (inPrison(player)){
                 return@setInteractEvent false
             }
 
@@ -52,21 +57,21 @@ class Coffin: AbstractSurvivor("coffin") {
                 sEvent.unregisterAll()
             }
 
-            IdentityFifty.broadcastSpectators(translate("spec_coffin_placed",p.name),
+            IdentityFifty.broadcastSpectators(translate("spec_coffin_placed",player.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
 
-            p.world.spawn(p.location,ArmorStand::class.java) {
-                p.playSound(p.location, Sound.ENTITY_EVOKER_FANGS_ATTACK, 1f, 2f)
+            player.world.spawn(player.location,ArmorStand::class.java) {
+                player.world.playSound(player.location, Sound.ENTITY_EVOKER_FANGS_ATTACK, 1f, 2f)
                 coffin = it.location
                 coffinUUID = it.uniqueId
                 it.setDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HEAD,EquipmentSlot.LEGS)
                 it.isInvisible = true
                 it.isInvulnerable = true
-//                GlowAPI.setGlowing(it, GlowAPI.Color.DARK_RED, Bukkit.getOnlinePlayers())
-//                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-//                    GlowAPI.setGlowing(it, GlowAPI.Color.WHITE, Bukkit.getOnlinePlayers())
-//                    it.isInvulnerable = false
-//                }, 60)
+                coffinGlowManager = GlowManager(it.uniqueId)
+                coffinGlowManager!!.glow(Bukkit.getOnlinePlayers().toMutableList(),GlowColor.DARK_RED,60)
+                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    coffinGlowTask = coffinGlowManager!!.glow(Bukkit.getOnlinePlayers().toMutableList(),GlowColor.WHITE,Int.MAX_VALUE).first()
+                }, 60)
                 it.setItem(EquipmentSlot.HEAD, SItem(Material.STICK).setCustomModelData(16))
 
                 sEvent.register(EntityDamageByEntityEvent::class.java){ e ->
@@ -78,10 +83,12 @@ class Coffin: AbstractSurvivor("coffin") {
                         e.entity.remove()
                         coffin = null
                         coffinUUID = null
+                        coffinGlowManager?.cancelTask(coffinGlowTask)
+                        coffinGlowManager = null
                         sEvent.unregisterAll()
                         item.setInteractCoolDown(1600)
-                        p.sendTranslateMsg("coffin_broken")
-                        IdentityFifty.broadcastSpectators(translate("spec_coffin_broken",p.name),
+                        player.sendTranslateMsg("coffin_broken")
+                        IdentityFifty.broadcastSpectators(translate("spec_coffin_broken",player.name),
                             AllowAction.RECEIVE_SURVIVORS_ACTION)
                     }
                 }
@@ -95,51 +102,54 @@ class Coffin: AbstractSurvivor("coffin") {
             }
             return@setInteractEvent true
         }.setDropEvent { e, item ->
+            val player = e.player
             e.isCancelled = true
             if (coffin == null){
                 return@setDropEvent
             }
-            if (!inPrison(p)){
+            if (!inPrison(player)){
                 return@setDropEvent
             }
 
-            val prisonData = IdentityFifty.identityFiftyTask!!.map.prisons.entries.find { it.value.inPlayer.contains(p.uniqueId) }!!
-            val playerData = IdentityFifty.survivors[p.uniqueId]!!
-            prisonData.value.inPlayer.remove(p.uniqueId)
-            val onGotHelp = playerData.survivorClass.onGotHelp(p,p)
+            val prisonData = IdentityFifty.identityFiftyTask!!.map.prisons.entries.find { it.value.inPlayer.contains(player.uniqueId) }!!
+            val playerData = IdentityFifty.survivors[player.uniqueId]!!
+            prisonData.value.inPlayer.remove(player.uniqueId)
+            val onGotHelp = playerData.survivorClass.onGotHelp(player,player)
             if (onGotHelp == ReturnAction.CANCEL){
-                p.teleport(prisonData.value.spawnLoc)
+                player.teleport(prisonData.value.spawnLoc)
                 return@setDropEvent
             }
             if (onGotHelp == ReturnAction.RETURN){
                 return@setDropEvent
             }
             playerData.setHealth(3, true)
-            playerData.survivorClass.onHelp(p,p)
+            playerData.survivorClass.onHelp(player,player)
             playerData.talentClasses.values.forEach {
-                it.onHelp(p,p)
-                it.onGotHelp(p,p)
+                it.onHelp(player,player)
+                it.onGotHelp(player,player)
             }
             IdentityFifty.hunters.values.forEach {
                 val hunterP = it.uuid.toPlayer()?:return@forEach
-                it.hunterClass.onSurvivorHelp(p,p,hunterP)
+                it.hunterClass.onSurvivorHelp(player,player,hunterP)
                 it.talentClasses.values.forEach { clazz ->
-                    clazz.onSurvivorHelp(p,p,hunterP)
+                    clazz.onSurvivorHelp(player,player,hunterP)
                 }
             }
-            p.teleport(coffin!!)
-            p.world.playSound(p.location, Sound.BLOCK_ENDER_CHEST_OPEN, 2f, 0.5f)
+            player.teleport(coffin!!)
+            player.world.playSound(player.location, Sound.BLOCK_ENDER_CHEST_OPEN, 2f, 0.5f)
 
             coffinUUID?.let { Bukkit.getEntity(it)?.remove() }
             coffin = null
             coffinUUID = null
+            coffinGlowManager?.cancelTask(coffinGlowTask)
+            coffinGlowManager = null
             sEvent.unregisterAll()
 
             IdentityFifty.hunters.forEach {
                 it.key.toPlayer()?.sendTranslateMsg("coffin_helped")
             }
 
-            IdentityFifty.broadcastSpectators(translate("spec_coffin_helped",p.name),
+            IdentityFifty.broadcastSpectators(translate("spec_coffin_helped",player.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
 
             item.setInteractCoolDown(1600)

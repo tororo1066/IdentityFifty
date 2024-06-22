@@ -112,8 +112,8 @@ class Gambler: AbstractHunter("gambler") {
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice")).setCustomModelData(11)
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))
-        val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { _, _ ->
-            diceTask(p)
+        val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, _ ->
+            diceTask(e.player)
             return@setInteractEvent true
         }.setInitialCoolDown(600)
 

@@ -33,12 +33,14 @@ class AreaMan: AbstractHunter("areaman") {
             .addLore(translate("area_skill_lore_3"))
             .addLore(translate("area_skill_lore_4"))
 
-        val areaSkillItem = IdentityFifty.interactManager.createSInteractItem(areaSkill,true).setInitialCoolDown(600).setInteractEvent { _, _ ->
+        val areaSkillItem = IdentityFifty.interactManager.createSInteractItem(areaSkill,true).setInitialCoolDown(600).setInteractEvent { e, _ ->
+
+            val player = e.player
 
             val length = 15
             val width = 6
 
-            val loc = p.location
+            val loc = player.location
 
             val players = ArrayList<Player>()
             IdentityFifty.hunters.forEach second@ { (uuid, _) ->
@@ -50,7 +52,7 @@ class AreaMan: AbstractHunter("areaman") {
                 loc.add(loc.direction.multiply(1)).getNearbyPlayers(width.toDouble()).filter { !glowedPlayers.contains(it) }.forEach {
                     val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
                     data.glowManager.glow(players,GlowColor.RED,150)
-                    p.playSound(p.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
+                    player.playSound(player.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     it.playSound(it.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     glowedPlayers.add(it)
                 }

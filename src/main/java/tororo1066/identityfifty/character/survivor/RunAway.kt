@@ -2,7 +2,6 @@ package tororo1066.identityfifty.character.survivor
 
 import org.bukkit.Material
 import org.bukkit.Sound
-import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -12,8 +11,6 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
-import tororo1066.identityfifty.talent.survivor.DamagedBoost
-import tororo1066.identityfifty.talent.survivor.GotHelpedSpeedUp
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -38,22 +35,23 @@ class RunAway : AbstractSurvivor("runaway") {
 
     override fun onStart(p: Player) {
         super.onStart(p)
-        val blindSkill = IdentityFifty.interactManager.createSInteractItem(blindSkillItem,true).setInteractEvent { _, _ ->
-            val entities = p.location.getNearbyPlayers(blindSkillRadius)
+        val blindSkill = IdentityFifty.interactManager.createSInteractItem(blindSkillItem,true).setInteractEvent { e, _ ->
+            val player = e.player
+            val entities = player.location.getNearbyPlayers(blindSkillRadius)
             if (entities.isEmpty()){
-                IdentityFifty.broadcastSpectators(translate("spec_camouflage_miss",p.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
-                p.sendTranslateMsg("camouflage_miss")
+                IdentityFifty.broadcastSpectators(translate("spec_camouflage_miss",player.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                player.sendTranslateMsg("camouflage_miss")
                 return@setInteractEvent true
             }
-            p.world.playSound(p.location, Sound.ENTITY_COW_DEATH,1f,2f)
+            player.world.playSound(player.location, Sound.ENTITY_COW_DEATH,1f,2f)
             entities.forEach {
                 if (!IdentityFifty.hunters.containsKey(it.uniqueId))return@forEach
                 IdentityFifty.stunEffect(it,0,blindSkillStun,StunState.OTHER)
                 it.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,blindSkillBlind,3,false,false,true))
                 it.isSprinting = false
                 it.sendTranslateMsg("camouflage_hit_hunter")
-                p.sendTranslateMsg("camouflage_hit_survivor",it.name)
-                IdentityFifty.broadcastSpectators(translate("spec_camouflage_hit",p.name,it.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
+                player.sendTranslateMsg("camouflage_hit_survivor",it.name)
+                IdentityFifty.broadcastSpectators(translate("spec_camouflage_hit",player.name,it.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
             }
             return@setInteractEvent true
         }.setInitialCoolDown(blindSkillCoolDown)
