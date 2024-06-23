@@ -37,7 +37,7 @@ class Searcher : AbstractSurvivor("searcher") {
                 val survivor = Bukkit.getPlayer(uuid)?:return@forEach
                 players.add(survivor)
                 survivor.playSound(survivor.location, Sound.ENTITY_ARROW_HIT_PLAYER,1f,0.5f)
-                survivor.sendTranslateMsg("search_lens_used_other",survivor.name)
+                survivor.sendTranslateMsg("search_lens_used_other",player.name)
             }
             IdentityFifty.hunters.forEach { (uuid, data) ->
                 Bukkit.getPlayer(uuid)?:return@forEach

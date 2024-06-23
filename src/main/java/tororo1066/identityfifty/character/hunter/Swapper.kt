@@ -57,7 +57,7 @@ class Swapper: AbstractHunter("swapper") {
                 player.world.playSound(player.location, Sound.BLOCK_BELL_USE, 0.7f, 2f)
                 player.location.getNearbyPlayers(30.0)
                     .sortedBy { player.location.distance(it.location) }
-                    .firstOrNull { IdentityFifty.survivors.containsKey(it.uniqueId) }?.let {
+                    .firstOrNull { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }?.let {
                         val data = IdentityFifty.survivors[it.uniqueId]!!
                         data.glowManager.glow(mutableSetOf(player), GlowColor.LIGHT_PURPLE, 200)
                         val hunterData = IdentityFifty.hunters[player.uniqueId]!!
@@ -75,6 +75,7 @@ class Swapper: AbstractHunter("swapper") {
                 val data = IdentityFifty.hunters[player.uniqueId]!!
                 IdentityFifty.survivors.values.forEach {
                     val survivor = it.uuid.toPlayer() ?: return@forEach
+                    if (IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(survivor.uniqueId) == false)return@forEach
                     if (inPrison(survivor))return@forEach
                     players.add(survivor)
                     it.glowManager.glow(mutableSetOf(player), GlowColor.RED, 100)
