@@ -47,9 +47,7 @@ class GlowManager(private val uuid: UUID) {
                 uuid.add(it.visiblePlayer.uniqueId)
             }
         }
-        uuid.forEach {
-            glowTasks.remove(it)
-        }
+        glowTasks.keys.removeAll(uuid.toSet())
     }
 
     inner class GlowTask(private val entity: Entity, val visiblePlayer: Player, var color: GlowColor, duration: Int) : BukkitRunnable() {
