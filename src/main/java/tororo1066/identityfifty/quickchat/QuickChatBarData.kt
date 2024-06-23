@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.quickchat
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.inventory.ItemStack
@@ -72,6 +73,8 @@ class QuickChatBarData(val uuid: UUID) {
             .addLore(translate("quick_chat_lore_2"))
             .setCustomData(IdentityFifty.plugin, "close", PersistentDataType.INTEGER, 1)
 
+        var enable = false
+
         val functionItem = IdentityFifty.interactManager.createSInteractItem(displayItem, true).setInteractEvent { e, _ ->
             if (e.action.isLeftClick) {
                 latestChat?.let {
@@ -140,13 +143,17 @@ class QuickChatBarData(val uuid: UUID) {
             setItems[8] = IdentityFifty.interactManager
                 .createSInteractItem(SItem(Material.BARRIER).setDisplayName(translate("close")), true)
                 .setInteractEvent close@ { _, _ ->
-                    returnItems()
+                    if (enable) returnItems()
                     return@close true
                 }
 
             setItems.forEachIndexed { index, sInteractItem ->
                 e.player.inventory.setItem(index, sInteractItem?:return@forEachIndexed)
             }
+
+            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                enable = true
+            }, 10)
 
             return@setInteractEvent true
         }.setInitialCoolDown(150)
