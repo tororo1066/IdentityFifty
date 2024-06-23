@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.interactions.commands.Command
-import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -21,17 +20,14 @@ import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.utils.toPlayer
-import java.util.*
-import java.util.function.Function
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import java.awt.Color
+import java.util.UUID
 import kotlin.random.Random
 
 class DiscordClient: ListenerAdapter(), Listener {
@@ -74,9 +70,8 @@ class DiscordClient: ListenerAdapter(), Listener {
         entryPermission = config.getLong("entryPermission")
         opPermission = config.getLong("opPermission")
         map = config.getString("map","")!!
-
         jda.getGuildById(guild)!!.updateCommands().addCommands(
-            Commands.slash("entry","ゲームにエントリーします").setDefaultPermissions(DefaultMemberPermissions.enabledFor(entryPermission))
+            Commands.slash("entry","ゲームにエントリーします")
                 .addOptions(
                     OptionData(OptionType.STRING, "type", "タイプ", true)
                         .addChoice("サバイバー", "survivor")
@@ -84,9 +79,9 @@ class DiscordClient: ListenerAdapter(), Listener {
                         .addChoice("観戦者", "spectator")
                         .addChoice("登録解除", "unregister")
                 ),
-            Commands.slash("himo", "discordアカウントとminecraftを紐づけします").setDefaultPermissions(DefaultMemberPermissions.enabledFor(entryPermission))
+            Commands.slash("himo", "discordアカウントとminecraftを紐づけします")
                 .addOptions(OptionData(OptionType.INTEGER, "code", "コード")),
-            Commands.slash("info","キャラクターの情報を表示します").setDefaultPermissions(DefaultMemberPermissions.enabledFor(entryPermission))
+            Commands.slash("info","キャラクターの情報を表示します")
                 .addSubcommands(
                     SubcommandData("survivor","サバイバーの情報を表示します")
                         .addOptions(
@@ -105,10 +100,13 @@ class DiscordClient: ListenerAdapter(), Listener {
                                 )
                         ),
                 ),
-            Commands.slash("enable", "有効にする").setDefaultPermissions(DefaultMemberPermissions.enabledFor(opPermission))
-                .addOptions(OptionData(OptionType.BOOLEAN, "value", "有効にするか", true)),
-            Commands.slash("enabletalent", "天賦を有効にする").setDefaultPermissions(DefaultMemberPermissions.enabledFor(opPermission))
-                .addOptions(OptionData(OptionType.BOOLEAN, "value", "有効にするか", true)),
+            Commands.slash("enable", "有効/無効を切り替える")
+                .addSubcommands(
+                    SubcommandData("game", "ゲームの有効/無効を切り替える")
+                        .addOptions(OptionData(OptionType.BOOLEAN, "value", "有効にするか", true)),
+                    SubcommandData("talent", "天賦の有効/無効を切り替える")
+                        .addOptions(OptionData(OptionType.BOOLEAN, "value", "有効にするか", true))
+                )
         ).queue()
 
         Bukkit.getPluginManager().registerEvents(this,IdentityFifty.plugin)
@@ -138,7 +136,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                 e.player.sendMessage("§c10秒後に切断されます...")
             })
             Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-                e.player.kick(Component.text("コードを入力してください"))
+                e.player.kick(Component.text("コードを入力してください $random"))
             },200)
             return
         }
@@ -369,7 +367,7 @@ class DiscordClient: ListenerAdapter(), Listener {
 
             "info" -> {
                 if (!member.roles.map { it.idLong }.contains(entryPermission))return
-                val type = e.getOption("type") { it.asString } ?:return
+                val type = e.subcommandName
                 val character = e.getOption("character") { it.asString } ?:return
 
                 if (character == "list"){
@@ -386,14 +384,14 @@ class DiscordClient: ListenerAdapter(), Listener {
                 val infoItems = ArrayList<ItemStack>()
 
                 if (type == "survivor") {
-                    val data = IdentityFifty.survivorsData.entries.find { translate(it.key) == character }?.value
+                    val data = IdentityFifty.survivorsData[character]
                     if (data == null){
                         e.reply("そのキャラクターは存在しません").queue()
                         return
                     }
                     infoItems.addAll(data.info())
                 } else {
-                    val data = IdentityFifty.huntersData.entries.find { translate(it.key) == character }?.value
+                    val data = IdentityFifty.huntersData[character]
                     if (data == null){
                         e.reply("そのキャラクターは存在しません").queue()
                         return
@@ -410,7 +408,15 @@ class DiscordClient: ListenerAdapter(), Listener {
                     embed.appendDescription("\n" + (ChatColor.stripColor(it)?:"Error"))
                 }
 
+                embed.setColor(if (type == "survivor") Color.GREEN else Color.RED)
+
                 embeds.add(embed)
+
+                fun getFirstColor(string: String): Color {
+                    if (!string.contains("§")) return Color.WHITE
+                    val color = string.split("§")[1].substring(0, 1).firstOrNull()?:'f'
+                    return ChatColor.getByChar(color)?.asBungee()?.color?:Color.WHITE
+                }
 
                 val others = infoItems.drop(1)
                 others.forEach {
@@ -419,6 +425,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                     it.lore?.forEach { lore ->
                         embedOther.appendDescription("\n" + (ChatColor.stripColor(lore)?:"Error"))
                     }
+                    embedOther.setColor(getFirstColor(it.itemMeta.displayName))
                     embeds.add(embedOther)
                 }
 
@@ -430,46 +437,44 @@ class DiscordClient: ListenerAdapter(), Listener {
             "enable" -> {
                 if (!member.roles.map { it.idLong }.contains(opPermission))return
                 val bool = e.getOption("value") { it.asBoolean } ?:return
-                if (bool){
-                    if (enable){
-                        e.reply("既にtrueです").queue()
-                        return
+                if (e.subcommandName == "talent") {
+                    if (bool) {
+                        if (enableTalent) {
+                            e.reply("既にtrueです").queue()
+                            return
+                        }
+                        enableTalent = true
+                        IdentityFifty.plugin.config.set("discord.enableTalent", true)
+                        IdentityFifty.plugin.saveConfig()
+                        e.reply("trueにしました").queue()
+                    } else {
+                        if (!enableTalent) {
+                            e.reply("既にfalseです").queue()
+                            return
+                        }
+                        enableTalent = false
+                        IdentityFifty.plugin.config.set("discord.enableTalent", false)
+                        IdentityFifty.plugin.saveConfig()
+                        e.reply("falseにしました").queue()
                     }
-                    enable = true
-                    run()
-                    e.reply("trueにしました").queue()
                 } else {
-                    if (!enable){
-                        e.reply("既にfalseです").queue()
-                        return
+                    if (bool) {
+                        if (enable) {
+                            e.reply("既にtrueです").queue()
+                            return
+                        }
+                        enable = true
+                        run()
+                        e.reply("trueにしました").queue()
+                    } else {
+                        if (!enable) {
+                            e.reply("既にfalseです").queue()
+                            return
+                        }
+                        enable = false
+                        end()
+                        e.reply("falseにしました").queue()
                     }
-                    enable = false
-                    end()
-                    e.reply("falseにしました").queue()
-                }
-            }
-
-            "enableTalent" -> {
-                if (!member.roles.map { it.idLong }.contains(opPermission))return
-                val bool = e.getOption("value") { it.asBoolean } ?:return
-                if (bool){
-                    if (enableTalent){
-                        e.reply("既にtrueです").queue()
-                        return
-                    }
-                    enableTalent = true
-                    IdentityFifty.plugin.config.set("discord.enableTalent",true)
-                    IdentityFifty.plugin.saveConfig()
-                    e.reply("trueにしました").queue()
-                } else {
-                    if (!enableTalent){
-                        e.reply("既にfalseです").queue()
-                        return
-                    }
-                    enableTalent = false
-                    IdentityFifty.plugin.config.set("discord.enableTalent",false)
-                    IdentityFifty.plugin.saveConfig()
-                    e.reply("falseにしました").queue()
                 }
             }
         }
