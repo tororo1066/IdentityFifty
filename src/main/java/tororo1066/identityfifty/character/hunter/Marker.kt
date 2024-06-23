@@ -23,6 +23,7 @@ import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
+import kotlin.math.min
 
 class Marker: AbstractHunter("marker") {
 
@@ -97,7 +98,7 @@ class Marker: AbstractHunter("marker") {
             val mark = marks[target.uniqueId]!!.first
             bossbar?.removeAll()
             bossbar = Bukkit.createBossBar(translate("marker_bossbar",target.name,mark.toString()), BarColor.GREEN, BarStyle.SOLID)
-            bossbar!!.progress = (mark / 10.0)
+            bossbar!!.progress = (min(mark, 10) / 10.0)
             bossbar!!.addPlayer(player)
         },0,5))
     }
