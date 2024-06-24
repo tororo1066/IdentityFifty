@@ -12,13 +12,13 @@ class FirstGameSpeedUp : AbstractHunterTalent("first_game_speed_up",1,AirSwingDo
     private var previousWalkSpeed = 0f
 
     override fun onStart(p: Player) {
-        previousWalkSpeed = 0.008f
-        p.walkSpeed += 0.008f
+        previousWalkSpeed = 0.009f
+        p.walkSpeed += 0.009f
     }
 
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
         p.walkSpeed -= previousWalkSpeed
-        val speedBuff = 0.008f / (IdentityFifty.identityFiftyTask!!.map.generatorGoal - remainingGenerator)
+        val speedBuff = 0.009f / (IdentityFifty.identityFiftyTask!!.map.generatorGoal - remainingGenerator)
         p.walkSpeed += speedBuff
         previousWalkSpeed = speedBuff
     }

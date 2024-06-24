@@ -14,7 +14,7 @@ class SurvivorHealedStop : AbstractHunterTalent("survivor_healed_stop",2,RemainT
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
         healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.SLOW,80,200))
         healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,100,3))
-        val radiusPlayer = p.location.getNearbyPlayers(35.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
+        val radiusPlayer = p.location.getNearbyPlayers(40.0).filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true }
         if (radiusPlayer.isNotEmpty()){
             p.sendTranslateMsg("survivor_healed_stop_detected")
         }

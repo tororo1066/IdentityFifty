@@ -12,7 +12,7 @@ class FullCowUp : AbstractSurvivorTalent("full_cow_up",1,GotHelpedSpeedUp::class
         val data = IdentityFifty.survivors[p.uniqueId]!!
         val health = data.getHealth()
         if (health == 5){
-            return damage * 1.05
+            return damage * 1.03
         }
         return damage
     }

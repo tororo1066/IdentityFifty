@@ -10,7 +10,7 @@ class HelpSpeedDown : AbstractHunterTalent("help_speed_down",1,TalentPlane::clas
 
     override fun onStart(p: Player) {
         IdentityFifty.survivors.forEach { (_, data) ->
-            data.helpTick = (data.helpTick * 1.05).toInt()
+            data.helpTick = (data.helpTick * 1.1).toInt()
         }
     }
 }

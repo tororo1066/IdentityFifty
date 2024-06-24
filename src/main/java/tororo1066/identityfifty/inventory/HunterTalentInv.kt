@@ -195,7 +195,7 @@ class HunterTalentInv(val data: HunterData) {
             setItems(listOf(47,48,50,51,52,53), glass())
             setItems(listOf(18),roadGlass())
             setItem(19,talentItem(SkillTeleport()))
-            setItem(0,talentItem(HelpGlow()))
+            setItem(0,talentItem(NoOneUp()))
             return true
         }
     }
@@ -227,7 +227,7 @@ class HunterTalentInv(val data: HunterData) {
             setItems(listOf(4,6,15,22),roadGlass())
             setItem(24,talentItem(FinishGateBuff()))
             setItem(13,talentItem(StunTimeDown()))
-            setItem(31,talentItem(NoOneUp()))
+            setItem(31,talentItem(HelpGlow()))
             return true
         }
     }
