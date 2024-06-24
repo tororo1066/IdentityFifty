@@ -41,13 +41,13 @@ class GlowManager(private val uuid: UUID) {
 
     fun cancelTask(taskId: Int) {
         val uuid = ArrayList<UUID>()
-        glowTasks.values.forEach {
-            if (it.taskId == taskId) {
-                it.cancel()
-                uuid.add(it.visiblePlayer.uniqueId)
-            }
+        uuid.addAll(glowTasks.filter { it.value.taskId == taskId }.keys)
+        uuid.forEach {
+            glowTasks[it]?.cancel()
         }
-        glowTasks.keys.removeAll(uuid.toSet())
+        uuid.forEach {
+            glowTasks.remove(it)
+        }
     }
 
     inner class GlowTask(private val entity: Entity, val visiblePlayer: Player, var color: GlowColor, duration: Int) : BukkitRunnable() {

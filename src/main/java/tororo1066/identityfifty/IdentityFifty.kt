@@ -88,7 +88,7 @@ class IdentityFifty : SJavaPlugin() {
 
         /** スタンのエフェクト(デフォルトの時間) **/
         fun stunEffect(p: Player) {
-            stunEffect(p,120,140,StunState.DAMAGED)
+            stunEffect(p,120,130,StunState.DAMAGED)
         }
 
         /** スタンのエフェクト(時間指定) **/

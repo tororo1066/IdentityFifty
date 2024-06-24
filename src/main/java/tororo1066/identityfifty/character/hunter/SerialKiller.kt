@@ -143,5 +143,8 @@ class SerialKiller: AbstractHunter("serialkiller") {
         return arrayListOf(passiveItem,killFindSkill)
     }
 
+    override fun description(): String {
+        return translate("serialkiller_description")
+    }
 
 }

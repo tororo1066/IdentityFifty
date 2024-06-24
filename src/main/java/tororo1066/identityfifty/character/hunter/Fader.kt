@@ -192,4 +192,8 @@ class Fader: AbstractHunter("fader"){
             .addLore(translate("glow_trap_lore_5"))
         return arrayListOf(passiveItem,trap)
     }
+
+    override fun description(): String {
+        return translate("fader_description")
+    }
 }

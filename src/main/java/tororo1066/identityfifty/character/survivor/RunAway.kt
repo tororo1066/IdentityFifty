@@ -79,4 +79,7 @@ class RunAway : AbstractSurvivor("runaway") {
         return arrayListOf(passiveItem,blindSkillItem)
     }
 
+    override fun description(): String {
+        return translate("runaway_description")
+    }
 }

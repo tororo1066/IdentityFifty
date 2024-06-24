@@ -13,7 +13,6 @@ import tororo1066.identityfifty.inventory.*
 import tororo1066.identityfifty.quickchat.QuickChatBarData
 import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
 import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
-import tororo1066.nmsutils.SPlayer
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sCommand.SCommand
@@ -232,6 +231,11 @@ class IdentityCommand : SCommand("identity","","identity.user") {
             .addArg(SCommandArg().addAllowString("entry")).setPlayerExecutor {
                 if (!DiscordClient.enable || !DiscordClient.enableTalent) {
                     it.sender.sendMessage("§cこのコマンドは無効化されています")
+                    return@setPlayerExecutor
+                }
+
+                if (!DiscordClient.survivors.containsKey(it.sender.uniqueId) && !DiscordClient.hunters.containsKey(it.sender.uniqueId) && !DiscordClient.spectators.containsKey(it.sender.uniqueId)){
+                    it.sender.sendMessage("§cあなたは参加していません")
                     return@setPlayerExecutor
                 }
 

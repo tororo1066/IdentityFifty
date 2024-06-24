@@ -129,4 +129,8 @@ class Offense : AbstractSurvivor("offense") {
             .addLore(translate("rugby_ball_lore_4"))
         return arrayListOf(passiveItem,tackleSkillItem)
     }
+
+    override fun description(): String {
+        return translate("offense_description")
+    }
 }

@@ -92,4 +92,8 @@ class Helper : AbstractSurvivor("helper") {
 
         return arrayListOf(passiveItem,protectSkill)
     }
+
+    override fun description(): String {
+        return translate("helper_description")
+    }
 }

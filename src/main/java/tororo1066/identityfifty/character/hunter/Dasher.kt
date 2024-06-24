@@ -76,4 +76,8 @@ class Dasher : AbstractHunter("dasher") {
             .addLore(translate("hyper_engine_lore_2"))
         return arrayListOf(passiveItem,firstSkillItem)
     }
+
+    override fun description(): String {
+        return translate("dasher_description")
+    }
 }

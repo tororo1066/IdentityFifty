@@ -321,4 +321,8 @@ class Controller: AbstractSurvivor("controller") {
 
         return arrayListOf(passiveItem,controllerSkill)
     }
+
+    override fun description(): String {
+        return translate("controller_description")
+    }
 }

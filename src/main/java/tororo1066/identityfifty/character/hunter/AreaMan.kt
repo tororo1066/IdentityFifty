@@ -117,7 +117,7 @@ class AreaMan: AbstractHunter("areaman") {
         cylinder.height = 45f
         cylinder.radius = 20f
         cylinder.particle = Particle.FLAME
-        cylinder.iterations = 30
+        cylinder.iterations = 20
         cylinder.period = 20
         cylinder.particles = 2000
         cylinder.angularVelocityX = 0.0
@@ -160,5 +160,9 @@ class AreaMan: AbstractHunter("areaman") {
             .addLore(translate("area_skill_lore_3"))
             .addLore(translate("area_skill_lore_4"))
         return arrayListOf(passiveItem,areaSkill)
+    }
+
+    override fun description(): String {
+        return translate("areaman_description")
     }
 }

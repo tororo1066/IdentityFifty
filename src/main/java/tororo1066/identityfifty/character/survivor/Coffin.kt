@@ -66,7 +66,6 @@ class Coffin: AbstractSurvivor("coffin") {
                 coffinUUID = it.uniqueId
                 it.setDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HEAD,EquipmentSlot.LEGS)
                 it.isInvisible = true
-                it.isInvulnerable = true
                 coffinGlowManager = GlowManager(it.uniqueId)
                 coffinGlowManager!!.glow(Bukkit.getOnlinePlayers().toMutableList(),GlowColor.DARK_RED,60)
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
@@ -80,6 +79,7 @@ class Coffin: AbstractSurvivor("coffin") {
                             e.isCancelled = true
                             return@register
                         }
+
                         e.entity.remove()
                         coffin = null
                         coffinUUID = null
@@ -189,5 +189,9 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_4"))
             .addLore(translate("coffin_skill_lore_5"))
         return arrayListOf(passiveItem, coffinSkill)
+    }
+
+    override fun description(): String {
+        return translate("coffin_description")
     }
 }

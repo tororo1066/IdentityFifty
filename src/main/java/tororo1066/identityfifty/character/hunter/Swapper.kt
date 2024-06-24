@@ -162,6 +162,10 @@ class Swapper: AbstractHunter("swapper") {
         return super.onStun(blindTime, slowTime, state, p)
     }
 
+    override fun onEnd(p: Player) {
+        sEvent.unregisterAll()
+    }
+
     override fun info(): ArrayList<ItemStack> {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("swapper_passive_lore_1"))
@@ -178,7 +182,7 @@ class Swapper: AbstractHunter("swapper") {
         return arrayListOf(passiveItem,changeColorSkill)
     }
 
-    override fun onEnd(p: Player) {
-        sEvent.unregisterAll()
+    override fun description(): String {
+        return translate("swapper_description")
     }
 }

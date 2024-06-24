@@ -2,6 +2,7 @@ package tororo1066.identityfifty.quickchat
 
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.Sound
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -22,8 +23,7 @@ class QuickChatBarData(val uuid: UUID) {
     companion object {
         val survivorChats = arrayListOf(
             NearHunter(),
-            SheepGeneratorNow(),
-            CowGeneratorNow(),
+            GeneratorNow(),
             HealMe(),
             HelpMe(),
             IWillHelpYou(),
@@ -73,10 +73,26 @@ class QuickChatBarData(val uuid: UUID) {
             .addLore(translate("quick_chat_lore_2"))
             .setCustomData(IdentityFifty.plugin, "close", PersistentDataType.INTEGER, 1)
 
-        var enable = false
-
         val functionItem = IdentityFifty.interactManager.createSInteractItem(displayItem, true).setInteractEvent { e, _ ->
             if (e.action.isLeftClick) {
+                if (IdentityFifty.survivors.containsKey(e.player.uniqueId)) {
+                    val p = e.player
+                    p.getTargetEntity(4)?.let {
+
+                        if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "Generator")) ||
+                            it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"))) {
+
+                            survivorChat(GeneratorNow())
+                            return@setInteractEvent true
+                        }
+                    }
+
+                    if (p.location.getNearbyPlayers(10.0).any { IdentityFifty.hunters.containsKey(it.uniqueId) }) {
+                        survivorChat(NearHunter())
+                        return@setInteractEvent true
+                    }
+                }
+
                 latestChat?.let {
                     if (IdentityFifty.survivors.containsKey(e.player.uniqueId)){
                         survivorChat(it)
@@ -139,6 +155,8 @@ class QuickChatBarData(val uuid: UUID) {
                 }
                 setItems[index] = chatItem
             }
+
+            var enable = false
 
             setItems[8] = IdentityFifty.interactManager
                 .createSInteractItem(SItem(Material.BARRIER).setDisplayName(translate("close")), true)

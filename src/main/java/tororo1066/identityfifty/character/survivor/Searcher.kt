@@ -84,4 +84,8 @@ class Searcher : AbstractSurvivor("searcher") {
             .addLore(translate("search_lens_lore_3"))
         return arrayListOf(passiveItem,searchSkillItem)
     }
+
+    override fun description(): String {
+        return translate("searcher_description")
+    }
 }

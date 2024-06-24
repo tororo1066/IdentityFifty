@@ -153,4 +153,8 @@ class Fixer: AbstractSurvivor("fixer") {
     override fun info(): ArrayList<ItemStack> {
         return arrayListOf(passiveItem, fixPlateItem)
     }
+
+    override fun description(): String {
+        return translate("fixer_description")
+    }
 }

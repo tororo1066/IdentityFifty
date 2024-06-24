@@ -3,8 +3,8 @@ package tororo1066.identityfifty.quickchat.survivor
 import tororo1066.identityfifty.quickchat.AbstractQuickChat
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 
-class SheepGeneratorNow: AbstractQuickChat() {
+class GeneratorNow: AbstractQuickChat() {
 
     override val message: String
-        get() = translate("sheep_generator_now")
+        get() = translate("generator_now")
 }

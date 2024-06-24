@@ -99,4 +99,7 @@ class Nurse : AbstractSurvivor("nurse") {
         return arrayListOf(passiveItem,speedUpItem)
     }
 
+    override fun description(): String {
+        return translate("nurse_description")
+    }
 }

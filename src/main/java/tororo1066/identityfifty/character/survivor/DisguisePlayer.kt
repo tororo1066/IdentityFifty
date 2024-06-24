@@ -1,13 +1,16 @@
 package tororo1066.identityfifty.character.survivor
 
+import me.libraryaddict.disguise.disguisetypes.PlayerDisguise
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
+import org.bukkit.entity.Chicken
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
@@ -18,11 +21,14 @@ import java.util.UUID
 
 class DisguisePlayer: AbstractSurvivor("disguise") {
 
+    var latentEntity: Chicken? = null
+
     override fun onStart(p: Player) {
         super.onStart(p)
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("disguise_passive_lore_1"))
             .addLore(translate("disguise_passive_lore_2"))
+            .addLore(translate("disguise_passive_lore_3"))
 
         val disguiseSkill = SItem(Material.STICK).setDisplayName(translate("disguise_skill")).setCustomModelData(10)
             .addLore(translate("disguise_skill_lore_1"))
@@ -86,10 +92,51 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
         }, 100)
     }
 
+    override fun onJail(prisonData: PrisonData, p: Player) {
+        val map = IdentityFifty.identityFiftyTask?.map ?: return
+        val randomJail = map.prisons.filter { it.value.inPlayer.isEmpty() }.values.randomOrNull() ?: return
+        map.world.spawn(randomJail.spawnLoc, Chicken::class.java) { chicken ->
+            chicken.setAI(false)
+            chicken.isSilent = true
+            val disguise = PlayerDisguise(p)
+                .setEntity(chicken)
+                .setNameVisible(false)
+            disguise.isSelfDisguiseVisible = false
+            disguise.startDisguise()
+
+            latentEntity = chicken
+        }
+
+    }
+
+    override fun onGotHelp(helper: Player, p: Player): ReturnAction {
+        latentEntity?.let {
+            it.location.world.playSound(it.location, Sound.ENTITY_SHEEP_DEATH, 2f, 2f)
+        }
+        latentEntity?.remove()
+        latentEntity = null
+        return super.onGotHelp(helper, p)
+    }
+
+    override fun onDie(p: Player) {
+        clear(p)
+    }
+
+    override fun onEnd(p: Player) {
+        clear(p)
+    }
+
+    private fun clear(p: Player){
+        latentEntity?.remove()
+        latentEntity = null
+        IdentityFifty.survivors[p.uniqueId]?.skinModifier?.unDisguise()
+    }
+
     override fun info(): ArrayList<ItemStack> {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("disguise_passive_lore_1"))
             .addLore(translate("disguise_passive_lore_2"))
+            .addLore(translate("disguise_passive_lore_3"))
 
         val disguiseSkill = SItem(Material.STICK).setDisplayName(translate("disguise_skill")).setCustomModelData(10)
             .addLore(translate("disguise_skill_lore_1"))
@@ -97,5 +144,9 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             .addLore(translate("disguise_skill_lore_3"))
 
         return arrayListOf(passiveItem,disguiseSkill)
+    }
+
+    override fun description(): String {
+        return translate("disguise_description")
     }
 }

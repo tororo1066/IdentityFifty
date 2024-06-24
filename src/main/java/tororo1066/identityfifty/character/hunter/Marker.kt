@@ -148,20 +148,6 @@ class Marker: AbstractHunter("marker") {
         remove(survivor.uniqueId)
     }
 
-    override fun info(): ArrayList<ItemStack> {
-        val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
-            .addLore(translate("marker_passive_lore_1"))
-            .addLore(translate("marker_passive_lore_2"))
-            .addLore(translate("marker_passive_lore_3"))
-            .addLore(translate("marker_passive_lore_4"))
-
-        val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow")).setCustomModelData(15)
-            .addLore(translate("mark_crossbow_lore_1"))
-            .addLore(translate("mark_crossbow_lore_2"))
-
-        return arrayListOf(passiveItem,crossBowSkill)
-    }
-
     private fun update(uuid: UUID, i: Int){
         marks[uuid]?.second?.cancel()
         marks[uuid] = Pair(i, task(uuid))
@@ -177,5 +163,23 @@ class Marker: AbstractHunter("marker") {
             marks.remove(uuid)
             uuid.toPlayer()?.sendTranslateMsg("mark_remove")
         }, 1400)
+    }
+
+    override fun info(): ArrayList<ItemStack> {
+        val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
+            .addLore(translate("marker_passive_lore_1"))
+            .addLore(translate("marker_passive_lore_2"))
+            .addLore(translate("marker_passive_lore_3"))
+            .addLore(translate("marker_passive_lore_4"))
+
+        val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow")).setCustomModelData(15)
+            .addLore(translate("mark_crossbow_lore_1"))
+            .addLore(translate("mark_crossbow_lore_2"))
+
+        return arrayListOf(passiveItem,crossBowSkill)
+    }
+
+    override fun description(): String {
+        return translate("marker_description")
     }
 }

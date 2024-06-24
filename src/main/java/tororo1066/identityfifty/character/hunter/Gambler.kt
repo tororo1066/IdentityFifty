@@ -160,4 +160,8 @@ class Gambler: AbstractHunter("gambler") {
             .addLore(translate("gamble_dice_lore_2"))
         return arrayListOf(passiveItem,firstSkillItem)
     }
+
+    override fun description(): String {
+        return translate("gambler_description")
+    }
 }

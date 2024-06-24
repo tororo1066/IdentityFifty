@@ -51,6 +51,8 @@ abstract class AbstractHunter(val name: String): Cloneable {
 
     abstract fun info(): ArrayList<ItemStack>
 
+    abstract fun description(): String
+
     public override fun clone(): AbstractHunter {
         return super.clone() as AbstractHunter
     }

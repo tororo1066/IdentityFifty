@@ -88,4 +88,8 @@ class Mechanic: AbstractSurvivor("mechanic") {
 
         return arrayListOf(passiveItem,slowSkill)
     }
+
+    override fun description(): String {
+        return translate("mechanic_description")
+    }
 }

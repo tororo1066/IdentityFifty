@@ -71,6 +71,7 @@ class DiscordClient: ListenerAdapter(), Listener {
         opPermission = config.getLong("opPermission")
         map = config.getString("map","")!!
         jda.getGuildById(guild)!!.updateCommands().addCommands(
+            Commands.slash("help","ヘルプを表示します"),
             Commands.slash("entry","ゲームにエントリーします")
                 .addOptions(
                     OptionData(OptionType.STRING, "type", "タイプ", true)
@@ -148,16 +149,19 @@ class DiscordClient: ListenerAdapter(), Listener {
             return
         }
         e.allow()
-        val isSurvivor = survivors.containsKey(uuid)
         Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+            val map = IdentityFifty.maps[this.map]!!
+            map.lobbyLocation?.let {
+                e.player.teleport(it)
+            }
             if (spectators.containsKey(e.player.uniqueId)){
                 e.player.performCommand("identity spectator")
                 e.player.gameMode = GameMode.SPECTATOR
                 return@Runnable
             }
-            if (isSurvivor){
+            if (survivors.containsKey(uuid)){
                 e.player.sendMessage("§aサバイバー${if (enableTalent) "と§c天賦§a" else ""}を選択してください")
-            } else {
+            } else if (hunters.containsKey(uuid)){
                 e.player.sendMessage("§aハンター${if (enableTalent) "と§c天賦§a" else ""}を選択してください")
             }
         },20)
@@ -240,6 +244,14 @@ class DiscordClient: ListenerAdapter(), Listener {
         val member = e.member?:return
         IdentityFifty.plugin.logger.info(e.name)
         when (e.name) {
+            "help" -> {
+                e.reply("""
+                    /entry (サバイバー or ハンター or 観戦者 or 登録解除) ゲームにエントリーします
+                    /himo discordアカウントとminecraftを紐づけします
+                    /info (survivor or hunter) <キャラクター名(or list)> キャラクターの情報を表示します
+                """.trimIndent())
+            }
+
             "entry" -> {
                 if (!member.roles.map { it.idLong }.contains(entryPermission)) {
                     e.reply("権限がありません <#800272407578411029> で権限をもらってください").queue()
@@ -351,7 +363,7 @@ class DiscordClient: ListenerAdapter(), Listener {
                 }
 
                 if (himoMode) {
-                    e.reply("紐づけモードがオンです xtororoに入ってコードを取得し(10秒でキックされます)、!himo <コード>を入力してください").queue()
+                    e.reply("紐づけモードがオンです xtororoに入ってコードを取得し(10秒でキックされます)、/himo <コード>を入力してください").queue()
                     return
                 }
 
@@ -362,7 +374,7 @@ class DiscordClient: ListenerAdapter(), Listener {
 
                 himoMode = true
 
-                e.reply("紐づけモードがオンになりました 5分以内にxtororoに入ってコードを取得し(10秒でキックされます)、!himo <コード>を入力してください").queue()
+                e.reply("紐づけモードがオンになりました xtororoに入ってコードを取得し(10秒でキックされます)、/himo <コード>を入力してください").queue()
             }
 
             "info" -> {
