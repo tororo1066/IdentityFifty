@@ -27,7 +27,9 @@ class QuickChatBarData(val uuid: UUID) {
             HealMe(),
             HelpMe(),
             IWillHelpYou(),
-            WillFinishedGenerator()
+            WillFinishedGenerator(),
+            ThankYou(),
+            Flee()
         )
 
         val hunterChats = arrayListOf<AbstractQuickChat>()
@@ -77,18 +79,17 @@ class QuickChatBarData(val uuid: UUID) {
             if (e.action.isLeftClick) {
                 if (IdentityFifty.survivors.containsKey(e.player.uniqueId)) {
                     val p = e.player
-                    p.getTargetEntity(4)?.let {
-
-                        if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "Generator")) ||
-                            it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"))) {
-
-                            survivorChat(GeneratorNow())
-                            return@setInteractEvent true
-                        }
-                    }
 
                     if (p.location.getNearbyPlayers(10.0).any { IdentityFifty.hunters.containsKey(it.uniqueId) }) {
                         survivorChat(NearHunter())
+                        return@setInteractEvent true
+                    }
+
+                    if (p.location.getNearbyEntities(4.0, 4.0, 4.0).any {
+                            it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "Generator")) ||
+                                    it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"))
+                        }) {
+                        survivorChat(GeneratorNow())
                         return@setInteractEvent true
                     }
                 }
