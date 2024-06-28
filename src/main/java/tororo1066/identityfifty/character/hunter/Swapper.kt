@@ -95,7 +95,7 @@ class Swapper: AbstractHunter("swapper") {
         sEvent.register(PlayerInteractEvent::class.java) { e ->
             if (e.player.uniqueId != p.uniqueId || e.hand != EquipmentSlot.HAND || !e.action.isLeftClick)return@register
             val player = e.player
-            val entity = player.getTargetEntity(if (white) 5 else 3)
+            val entity = player.world.rayTraceEntities(player.location, player.location.direction, if (white) 5.5 else 3.0)?.hitEntity
             if (entity == null) {
                 if (!white) {
                     val defaultTarget = player.getTargetEntity(4)
@@ -146,14 +146,14 @@ class Swapper: AbstractHunter("swapper") {
                 return if (white) {
                     blindTime + 20 to slowTime + 30
                 } else {
-                    blindTime - 30 to slowTime - 30
+                    blindTime - 20 to slowTime - 20
                 }
             }
             StunState.WOODPLATE -> {
                 return if (white) {
                     blindTime + 10 to slowTime + 10
                 } else {
-                    blindTime - 30 to slowTime - 30
+                    blindTime - 20 to slowTime - 20
                 }
             }
             else -> {

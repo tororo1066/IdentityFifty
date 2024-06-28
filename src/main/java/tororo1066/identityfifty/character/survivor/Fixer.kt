@@ -57,9 +57,10 @@ class Fixer: AbstractSurvivor("fixer") {
                 player.sendTranslateMsg("fix_plate_no_plate")
                 return@setInteractEvent false
             }
-            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
-                item.setInteractCoolDown(fixPlateCoolDown)
-            })
+            item.setInteractCoolDown(fixPlateCoolDown)
+//            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+//                item.setInteractCoolDown(fixPlateCoolDown)
+//            })
             val plateLoc = plate.persistentDataContainer.get(
                 NamespacedKey(IdentityFifty.plugin, "UsedPlate"),
                 PersistentDataType.INTEGER_ARRAY
@@ -116,7 +117,9 @@ class Fixer: AbstractSurvivor("fixer") {
                     player.world.playSound(player.location, Sound.BLOCK_ANVIL_USE, 2f, 1f)
                     bossBar.removeAll()
                     slow.cancel()
-                    slowTasks.add(IdentityFifty.speedModifier(player, -0.05, 999999, AttributeModifier.Operation.ADD_NUMBER))
+                    if (slowTasks.size < 10) {
+                        slowTasks.add(IdentityFifty.speedModifier(player, -0.05, 9999999, AttributeModifier.Operation.ADD_NUMBER))
+                    }
                     it.cancel()
                     return@Consumer
                 }

@@ -70,6 +70,9 @@ class SerialKiller: AbstractHunter("serialkiller") {
                         data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), GlowColor.RED, 200)
                         player.addPotionEffect(PotionEffect(PotionEffectType.SLOW,200,1))
                         player.sendTranslateMsg("kill_find_failed")
+                        IdentityFifty.survivors.keys.forEach { uuid ->
+                            uuid.toPlayer()?.sendTranslateMsg("kill_find_failed_survivor")
+                        }
                         IdentityFifty.broadcastSpectators(translate("spec_kill_find_failed",player.name),
                             AllowAction.RECEIVE_HUNTERS_ACTION)
                         player.world.playSound(player.location, Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1f)
@@ -110,13 +113,11 @@ class SerialKiller: AbstractHunter("serialkiller") {
     }
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
-        val data = IdentityFifty.hunters[p.uniqueId]!!
-        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(), GlowColor.RED, 100)
+        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,100,1))
     }
 
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
-        val data = IdentityFifty.hunters[p.uniqueId]!!
-        data.glowManager.glow(IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList(), GlowColor.RED, 100)
+        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,100,1))
     }
 
     override fun onFinishedAttack(attackPlayer: Player, result: Int, p: Player) {

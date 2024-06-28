@@ -134,13 +134,12 @@ class Marker: AbstractHunter("marker") {
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
         val data = IdentityFifty.survivors[healPlayer.uniqueId]?:return
-        val players = ArrayList<Player>()
-        players.add(p)
-        data.glowManager.glow(players,GlowColor.RED,200)
+        data.glowManager.glow(mutableSetOf(p),GlowColor.RED,200)
         p.sendTranslateMsg("marker_healed_survivor")
         p.playSound(p.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
         healedPlayer.sendTranslateMsg("marker_heal_view")
-        healedPlayer.playSound(healedPlayer.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
+        healPlayer.sendTranslateMsg("marker_heal_view")
+        healedPlayer.world.playSound(healedPlayer.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
     }
 
 
@@ -149,6 +148,11 @@ class Marker: AbstractHunter("marker") {
     }
 
     private fun update(uuid: UUID, i: Int){
+        uuid.toPlayer()?.sendTranslateMsg("mark_update", (marks[uuid]?.first?:0).toString(), i.toString())
+        IdentityFifty.broadcastSpectators(
+            translate("spec_mark_update",uuid.toPlayer()?.name?:uuid.toString(),i.toString()),
+            AllowAction.RECEIVE_HUNTERS_ACTION
+        )
         marks[uuid]?.second?.cancel()
         marks[uuid] = Pair(i, task(uuid))
     }
@@ -162,6 +166,10 @@ class Marker: AbstractHunter("marker") {
         return Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
             marks.remove(uuid)
             uuid.toPlayer()?.sendTranslateMsg("mark_remove")
+            IdentityFifty.broadcastSpectators(
+                translate("spec_mark_remove",uuid.toPlayer()?.name?:"不明"),
+                AllowAction.RECEIVE_HUNTERS_ACTION
+            )
         }, 1400)
     }
 

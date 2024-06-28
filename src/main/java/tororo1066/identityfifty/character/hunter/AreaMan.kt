@@ -70,7 +70,7 @@ class AreaMan: AbstractHunter("areaman") {
             }
 
             if (glowedPlayers.isNotEmpty()){
-                IdentityFifty.speedModifier(p,glowedPlayers.size * 0.15,40+glowedPlayers.size*40, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+                IdentityFifty.speedModifier(p,glowedPlayers.size * 0.1,100, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
             }
 
             IdentityFifty.broadcastSpectators(translate("spec_area_skill_used",p.name), AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -91,7 +91,7 @@ class AreaMan: AbstractHunter("areaman") {
 
         p.sendTranslateMsg("area_message")
 
-        dieLocation.getNearbyPlayers(3.0).run {
+        dieLocation.getNearbyPlayers(4.0).run {
             if (isNotEmpty()) p.sendTranslateMsg("area_message")
             forEach {
                 val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach

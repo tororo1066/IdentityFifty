@@ -86,7 +86,7 @@ class Coffin: AbstractSurvivor("coffin") {
                         coffinGlowManager?.cancelTask(coffinGlowTask)
                         coffinGlowManager = null
                         sEvent.unregisterAll()
-                        item.setInteractCoolDown(1600)
+                        item.setInteractCoolDown(2000)
                         player.sendTranslateMsg("coffin_broken")
                         IdentityFifty.broadcastSpectators(translate("spec_coffin_broken",player.name),
                             AllowAction.RECEIVE_SURVIVORS_ACTION)
@@ -152,9 +152,9 @@ class Coffin: AbstractSurvivor("coffin") {
             IdentityFifty.broadcastSpectators(translate("spec_coffin_helped",player.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
 
-            item.setInteractCoolDown(1600)
+            item.setInteractCoolDown(2000)
 
-        }.setInitialCoolDown(1600)
+        }.setInitialCoolDown(2000)
 
         p.inventory.addItem(passiveItem,coffinSkillItem)
     }
@@ -167,7 +167,7 @@ class Coffin: AbstractSurvivor("coffin") {
 
     override fun onJail(prisonData: PrisonData, p: Player) {
         val data = IdentityFifty.survivors[p.uniqueId]!!
-        data.remainingTime -= 20
+        data.remainingTime -= 15
     }
 
     override fun onEnd(p: Player) {

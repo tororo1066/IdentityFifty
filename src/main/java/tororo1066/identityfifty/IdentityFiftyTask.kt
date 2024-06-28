@@ -1477,6 +1477,11 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                         deadSurvivor.add(survivor.uuid)
                         survivorCount--
                         p.gameMode = GameMode.SPECTATOR
+                        map.prisons.values.forEach { data ->
+                            if (data.inPlayer.contains(survivor.uuid)){
+                                data.inPlayer.remove(survivor.uuid)
+                            }
+                        }
                         broadcast(translate("survivor_was_died", survivor.name))
 
                         if (survivorCount == 0){
