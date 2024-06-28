@@ -1,6 +1,8 @@
 package tororo1066.identityfifty.commands
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -206,7 +208,31 @@ class IdentityCommand : SCommand("identity","","identity.user") {
 
         addCommand(SCommandObject().addArg(SCommandArg().addAllowString("unregister")).setPlayerExecutor {
             if (DiscordClient.enable){
-                it.sender.sendMessage("§c登録解除はできません")
+                if (!IdentityFifty.discordClient.canEntry) {
+                    it.sender.sendMessage("§cこのコマンドは無効化されています")
+                    return@setPlayerExecutor
+                }
+                if (!DiscordClient.survivors.containsKey(it.sender.uniqueId) && !DiscordClient.hunters.containsKey(it.sender.uniqueId) && !DiscordClient.spectators.containsKey(it.sender.uniqueId)){
+                    it.sender.sendMessage("§cあなたは参加していません")
+                    return@setPlayerExecutor
+                }
+                IdentityFifty.hunters.remove(it.sender.uniqueId)
+                IdentityFifty.survivors.remove(it.sender.uniqueId)
+                IdentityFifty.spectators.remove(it.sender.uniqueId)
+                DiscordClient.survivors.remove(it.sender.uniqueId)
+                DiscordClient.hunters.remove(it.sender.uniqueId)
+                DiscordClient.spectators.remove(it.sender.uniqueId)
+                DiscordClient.entries.remove(it.sender.uniqueId)
+
+                IdentityFifty.discordClient.jda.getTextChannelById(
+                    IdentityFifty.discordClient.infoChannel
+                )!!.sendMessage(
+                    "${it.sender.name}が登録解除しました\n" +
+                            "${DiscordClient.survivors.size}/${DiscordClient.survivorLimit} ${DiscordClient.hunters.size}/${DiscordClient.hunterLimit}"
+                ).queue()
+                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    it.sender.kick(Component.text(translate("unregistered")))
+                }, 5)
                 return@setPlayerExecutor
             }
             IdentityFifty.hunters.remove(it.sender.uniqueId)
@@ -380,6 +406,61 @@ class IdentityCommand : SCommand("identity","","identity.user") {
                 it.sender.sendTranslateMsg("not_registered")
             }
         })
+
+        addCommand(SCommandObject().addArg(SCommandArg("acceptInvite"))
+            .addArg(SCommandArg(listOf("survivor", "hunter", "spectator")))
+            .setPlayerExecutor {
+                if (!DiscordClient.enable) {
+                    it.sender.sendMessage("§cこのコマンドは無効化されています")
+                    return@setPlayerExecutor
+                }
+                if (!DiscordClient.invite.any { entry -> entry.value.contains(it.sender.uniqueId) }){
+                    it.sender.sendMessage("§c招待されていません")
+                    return@setPlayerExecutor
+                }
+
+                when(it.args[1]) {
+                    "survivor" -> {
+                        if (DiscordClient.survivors.size >= DiscordClient.survivorLimit){
+                            it.sender.sendMessage("§cサバイバーは${DiscordClient.survivorLimit}人までです")
+                            return@setPlayerExecutor
+                        }
+
+                        DiscordClient.survivors[it.sender.uniqueId] = 0L
+                        it.sender.sendMessage("§aサバイバーで参加しました")
+                    }
+
+                    "hunter" -> {
+                        if (DiscordClient.hunters.size >= DiscordClient.hunterLimit){
+                            it.sender.sendMessage("§cハンターは${DiscordClient.hunterLimit}人までです")
+                            return@setPlayerExecutor
+                        }
+
+                        DiscordClient.hunters[it.sender.uniqueId] = 0L
+                        it.sender.sendMessage("§aハンターで参加しました")
+                    }
+
+                    "spectator" -> {
+                        DiscordClient.spectators[it.sender.uniqueId] = 0L
+                        it.sender.sendMessage("§a観戦者で参加しました")
+                        it.sender.performCommand("identity spectator")
+                        it.sender.gameMode = GameMode.SPECTATOR
+                    }
+                }
+
+                DiscordClient.invite.entries.forEach { entry ->
+                    entry.value.remove(it.sender.uniqueId)
+                }
+
+                if (it.args[1] != "spectator") {
+                    IdentityFifty.discordClient.jda.getTextChannelById(
+                        IdentityFifty.discordClient.infoChannel
+                    )!!.sendMessage(
+                        "${it.sender.name}が${if (it.args[1] == "survivor") "サバイバー" else "ハンター"}として参加しました\n" +
+                                "${DiscordClient.survivors.size}/${DiscordClient.survivorLimit} ${DiscordClient.hunters.size}/${DiscordClient.hunterLimit}"
+                    ).queue()
+                }
+            })
 
         //debug
 
