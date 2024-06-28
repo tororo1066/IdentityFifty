@@ -53,14 +53,14 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         nowHealth: Double,
         p: Player
     ): Double {
-        addActionPoint(damage * 0.04)
-        val buff = 1 + (0.125 * (actionPoint / 100))
+        addActionPoint(damage * 0.035)
+        val buff = 1 + (0.1 * (actionPoint / 100))
         return damage * buff
     }
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
-        addActionPoint(damage * 0.04)
-        val buff = 1 + (0.125 * (actionPoint / 100))
+        addActionPoint(damage * 0.035)
+        val buff = 1 + (0.1 * (actionPoint / 100))
         return damage * buff
     }
 

@@ -12,7 +12,7 @@ class FullSheepUp :AbstractSurvivorTalent("full_sheep_up",1,HealSpeedUp::class.j
         val data = IdentityFifty.survivors[p.uniqueId]!!
         val health = data.getHealth()
         if (health == 5){
-            return damage * 1.05
+            return damage * 1.03
         }
         return damage
     }

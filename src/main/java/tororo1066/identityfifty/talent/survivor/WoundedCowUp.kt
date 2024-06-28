@@ -12,7 +12,7 @@ class WoundedCowUp :AbstractSurvivorTalent("wounded_cow_up",1,HatchLow::class.ja
         val data = IdentityFifty.survivors[p.uniqueId]!!
         val health = data.getHealth()
         if (health in 2..4){
-            return damage * 1.05
+            return damage * 1.03
         }
         return damage
     }

@@ -9,6 +9,6 @@ class LowHitPlate: AbstractHunterTalent("low_hit_plate",1,TalentPlane::class.jav
     }
 
     override fun onDamagedWoodPlate(usedPlayer: Player, loc: Location, blindTime: Int, slowTime: Int, p: Player): Pair<Int, Int> {
-        return Pair(blindTime, slowTime - 10)
+        return Pair(blindTime, slowTime - 15)
     }
 }
