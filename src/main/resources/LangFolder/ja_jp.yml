@@ -33,6 +33,7 @@ survivor_was_died: "§c§l{0}§4§lは死んでしまった..."
 
 spec_healed_survivor: "§d{0}§aが§c{1}§aを回復した"
 spec_helped_survivor: "§d{0}§aが§c{1}§aを救助した"
+spec_damaged_survivor: "§d{0} §a====(§c{1}ダメージ§a)====> §c{2}"
 
 # debug start
 # debug command
@@ -248,6 +249,8 @@ i_will_help_you: "助けに行く！"
 heal_me: "回復して！"
 help_me: "助けて！"
 will_finished_generator: "発電機発電準備完了！"
+thank_you: "ありがとう！"
+flee: "逃げて！"
 
 # quick chat end
 
@@ -461,3 +464,6 @@ change_color_glowing: "§c近くのサバイバーと互いに発光した"
 change_color_glowing_survivor: "§c近くのハンターと互いに発光した..."
 change_color_black: "§8黒に変化した"
 spec_change_color_black: "§d{0}§aが§8色調§f変化§aで黒に変化した"
+
+fixer: "技工士"
+fixer_passive_lore_1: "§f§l"

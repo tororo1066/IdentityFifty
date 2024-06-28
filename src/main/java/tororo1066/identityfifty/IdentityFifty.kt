@@ -39,7 +39,7 @@ import java.io.File
 import java.net.InetSocketAddress
 import java.util.UUID
 
-class IdentityFifty : SJavaPlugin() {
+class IdentityFifty : SJavaPlugin(UseOption.SInput) {
 
     companion object {
         /** サバイバークラスのデータ クローンして使う方がいいかも **/
@@ -142,12 +142,12 @@ class IdentityFifty : SJavaPlugin() {
             this.sendMessage(PREFIX + s)
         }
 
-        fun broadcastSpectators(s: String, action: AllowAction) {
-            spectators.values.filter { it.actions.contains(action) }.forEach {
+        fun broadcastSpectators(s: String, vararg action: AllowAction) {
+            spectators.values.filter { it.actions.any { any -> action.contains(any) } }.forEach {
                 it.uuid.toPlayer()?.sendMessage(PREFIX + s)
             }
             if (loggerMode){
-                plugin.logger.info(PREFIX + s)
+                Bukkit.getConsoleSender().sendMessage(PREFIX + s)
             }
         }
 

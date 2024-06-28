@@ -69,7 +69,14 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
     }
 
     private fun broadcast(string: String){
-        Bukkit.broadcast(Component.text(IdentityFifty.PREFIX + string),Server.BROADCAST_CHANNEL_USERS)
+//        Bukkit.broadcast(Component.text(IdentityFifty.PREFIX + string),Server.BROADCAST_CHANNEL_USERS)
+        IdentityFifty.survivors.keys
+            .plus(IdentityFifty.hunters.keys)
+            .plus(IdentityFifty.spectators.keys)
+            .forEach {
+                it.toPlayer()?.sendMessage(IdentityFifty.PREFIX + string)
+            }
+        Bukkit.getConsoleSender().sendMessage(IdentityFifty.PREFIX + string)
     }
 
     private fun runTask(unit: ()->Unit){
@@ -295,6 +302,10 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {
+                val attribute = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!
+                attribute.modifiers.forEach {
+                    attribute.removeModifier(it)
+                }
                 p.walkSpeed = 0.2f
                 p.foodLevel = 20
                 p.gameMode = GameMode.SURVIVAL
@@ -312,6 +323,10 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {
+                val attribute = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!
+                attribute.modifiers.forEach {
+                    attribute.removeModifier(it)
+                }
                 p.walkSpeed = 0.28f
                 p.foodLevel = 20
                 p.gameMode = GameMode.SURVIVAL
@@ -1198,6 +1213,11 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     }
 
                     hunterData.hunterClass.onFinishedAttack(e.entity as Player, onDamage.second, e.damager as Player)
+                    IdentityFifty.broadcastSpectators(
+                        translate("spec_damaged_survivor", e.damager.name, onDamage.second.toString(), e.entity.name),
+                        AllowAction.RECEIVE_SURVIVORS_ACTION,
+                        AllowAction.RECEIVE_HUNTERS_ACTION
+                    )
                 } else {
                     if (e.damager is Arrow)return@register
                     e.isCancelled = true
