@@ -9,19 +9,26 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.IdentityFifty
+import tororo1066.identityfifty.data.GlowManager
 import tororo1066.identityfifty.data.PrisonData
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.identityfifty.enumClass.StunState
+import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 
 class DisguisePlayer: AbstractSurvivor("disguise") {
 
-    var latentEntity: Chicken? = null
+    private var latentEntity: Chicken? = null
+    private var entityGlowManager: GlowManager? = null
+    private var glowTasks = mutableListOf<Int>()
+    private var searchTask: BukkitTask? = null
 
     override fun onStart(p: Player) {
         super.onStart(p)
@@ -29,6 +36,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             .addLore(translate("disguise_passive_lore_1"))
             .addLore(translate("disguise_passive_lore_2"))
             .addLore(translate("disguise_passive_lore_3"))
+            .addLore(translate("disguise_passive_lore_4"))
 
         val disguiseSkill = SItem(Material.STICK).setDisplayName(translate("disguise_skill")).setCustomModelData(10)
             .addLore(translate("disguise_skill_lore_1"))
@@ -93,28 +101,43 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
     }
 
     override fun onJail(prisonData: PrisonData, p: Player) {
-        val map = IdentityFifty.identityFiftyTask?.map ?: return
-        val randomJail = map.prisons.filter { it.value.inPlayer.isEmpty() }.values.randomOrNull() ?: return
-        map.world.spawn(randomJail.spawnLoc, Chicken::class.java) { chicken ->
-            chicken.setAI(false)
-            chicken.isSilent = true
-            val disguise = PlayerDisguise(p)
-                .setEntity(chicken)
-                .setNameVisible(false)
-            disguise.isSelfDisguiseVisible = false
-            disguise.startDisguise()
+        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+            val map = IdentityFifty.identityFiftyTask?.map ?: return@Runnable
+            val randomJail = map.prisons.filter { it.value.inPlayer.isEmpty() }
+                .values.randomOrNull() ?: return@Runnable
+            map.world.spawn(randomJail.spawnLoc, Chicken::class.java) { chicken ->
+                chicken.setAI(false)
+                chicken.isSilent = true
+                val disguise = PlayerDisguise(p)
+                    .setEntity(chicken)
+                    .setNameVisible(false)
+                disguise.isSelfDisguiseVisible = false
+                disguise.startDisguise()
 
-            latentEntity = chicken
-        }
+                latentEntity = chicken
+                entityGlowManager = GlowManager(chicken.uniqueId).also {
+                    glowTasks.addAll(it.glow(mutableSetOf(p), GlowColor.YELLOW, 1000000))
+                }
+                searchTask = Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Runnable second@ {
+                    val players = chicken.location.getNearbyPlayers(12.0)
+                        .filter { IdentityFifty.hunters.containsKey(it.uniqueId) }
+                    if (players.isEmpty())return@second
 
+                    val receivers = IdentityFifty.survivors.mapNotNull { it.key.toPlayer() }.toMutableList()
+                    players.forEach { hunter ->
+                        val data = IdentityFifty.hunters[hunter.uniqueId]!!
+                        data.glowManager.glow(receivers, GlowColor.BLUE, 21)
+                    }
+                }, 0, 20)
+            }
+        }, 10)
     }
 
     override fun onGotHelp(helper: Player, p: Player): ReturnAction {
         latentEntity?.let {
             it.location.world.playSound(it.location, Sound.ENTITY_SHEEP_DEATH, 2f, 2f)
         }
-        latentEntity?.remove()
-        latentEntity = null
+        clear(p)
         return super.onGotHelp(helper, p)
     }
 
@@ -127,6 +150,10 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
     }
 
     private fun clear(p: Player){
+        searchTask?.cancel()
+        glowTasks.forEach { entityGlowManager?.cancelTask(it) }
+        glowTasks.clear()
+        entityGlowManager = null
         latentEntity?.remove()
         latentEntity = null
         IdentityFifty.survivors[p.uniqueId]?.skinModifier?.unDisguise()
@@ -137,6 +164,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             .addLore(translate("disguise_passive_lore_1"))
             .addLore(translate("disguise_passive_lore_2"))
             .addLore(translate("disguise_passive_lore_3"))
+            .addLore(translate("disguise_passive_lore_4"))
 
         val disguiseSkill = SItem(Material.STICK).setDisplayName(translate("disguise_skill")).setCustomModelData(10)
             .addLore(translate("disguise_skill_lore_1"))
