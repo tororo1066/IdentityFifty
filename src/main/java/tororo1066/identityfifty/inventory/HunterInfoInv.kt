@@ -15,6 +15,7 @@ class HunterInfoInv(val data: AbstractHunter): SInventory(IdentityFifty.plugin,t
         data.info().forEachIndexed { index, itemStack ->
             setItem(index,itemStack)
         }
+        p.sendMessage(data.description())
         return true
     }
 }
