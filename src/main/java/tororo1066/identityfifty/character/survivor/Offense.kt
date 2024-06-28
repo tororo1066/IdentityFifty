@@ -74,11 +74,10 @@ class Offense : AbstractSurvivor("offense") {
                 val players = player.location.getNearbyPlayers(1.0).filter { fil -> IdentityFifty.hunters.containsKey(fil.uniqueId) }
                 if (players.isNotEmpty()){
                     players.forEach { hit ->
-                        hit.playSound(hit.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
+                        hit.world.playSound(hit.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
                         hit.sendTranslateMsg("rugby_ball_hit_hunter")
-                        player.playSound(hit.location, Sound.BLOCK_ANVIL_PLACE, 1f, 1f)
                         player.sendTranslateMsg("rugby_ball_hit",hit.name)
-                        IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_hit",hit.name,hit.name),
+                        IdentityFifty.broadcastSpectators(translate("spec_rugby_ball_hit",player.name,hit.name),
                             AllowAction.RECEIVE_SURVIVORS_ACTION)
                         IdentityFifty.stunEffect(hit, (actionTime*6-20), (actionTime*6), StunState.OTHER)
                     }
