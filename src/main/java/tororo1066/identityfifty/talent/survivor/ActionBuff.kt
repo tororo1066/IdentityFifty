@@ -40,14 +40,14 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 2, RemainTimeUp::class.
         nowHealth: Double,
         p: Player
     ): Double {
-        addActionPoint(damage * 0.03)
-        val buff = 1 + (0.06 * (actionPoint / 100))
+        addActionPoint(damage * 0.025)
+        val buff = 1 + (0.03 * (actionPoint / 100))
         return damage * buff
     }
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
-        addActionPoint(damage * 0.03)
-        val buff = 1 + (0.06 * (actionPoint / 100))
+        addActionPoint(damage * 0.025)
+        val buff = 1 + (0.03 * (actionPoint / 100))
         return damage * buff
     }
 
