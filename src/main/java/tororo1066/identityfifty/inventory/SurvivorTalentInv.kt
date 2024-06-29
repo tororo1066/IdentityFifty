@@ -213,9 +213,9 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,48,51,52,53), glass())
             setItems(listOf(22,29,38,40),roadGlass())
-            setItem(20,talentItem(JailedOtherSurvivorGlow()))
+            setItem(20,talentItem(ActionBuff()))
             setItem(31,talentItem(FullSheepUp()))
-            setItem(13,talentItem(ActionBuff()))
+            setItem(13,talentItem(JailedOtherSurvivorGlow()))
 
             return true
         }

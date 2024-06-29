@@ -8,7 +8,7 @@ import tororo1066.identityfifty.data.PrisonData
 import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.utils.toPlayer
 
-class JailedOtherSurvivorGlow : AbstractSurvivorTalent("jailed_other_survivor_glow", 2, RemainTimeUp::class.java) {
+class JailedOtherSurvivorGlow : AbstractSurvivorTalent("jailed_other_survivor_glow", 5, FullSheepUp::class.java) {
     override fun lore(): List<String> {
         return listOf(
             "jailed_other_survivor_glow_lore_1",

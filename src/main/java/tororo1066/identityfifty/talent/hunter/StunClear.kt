@@ -23,7 +23,7 @@ class StunClear : AbstractHunterTalent("stun_clear",5,SurvivorJailedSpeedUp::cla
         noImp = true
         Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
             noImp = false
-        },60)
+        },140)
     }
 
     override fun onStart(p: Player) {
@@ -46,7 +46,7 @@ class StunClear : AbstractHunterTalent("stun_clear",5,SurvivorJailedSpeedUp::cla
             }
 
             return@setInteractEvent false
-        }.setInitialCoolDown(3600)
+        }.setInitialCoolDown(2800)
         p.inventory.addItem(stunClearItem)
     }
 
