@@ -8,7 +8,7 @@ import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import kotlin.math.floor
 
-class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.java) {
+class ActionBuff : AbstractSurvivorTalent("action_buff", 2, RemainTimeUp::class.java) {
 
     override fun lore(): List<String> {
         return listOf("action_buff_lore_1", "action_buff_lore_2")
@@ -32,19 +32,6 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         return super.onDamage(damage, toHealth, stun, damager, p)
     }
 
-    override fun onEnterWindow(p: Player) {
-        //actionPoint += 1
-        task = IdentityFifty.speedModifier(
-            p,
-            (0.15 * (actionPoint / 100)),
-            Int.MAX_VALUE,
-            AttributeModifier.Operation.MULTIPLY_SCALAR_1
-        )
-    }
-
-    override fun onExitWindow(p: Player) {
-        task?.cancel()
-    }
 
     override fun sheepGeneratorModify(
         damage: Double,
@@ -53,14 +40,14 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         nowHealth: Double,
         p: Player
     ): Double {
-        addActionPoint(damage * 0.035)
-        val buff = 1 + (0.1 * (actionPoint / 100))
+        addActionPoint(damage * 0.025)
+        val buff = 1 + (0.03 * (actionPoint / 100))
         return damage * buff
     }
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
-        addActionPoint(damage * 0.035)
-        val buff = 1 + (0.1 * (actionPoint / 100))
+        addActionPoint(damage * 0.025)
+        val buff = 1 + (0.03 * (actionPoint / 100))
         return damage * buff
     }
 
@@ -84,7 +71,7 @@ class ActionBuff : AbstractSurvivorTalent("action_buff", 5, FullSheepUp::class.j
         p: Player
     ): Pair<Int, Int> {
         addActionPoint(20.0)
-        val plateBuff = 1 + (0.15 * (actionPoint / 100))
+        val plateBuff = 1 + (0.125 * (actionPoint / 100))
         return Pair((blindTime * plateBuff).toInt(), (slowTime * plateBuff).toInt())
     }
 
