@@ -216,7 +216,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 IdentityFifty.characterLogSQL.insertAll(true)
             }
         } else {
-            if (escapedSurvivor.size == survivorSize){
+            if (escapedSurvivor.size == survivorSize / 2){
                 onlinePlayersAction {
                     it.showTitle(Title.title(Component.text(translate("draw")), Component.text(""), Title.Times.times(
                     Duration.ZERO, Duration.ofSeconds(3), Duration.ofSeconds(1))))
@@ -1099,6 +1099,10 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                                                 modify = clazz.onHitWoodPlate(p, it.location,modify.first,modify.second,e.player)
                                             }
                                             IdentityFifty.stunEffect(p,modify.first,modify.second,StunState.WOODPLATE)
+                                            IdentityFifty.broadcastSpectators(
+                                                translate("spec_hit_wood_plate", e.player.name, p.name),
+                                                AllowAction.RECEIVE_HUNTERS_ACTION
+                                            )
                                         }
                                         it.persistentDataContainer.remove(NamespacedKey(IdentityFifty.plugin,"PlateLoc"))
                                         it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"UsedPlate"), PersistentDataType.INTEGER_ARRAY] = intArrayOf(

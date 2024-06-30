@@ -15,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.identityfifty.data.SurvivorData
+import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
@@ -23,19 +24,18 @@ import java.util.function.Consumer
 class Fixer: AbstractSurvivor("fixer") {
 
     private val fixPlateCoolDown = 2400
-    private val fixTime = 100
+    private val fixTime = 80
     private val fixLengthMultiplier = 20
 
     private val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
         .addLore(translate("fixer_passive_lore_1"))
         .addLore(translate("fixer_passive_lore_2"))
-        .addLore(translate("fixer_passive_lore_3"))
 
     private val fixPlateItem = SItem(Material.STICK).setDisplayName(translate("fix_plate")).setCustomModelData(29)
         .addLore(translate("fix_plate_lore_1"))
         .addLore(translate("fix_plate_lore_2"))
         .addLore(translate("fix_plate_lore_3"))
-        .addLore(translate("fix_plate_lore_4"))
+        .addLore(translate("fix_plate_lore_4", fixPlateCoolDown / 20))
 
     private val slowTasks = ArrayList<BukkitRunnable>()
 
@@ -57,10 +57,6 @@ class Fixer: AbstractSurvivor("fixer") {
                 player.sendTranslateMsg("fix_plate_no_plate")
                 return@setInteractEvent false
             }
-            item.setInteractCoolDown(fixPlateCoolDown)
-//            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
-//                item.setInteractCoolDown(fixPlateCoolDown)
-//            })
             val plateLoc = plate.persistentDataContainer.get(
                 NamespacedKey(IdentityFifty.plugin, "UsedPlate"),
                 PersistentDataType.INTEGER_ARRAY
@@ -78,13 +74,21 @@ class Fixer: AbstractSurvivor("fixer") {
             val bossBar = Bukkit.createBossBar(translate("fix_plate_bossbar"), BarColor.BLUE, BarStyle.SOLID)
             bossBar.progress = 0.0
             bossBar.addPlayer(player)
-            val slow = IdentityFifty.speedModifier(player, -0.8, 999999, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+            val slow = IdentityFifty.speedModifier(player, -0.7, 999999, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+            IdentityFifty.broadcastSpectators(
+                translate("spec_fix_plate_used", player.name),
+                AllowAction.RECEIVE_SURVIVORS_ACTION
+            )
             Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer {
 
                 if (player.location.distance(plate.location) > 3.0) {
                     bossBar.removeAll()
                     slow.cancel()
                     item.setInteractCoolDown(0)
+                    IdentityFifty.broadcastSpectators(
+                        translate("spec_fix_plate_cancel", player.name),
+                        AllowAction.RECEIVE_SURVIVORS_ACTION
+                    )
                     it.cancel()
                     return@Consumer
                 }
@@ -117,9 +121,13 @@ class Fixer: AbstractSurvivor("fixer") {
                     player.world.playSound(player.location, Sound.BLOCK_ANVIL_USE, 2f, 1f)
                     bossBar.removeAll()
                     slow.cancel()
-                    if (slowTasks.size < 10) {
-                        slowTasks.add(IdentityFifty.speedModifier(player, -0.05, 9999999, AttributeModifier.Operation.ADD_NUMBER))
+                    if (slowTasks.size < 5) {
+                        slowTasks.add(IdentityFifty.speedModifier(player, -0.008, 9999999, AttributeModifier.Operation.ADD_NUMBER))
                     }
+                    IdentityFifty.broadcastSpectators(
+                        translate("spec_fix_plate_success", player.name),
+                        AllowAction.RECEIVE_SURVIVORS_ACTION
+                    )
                     it.cancel()
                     return@Consumer
                 }
@@ -128,13 +136,14 @@ class Fixer: AbstractSurvivor("fixer") {
             }, 0, 1)
 
             return@setInteractEvent true
-        }
+        }.setInitialCoolDown(fixPlateCoolDown)
 
         p.inventory.addItem(passiveItem, fixPlateSkill)
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {
         data.survivorClass = this
+        data.healTick = 300
         return data
     }
 
@@ -145,7 +154,7 @@ class Fixer: AbstractSurvivor("fixer") {
         slowTime: Int,
         p: Player
     ): Pair<Int, Int> {
-        return blindTime to slowTime + 20
+        return blindTime + 40 to slowTime
     }
 
     override fun onEnd(p: Player) {

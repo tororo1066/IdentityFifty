@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.tororopluginapi.SStr
+import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.utils.sendMessage
 import tororo1066.tororopluginapi.utils.toPlayer
@@ -220,10 +221,15 @@ class DiscordClient: ListenerAdapter(), Listener {
                 }
 
                 Thread.sleep(7000)
+                val lang = SLang.langFile[SLang.defaultLanguage]
 
                 Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
                     (survivors + hunters + spectators).forEach {
-                        it.key.toPlayer()?.kick(Component.text("遊んでくれてありがとう:heart:"))
+                        if (lang != null) {
+                            it.key.toPlayer()?.kick(Component.text(lang.getStringList("tips").randomOrNull()?:""))
+                        } else {
+                            it.key.toPlayer()?.kick(Component.text("遊んでくれてありがとう:heart:"))
+                        }
                     }
                 })
 

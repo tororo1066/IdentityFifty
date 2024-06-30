@@ -133,7 +133,7 @@ class Marker: AbstractHunter("marker") {
     }
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
-        val data = IdentityFifty.survivors[healPlayer.uniqueId]?:return
+        val data = IdentityFifty.survivors[healedPlayer.uniqueId]?:return
         data.glowManager.glow(mutableSetOf(p),GlowColor.RED,200)
         p.sendTranslateMsg("marker_healed_survivor")
         p.playSound(p.location,Sound.BLOCK_ENCHANTMENT_TABLE_USE,1f,1f)
@@ -144,13 +144,29 @@ class Marker: AbstractHunter("marker") {
 
 
     override fun onSurvivorJail(survivor: Player, prison: PrisonData, p: Player) {
+        val data = IdentityFifty.survivors[survivor.uniqueId]?:return
+        data.glowManager.cancelTask(p.uniqueId)
+        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+            remove(survivor.uniqueId)
+            p.sendTranslateMsg("mark_remove")
+            IdentityFifty.broadcastSpectators(
+                translate("spec_mark_remove",p.name),
+                AllowAction.RECEIVE_HUNTERS_ACTION
+            )
+        }, 10)
+    }
+
+    override fun onSurvivorDie(survivor: Player, playerNumber: Int, p: Player) {
         remove(survivor.uniqueId)
     }
 
     private fun update(uuid: UUID, i: Int){
         uuid.toPlayer()?.sendTranslateMsg("mark_update", (marks[uuid]?.first?:0).toString(), i.toString())
         IdentityFifty.broadcastSpectators(
-            translate("spec_mark_update",uuid.toPlayer()?.name?:uuid.toString(),i.toString()),
+            translate(
+                "spec_mark_update",
+                uuid.toPlayer()?.name?:uuid.toString(), (marks[uuid]?.first?:0).toString(), i.toString()
+            ),
             AllowAction.RECEIVE_HUNTERS_ACTION
         )
         marks[uuid]?.second?.cancel()
@@ -167,7 +183,7 @@ class Marker: AbstractHunter("marker") {
             marks.remove(uuid)
             uuid.toPlayer()?.sendTranslateMsg("mark_remove")
             IdentityFifty.broadcastSpectators(
-                translate("spec_mark_remove",uuid.toPlayer()?.name?:"不明"),
+                translate("spec_mark_remove",uuid.toPlayer()?.name?:"Unknown"),
                 AllowAction.RECEIVE_HUNTERS_ACTION
             )
         }, 1400)
