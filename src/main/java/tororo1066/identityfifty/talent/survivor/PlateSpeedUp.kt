@@ -17,7 +17,7 @@ class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",2,HelpSpeedUp::clas
 
     override fun onWoodPlate(loc: Location, p: Player) {
         if (boostCoolTime <= 0) {
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,2))
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,70,1))
 
             boostCoolTime = 40
             IdentityFifty.util.repeatDelay(amount = 40, repeatTick = 20, delayTick = 20, unit = {
@@ -28,7 +28,7 @@ class PlateSpeedUp : AbstractSurvivorTalent("plate_speed_up",2,HelpSpeedUp::clas
 
     override fun onExitWindow(p: Player) {
         if (windowBoostCoolTime <= 0) {
-            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,60,2))
+            p.addPotionEffect(PotionEffect(PotionEffectType.SPEED,70,1))
 
             windowBoostCoolTime = 40
             IdentityFifty.util.repeatDelay(amount = 40, repeatTick = 20, delayTick = 20, unit = {

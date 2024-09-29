@@ -8,7 +8,7 @@ class LowFootPrints : AbstractSurvivorTalent("low_foot_prints",2,HealSpeedUp::cl
         return listOf("low_foot_prints_lore_1")
     }
     override fun parameters(data: SurvivorData): SurvivorData {
-        data.footprintsTime = (data.footprintsTime * 0.85)
+        data.footprintsTime = (data.footprintsTime * 0.9)
         return data
     }
 }
