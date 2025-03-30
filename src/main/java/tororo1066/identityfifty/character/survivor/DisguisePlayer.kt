@@ -20,6 +20,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 
@@ -66,8 +67,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             return@setInteractEvent true
         }.setInitialCoolDown(1000)
 
-        p.inventory.addItem(passiveItem)
-        p.inventory.addItem(disguiseSkillItem)
+        p.inventory.addItem(passiveItem,disguiseSkillItem)
 
     }
 
@@ -165,16 +165,15 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             .addLore(translate("disguise_passive_lore_2"))
             .addLore(translate("disguise_passive_lore_3"))
             .addLore(translate("disguise_passive_lore_4"))
+            .build()
 
         val disguiseSkill = SItem(Material.STICK).setDisplayName(translate("disguise_skill")).setCustomModelData(10)
             .addLore(translate("disguise_skill_lore_1"))
             .addLore(translate("disguise_skill_lore_2"))
             .addLore(translate("disguise_skill_lore_3"))
+            .build()
 
         return arrayListOf(passiveItem,disguiseSkill)
     }
 
-    override fun description(): String {
-        return translate("disguise_description")
-    }
 }

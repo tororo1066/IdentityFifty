@@ -19,6 +19,7 @@ import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import java.util.function.Consumer
 
 class Fixer: AbstractSurvivor("fixer") {
@@ -122,7 +123,7 @@ class Fixer: AbstractSurvivor("fixer") {
                     bossBar.removeAll()
                     slow.cancel()
                     if (slowTasks.size < 5) {
-                        slowTasks.add(IdentityFifty.speedModifier(player, -0.008, 9999999, AttributeModifier.Operation.ADD_NUMBER))
+                        slowTasks.add(IdentityFifty.speedModifier(player, -0.005, 9999999, AttributeModifier.Operation.ADD_NUMBER))
                     }
                     IdentityFifty.broadcastSpectators(
                         translate("spec_fix_plate_success", player.name),
@@ -163,10 +164,7 @@ class Fixer: AbstractSurvivor("fixer") {
     }
 
     override fun info(): ArrayList<ItemStack> {
-        return arrayListOf(passiveItem, fixPlateItem)
+        return arrayListOf(passiveItem.build(), fixPlateItem.build())
     }
 
-    override fun description(): String {
-        return translate("fixer_description")
-    }
 }

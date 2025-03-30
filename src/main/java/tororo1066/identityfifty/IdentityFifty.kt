@@ -225,7 +225,7 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
 
     }
 
-    override fun onDisable() {
+    override fun onEnd() {
         http?.stop(0)
         discordClient.jda.shutdownNow()
     }

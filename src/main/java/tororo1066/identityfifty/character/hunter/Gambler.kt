@@ -18,6 +18,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import kotlin.random.Random
 import kotlin.random.nextInt
@@ -113,12 +114,12 @@ class Gambler: AbstractHunter("gambler") {
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, _ ->
+            if (isStunned(e.player)) return@setInteractEvent false
             diceTask(e.player)
             return@setInteractEvent true
         }.setInitialCoolDown(600)
 
-        p.inventory.addItem(passiveItem)
-        p.inventory.addItem(firstSkill)
+        p.inventory.addItem(passiveItem, firstSkill)
     }
 
     override fun parameters(data: HunterData): HunterData {
@@ -155,13 +156,12 @@ class Gambler: AbstractHunter("gambler") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("gambler_passive_lore_1"))
             .addLore(translate("gambler_passive_lore_2"))
+            .build()
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice")).setCustomModelData(11)
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))
+            .build()
         return arrayListOf(passiveItem,firstSkillItem)
     }
 
-    override fun description(): String {
-        return translate("gambler_description")
-    }
 }

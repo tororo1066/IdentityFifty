@@ -10,6 +10,7 @@ import org.bukkit.persistence.PersistentDataType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 
 class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, EndGameSpeedUp::class.java) {
 

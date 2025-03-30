@@ -6,6 +6,7 @@ import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 
 class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.java) {
     override fun lore(): List<String> {
@@ -21,7 +22,7 @@ class HelpHeal :AbstractSurvivorTalent("help_heal",5,WoundedGeneratorUp::class.j
         val helpHealItem = IdentityFifty.interactManager.createSInteractItem(helpHeal, true).setInteractEvent{ _, item ->
             p.playSound(p.location, Sound.BLOCK_BEACON_ACTIVATE,1f,1.25f)
             healPrivilegeCount += 1
-            item.amount = 0
+            item.itemStack.amount = 0
             item.delete()
             return@setInteractEvent true
         }

@@ -1,0 +1,15 @@
+name: IdentityFifty
+version: '1.0'
+main: tororo1066.identityfifty.IdentityFifty
+api-version: '1.20'
+
+dependencies:
+  server:
+    WorldGuard:
+      required: true
+    WorldEdit:
+      required: true
+    LibsDisguises:
+      required: true
+    NMSUtils:
+      required: true

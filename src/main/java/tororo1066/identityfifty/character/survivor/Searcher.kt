@@ -12,6 +12,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 
 class Searcher : AbstractSurvivor("searcher") {
@@ -77,15 +78,14 @@ class Searcher : AbstractSurvivor("searcher") {
             .addLore(translate("searcher_passive_lore_1"))
             .addLore(translate("searcher_passive_lore_2"))
             .addLore(translate("searcher_passive_lore_3"))
+            .build()
 
         val searchSkillItem = SItem(Material.STICK).setDisplayName(translate("search_lens")).setCustomModelData(5)
             .addLore(translate("search_lens_lore_1"))
             .addLore(translate("search_lens_lore_2"))
             .addLore(translate("search_lens_lore_3"))
+            .build()
         return arrayListOf(passiveItem,searchSkillItem)
     }
 
-    override fun description(): String {
-        return translate("searcher_description")
-    }
 }

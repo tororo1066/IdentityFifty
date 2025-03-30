@@ -17,6 +17,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 
 class AreaMan: AbstractHunter("areaman") {
 
@@ -36,6 +37,8 @@ class AreaMan: AbstractHunter("areaman") {
         val areaSkillItem = IdentityFifty.interactManager.createSInteractItem(areaSkill,true).setInitialCoolDown(600).setInteractEvent { e, _ ->
 
             val player = e.player
+
+            if (isStunned(player)) return@setInteractEvent false
 
             val length = 15
             val width = 6
@@ -155,16 +158,15 @@ class AreaMan: AbstractHunter("areaman") {
             .addLore(translate("areaman_passive_lore_1"))
             .addLore(translate("areaman_passive_lore_2"))
             .addLore(translate("areaman_passive_lore_3"))
+            .build()
 
         val areaSkill = SItem(Material.STICK).setDisplayName(translate("area_skill")).setCustomModelData(9)
             .addLore(translate("area_skill_lore_1"))
             .addLore(translate("area_skill_lore_2"))
             .addLore(translate("area_skill_lore_3"))
             .addLore(translate("area_skill_lore_4"))
+            .build()
         return arrayListOf(passiveItem,areaSkill)
     }
 
-    override fun description(): String {
-        return translate("areaman_description")
-    }
 }

@@ -15,6 +15,7 @@ import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.setPitchL
 import java.util.function.Consumer
 
@@ -120,16 +121,15 @@ class Offense : AbstractSurvivor("offense") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("offense_passive_lore_1"))
             .addLore(translate("offense_passive_lore_2"))
+            .build()
 
         val tackleSkillItem = SItem(Material.STICK).setDisplayName(translate("rugby_ball")).setCustomModelData(14)
             .addLore(translate("rugby_ball_lore_1"))
             .addLore(translate("rugby_ball_lore_2"))
             .addLore(translate("rugby_ball_lore_3"))
             .addLore(translate("rugby_ball_lore_4"))
+            .build()
         return arrayListOf(passiveItem,tackleSkillItem)
     }
 
-    override fun description(): String {
-        return translate("offense_description")
-    }
 }

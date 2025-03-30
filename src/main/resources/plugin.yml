@@ -7,8 +7,6 @@ depend:
   - WorldGuard
   - WorldEdit
   - LibsDisguises
-
-softdepend:
   - NMSUtils
 
 commands:

@@ -14,6 +14,7 @@ import tororo1066.identityfifty.enumClass.StunState
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 
 class RunAway : AbstractSurvivor("runaway") {
 
@@ -55,8 +56,7 @@ class RunAway : AbstractSurvivor("runaway") {
             }
             return@setInteractEvent true
         }.setInitialCoolDown(blindSkillCoolDown)
-        p.inventory.addItem(passiveItem)
-        p.inventory.addItem(blindSkill)
+        p.inventory.addItem(passiveItem, blindSkill)
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {
@@ -76,10 +76,7 @@ class RunAway : AbstractSurvivor("runaway") {
     }
 
     override fun info(): ArrayList<ItemStack> {
-        return arrayListOf(passiveItem,blindSkillItem)
+        return arrayListOf(passiveItem.build(),blindSkillItem.build())
     }
 
-    override fun description(): String {
-        return translate("runaway_description")
-    }
 }

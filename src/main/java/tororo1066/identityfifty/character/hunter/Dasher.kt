@@ -12,6 +12,7 @@ import tororo1066.identityfifty.data.HunterData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 
 class Dasher : AbstractHunter("dasher") {
 
@@ -25,6 +26,7 @@ class Dasher : AbstractHunter("dasher") {
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, _ ->
             //加速
             val player = e.player
+            if (isStunned(player)) return@setInteractEvent false
             player.addPotionEffect(PotionEffect(PotionEffectType.SPEED,80,1))
             player.world.playSound(player.location, Sound.ENTITY_WITHER_SHOOT,1f,1.5f)
             IdentityFifty.broadcastSpectators(translate("spec_hyper_engine_used",player.name),AllowAction.RECEIVE_HUNTERS_ACTION)
@@ -71,13 +73,12 @@ class Dasher : AbstractHunter("dasher") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("dasher_passive_lore_1"))
             .addLore(translate("dasher_passive_lore_2"))
+            .build()
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("hyper_engine")).setCustomModelData(4)
             .addLore(translate("hyper_engine_lore_1"))
             .addLore(translate("hyper_engine_lore_2"))
+            .build()
         return arrayListOf(passiveItem,firstSkillItem)
     }
 
-    override fun description(): String {
-        return translate("dasher_description")
-    }
 }

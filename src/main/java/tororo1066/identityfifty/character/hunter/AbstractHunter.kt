@@ -3,6 +3,7 @@ package tororo1066.identityfifty.character.hunter
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitTask
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.HunterData
@@ -51,13 +52,15 @@ abstract class AbstractHunter(val name: String): Cloneable {
 
     abstract fun info(): ArrayList<ItemStack>
 
-    abstract fun description(): String
-
     public override fun clone(): AbstractHunter {
         return super.clone() as AbstractHunter
     }
 
     protected fun inPrison(p: Player): Boolean {
         return IdentityFifty.identityFiftyTask?.map?.prisons?.any { it.value.inPlayer.contains(p.uniqueId) } == true
+    }
+
+    protected fun isStunned(p: Player): Boolean {
+        return p.getPotionEffect(PotionEffectType.SLOW)?.amplifier == 200
     }
 }

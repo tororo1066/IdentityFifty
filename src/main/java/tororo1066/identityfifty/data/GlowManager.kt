@@ -55,6 +55,13 @@ class GlowManager(private val uuid: UUID) {
         glowTasks.remove(uuid)
     }
 
+    fun cancelAll() {
+        glowTasks.forEach {
+            it.value.cancel()
+        }
+        glowTasks.clear()
+    }
+
     inner class GlowTask(private val entity: Entity, val visiblePlayer: Player, var color: GlowColor, duration: Int) : BukkitRunnable() {
         var tick = duration
         fun changeColor(color: GlowColor) {

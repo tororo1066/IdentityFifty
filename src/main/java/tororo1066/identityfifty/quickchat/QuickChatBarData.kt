@@ -13,6 +13,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SInteractItem
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.setItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 

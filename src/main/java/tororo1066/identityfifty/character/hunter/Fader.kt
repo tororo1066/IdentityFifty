@@ -16,6 +16,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import java.util.UUID
 
 class Fader: AbstractHunter("fader"){
@@ -78,6 +79,7 @@ class Fader: AbstractHunter("fader"){
                     .setCustomData(IdentityFifty.plugin,"glow_trap", PersistentDataType.INTEGER, 1)
                 val trapSkillItem = IdentityFifty.interactManager.createSInteractItem(trap, true).setInteractEvent { e, item ->
                     val itemPlayer = e.player
+                    if (isStunned(itemPlayer)) return@setInteractEvent false
                     e.item!!.amount -= 1
                     item.delete()
                     if (traps.size >= 3){ //設置済のトラップが2個以上ある場合は一番古いものを削除
@@ -183,6 +185,7 @@ class Fader: AbstractHunter("fader"){
             .addLore(translate("fader_passive_lore_1"))
             .addLore(translate("fader_passive_lore_2"))
             .addLore(translate("fader_passive_lore_3"))
+            .build()
         val trap = SItem(Material.STICK).setDisplayName(translate("glow_trap"))
             .setCustomModelData(13)
             .addLore(translate("glow_trap_lore_1"))
@@ -190,10 +193,8 @@ class Fader: AbstractHunter("fader"){
             .addLore(translate("glow_trap_lore_3"))
             .addLore(translate("glow_trap_lore_4"))
             .addLore(translate("glow_trap_lore_5"))
+            .build()
         return arrayListOf(passiveItem,trap)
     }
 
-    override fun description(): String {
-        return translate("fader_description")
-    }
 }

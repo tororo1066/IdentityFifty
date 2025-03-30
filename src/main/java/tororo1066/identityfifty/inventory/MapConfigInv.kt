@@ -292,13 +292,13 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             val data = GeneratorData()
             data.location = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${loc.blockX} ${loc.blockY} ${loc.blockZ}を追加しました")
-            sInput.sendInputCUI(p,PlusInt::class.java,"§b発電機のHPを入力してください") { int ->
+            sInput.sendInputCUI(p,PlusInt::class.java,"§b発電機のHPを入力してください", action = { int ->
                 data.health = int.get()
                 mapData.generators.add(data)
                 loadGeneratorLocations()
                 generatorLocationsInv.open(p)
                 p.sendMessage("§aHPを${int}にしました")
-            }
+            })
 
         }
         items.add(inputItem)
@@ -326,17 +326,17 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             val data = GeneratorData()
             data.location = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${loc.blockX} ${loc.blockY} ${loc.blockZ}を追加しました")
-            sInput.sendInputCUI(p,Location::class.java,"§b鉄のドアの位置を入力してください") { doorLoc ->
+            sInput.sendInputCUI(p,Location::class.java,"§b鉄のドアの位置を入力してください", action = { doorLoc ->
                 data.doorLocation = Location(mapData.world,doorLoc.blockX.toDouble(),doorLoc.blockY.toDouble(),doorLoc.blockZ.toDouble())
                 p.sendMessage("§a${doorLoc.blockX} ${doorLoc.blockY} ${doorLoc.blockZ}を追加しました")
-                sInput.sendInputCUI(p,PlusInt::class.java,"§b発電機のHPを入力してください") { int ->
+                sInput.sendInputCUI(p,PlusInt::class.java,"§b発電機のHPを入力してください", action = { int ->
                     data.health = int.get()
                     mapData.escapeGenerators.add(data)
                     loadEscapeGeneratorLocations()
                     escapeGeneratorLocationsInv.open(p)
                     p.sendMessage("§aHPを${int}にしました")
-                }
-            }
+                })
+            })
         }
         items.add(inputItem)
         escapeGeneratorLocationsInv.setResourceItems(items)
@@ -389,17 +389,17 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             val data = PrisonData()
             data.escapeLoc = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${locToString(loc)}を追加しました")
-            sInput.sendInputCUI(p,Location::class.java,"§b鉄のドアの位置を入力してください") { doorLoc ->
+            sInput.sendInputCUI(p,Location::class.java,"§b鉄のドアの位置を入力してください", action = { doorLoc ->
                 data.doorLoc = Location(mapData.world,doorLoc.blockX.toDouble(),doorLoc.blockY.toDouble(),doorLoc.blockZ.toDouble())
                 p.sendMessage("§a${doorLoc.blockX} ${doorLoc.blockY} ${doorLoc.blockZ}を追加しました")
-                sInput.sendInputCUI(p,Location::class.java,"§b出現位置を入力してください") { loc3 ->
+                sInput.sendInputCUI(p,Location::class.java,"§b出現位置を入力してください", action = { loc3 ->
                     data.spawnLoc = loc3
                     mapData.prisons[data.escapeLoc] = data
                     loadPrisonLocations()
                     prisonsInv.open(p)
                     p.sendMessage("§a${locToString(loc3)}を追加しました")
-                }
-            }
+                })
+            })
         }
         items.add(inputItem)
         prisonsInv.setResourceItems(items)
@@ -428,17 +428,17 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
             val data = WoodPlateData()
             data.loc = Location(mapData.world,loc.blockX.toDouble(),loc.blockY.toDouble(),loc.blockZ.toDouble())
             p.sendMessage("§a${loc.blockX} ${loc.blockY} ${loc.blockZ}を追加しました")
-            sInput.sendInputCUI(p,PlusInt::class.java,"§b板の長さを入力してください") { int ->
+            sInput.sendInputCUI(p,PlusInt::class.java,"§b板の長さを入力してください", action = { int ->
                 data.length = int.get()
                 p.sendMessage("§a板の長さを${int.get()}にしました")
-                sInput.sendInputCUI(p,BlockFace::class.java,"§b板の向きを入力してください") { face ->
+                sInput.sendInputCUI(p,BlockFace::class.java,"§b板の向きを入力してください", action = { face ->
                     data.face = face
                     mapData.woodPlates[data.loc] = data
                     loadWoodPlates()
                     woodPlatesInv.open(p)
                     p.sendMessage("§a向きを${face.name}にしました")
-                }
-            }
+                })
+            })
 
 
         }

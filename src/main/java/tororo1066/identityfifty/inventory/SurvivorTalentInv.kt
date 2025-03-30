@@ -88,7 +88,8 @@ class SurvivorTalentInv(val data: SurvivorData) {
             this.moveChildInventory(inv,p)
         }
 
-        fun talentItem(talent: AbstractSurvivorTalent): SInventoryItem {
+        fun talentItem(talentClass: Class<out AbstractSurvivorTalent>): SInventoryItem {
+            val talent = talentClass.getConstructor().newInstance()
             return SInventoryItem(if (data.talentClasses.containsKey(talent.javaClass)) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE)
                 .setDisplayName(translate(talent.name))
                 .setLore(talent.lore().map { translate(it) })
@@ -156,17 +157,17 @@ class SurvivorTalentInv(val data: SurvivorData) {
 
             setItems(listOf(5,7,8,11,13,19,21,23,25,31,33,36,37,39),roadGlass())
 
-            setItem(4,talentItem(HealSpeedUp()))
-            setItem(6,talentItem(LowFootPrints()))
-            setItem(22,talentItem(TalentPlane()))
-            setItem(18,talentItem(WoundedCowUp()))
-            setItem(2,talentItem(RemainTimeUp()))
-            setItem(20,talentItem(HatchLow()))
-            setItem(24,talentItem(GotHelpedSpeedUp()))
-            setItem(42,talentItem(FinishedSheepGlow()))
-            setItem(26,talentItem(FullCowUp()))
-            setItem(40,talentItem(HelpSpeedUp()))
-            setItem(38,talentItem(PlateSpeedUp()))
+            setItem(4,talentItem(HealSpeedUp::class.java))
+            setItem(6,talentItem(LowFootPrints::class.java))
+            setItem(22,talentItem(TalentPlane::class.java))
+            setItem(18,talentItem(WoundedCowUp::class.java))
+            setItem(2,talentItem(RemainTimeUp::class.java))
+            setItem(20,talentItem(HatchLow::class.java))
+            setItem(24,talentItem(GotHelpedSpeedUp::class.java))
+            setItem(42,talentItem(FinishedSheepGlow::class.java))
+            setItem(26,talentItem(FullCowUp::class.java))
+            setItem(40,talentItem(HelpSpeedUp::class.java))
+            setItem(38,talentItem(PlateSpeedUp::class.java))
             return true
         }
     }
@@ -181,8 +182,8 @@ class SurvivorTalentInv(val data: SurvivorData) {
             setItems(listOf(45,46,47,48,50,51), glass())
             setItems(listOf(26),roadGlass())
 //            setItem(25,talentItem(DashUltraSpeed()))
-            setItem(25, talentItem(HideFromHunter()))
-            setItem(44,talentItem(HighHitPlate()))
+            setItem(25, talentItem(HideFromHunter::class.java))
+            setItem(44,talentItem(HighHitPlate::class.java))
 
             return true
         }
@@ -197,8 +198,8 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(47,48,50,51,52,53), glass())
             setItems(listOf(18),roadGlass())
-            setItem(19,talentItem(DamagedDelay()))
-            setItem(0,talentItem(DamagedBoost()))
+            setItem(19,talentItem(DamagedDelay::class.java))
+            setItem(0,talentItem(DamagedBoost::class.java))
 
             return true
         }
@@ -213,9 +214,9 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,48,51,52,53), glass())
             setItems(listOf(22,29,38,40),roadGlass())
-            setItem(20,talentItem(ActionBuff()))
-            setItem(31,talentItem(FullSheepUp()))
-            setItem(13,talentItem(JailedOtherSurvivorGlow()))
+            setItem(20,talentItem(ActionBuff::class.java))
+            setItem(31,talentItem(FullSheepUp::class.java))
+            setItem(13,talentItem(JailedOtherSurvivorGlow::class.java))
 
             return true
         }
@@ -230,9 +231,9 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,50,51,52,53), glass())
             setItems(listOf(4,6,15,22),roadGlass())
-            setItem(24,talentItem(GateOpenBoost()))
-            setItem(13,talentItem(WoundedGeneratorUp()))
-            setItem(31,talentItem(HelpHeal()))
+            setItem(24,talentItem(GateOpenBoost::class.java))
+            setItem(13,talentItem(WoundedGeneratorUp::class.java))
+            setItem(31,talentItem(HelpHeal::class.java))
 
             return true
         }

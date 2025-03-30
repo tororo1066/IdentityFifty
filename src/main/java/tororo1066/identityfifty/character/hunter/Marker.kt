@@ -21,6 +21,7 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 import kotlin.math.min
@@ -48,6 +49,7 @@ class Marker: AbstractHunter("marker") {
 
         val crossBowSkillItem = IdentityFifty.interactManager.createSInteractItem(crossBowSkill,true).setInteractEvent { e, _ ->
             val player = e.player
+            if (isStunned(player)) return@setInteractEvent false
             val arrow = player.launchProjectile(Arrow::class.java)
             player.world.playSound(player.location, Sound.ENTITY_ARROW_SHOOT,1f,1f)
             arrow.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"marker"),
@@ -70,7 +72,7 @@ class Marker: AbstractHunter("marker") {
             return@setInteractEvent true
         }.setInitialCoolDown(400)
 
-        p.inventory.addItem(passiveItem,crossBowSkillItem)
+        p.inventory.addItem(passiveItem, crossBowSkillItem)
 
         sEvent.register(EntityDamageByEntityEvent::class.java){ e ->
             if (!IdentityFifty.survivors.containsKey(e.entity.uniqueId))return@register
@@ -195,15 +197,14 @@ class Marker: AbstractHunter("marker") {
             .addLore(translate("marker_passive_lore_2"))
             .addLore(translate("marker_passive_lore_3"))
             .addLore(translate("marker_passive_lore_4"))
+            .build()
 
         val crossBowSkill = SItem(Material.STICK).setDisplayName(translate("mark_crossbow")).setCustomModelData(15)
             .addLore(translate("mark_crossbow_lore_1"))
             .addLore(translate("mark_crossbow_lore_2"))
+            .build()
 
         return arrayListOf(passiveItem,crossBowSkill)
     }
 
-    override fun description(): String {
-        return translate("marker_description")
-    }
 }

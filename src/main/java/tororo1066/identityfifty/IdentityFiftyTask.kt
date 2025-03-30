@@ -510,10 +510,10 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     it.isInvulnerable = true
                     it.isInvisible = true
                     it.setDisabledSlots(EquipmentSlot.CHEST,EquipmentSlot.FEET,EquipmentSlot.HEAD,EquipmentSlot.LEGS)
-                    it.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(18))
+                    it.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(18).build())
                     if (survivorCount == 1){
                         it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER,1)
-                        it.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19))
+                        it.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19).build())
                     }
                 }
             }
@@ -1115,7 +1115,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                                         return@setInteractEvent true
                                     }
 
-                            e.player.inventory.setItemInOffHand(item)
+                            e.player.inventory.setItemInOffHand(item.itemStack)
 
                         }
                     }
@@ -1148,7 +1148,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
             if (survivorCount == 1 && hatchUUID != null){
                 val armorStand = Bukkit.getEntity(hatchUUID!!) as ArmorStand
-                armorStand.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19))
+                armorStand.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19).build())
                 armorStand.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER,1)
             }
         }
@@ -1496,7 +1496,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
                         if (survivorCount == 1 && hatchUUID != null){
                             val armorStand = Bukkit.getEntity(hatchUUID!!) as ArmorStand
-                            armorStand.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19))
+                            armorStand.setItem(EquipmentSlot.HEAD,SItem(Material.STICK).setCustomModelData(19).build())
                             armorStand.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"hatch"), PersistentDataType.INTEGER,1)
                         }
 

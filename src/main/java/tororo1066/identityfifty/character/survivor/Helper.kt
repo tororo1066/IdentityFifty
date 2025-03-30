@@ -12,6 +12,7 @@ import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import java.util.function.Consumer
 
 class Helper : AbstractSurvivor("helper") {
@@ -84,16 +85,15 @@ class Helper : AbstractSurvivor("helper") {
     override fun info(): ArrayList<ItemStack> {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("helper_passive_lore_1"))
+            .build()
 
         val protectSkill = SItem(Material.STICK).setDisplayName(translate("helper_protect")).setCustomModelData(7)
             .addLore(translate("helper_protect_lore_1"))
             .addLore(translate("helper_protect_lore_2"))
             .addLore(translate("helper_protect_lore_3"))
+            .build()
 
         return arrayListOf(passiveItem,protectSkill)
     }
 
-    override fun description(): String {
-        return translate("helper_description")
-    }
 }

@@ -16,6 +16,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 import java.util.function.Consumer
@@ -39,6 +40,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
 
         val killFindSkillItem = IdentityFifty.interactManager.createSInteractItem(killFindSkill).setInteractEvent { e, _ ->
             val player = e.player
+            if (isStunned(player)) return@setInteractEvent false
             player.world.playSound(player.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
             player.world.playSound(player.location, Sound.ENTITY_BLAZE_SHOOT, 1f, 1f)
             IdentityFifty.broadcastSpectators(translate("spec_kill_find_used",player.name),
@@ -135,17 +137,15 @@ class SerialKiller: AbstractHunter("serialkiller") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("serialkiller_passive_lore_1"))
             .addLore(translate("serialkiller_passive_lore_2"))
+            .build()
 
         val killFindSkill = SItem(Material.STICK).setDisplayName(translate("kill_find")).setCustomModelData(27)
             .addLore(translate("kill_find_lore_1"))
             .addLore(translate("kill_find_lore_2"))
             .addLore(translate("kill_find_lore_3"))
+            .build()
 
         return arrayListOf(passiveItem,killFindSkill)
-    }
-
-    override fun description(): String {
-        return translate("serialkiller_description")
     }
 
 }

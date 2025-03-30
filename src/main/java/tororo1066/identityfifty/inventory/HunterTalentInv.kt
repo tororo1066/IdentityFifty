@@ -86,7 +86,8 @@ class HunterTalentInv(val data: HunterData) {
             this.moveChildInventory(inv,p)
         }
 
-        fun talentItem(talent: AbstractHunterTalent): SInventoryItem {
+        fun talentItem(talentClass: Class<out AbstractHunterTalent>): SInventoryItem {
+            val talent = talentClass.getConstructor().newInstance()
             return SInventoryItem(if (data.talentClasses.containsKey(talent.javaClass)) Material.LIME_STAINED_GLASS_PANE else Material.RED_STAINED_GLASS_PANE)
                 .setDisplayName(translate(talent.name))
                 .addLore(talent.lore().map { translate(it) })
@@ -154,17 +155,17 @@ class HunterTalentInv(val data: HunterData) {
 
             setItems(listOf(5,7,8,11,13,19,21,23,25,31,33,36,37,39),roadGlass())
 
-            setItem(4,talentItem(HelpSpeedDown()))
-            setItem(6,talentItem(PlateGlow()))
-            setItem(22,talentItem(TalentPlane()))
-            setItem(18,talentItem(EndGameSpeedUp()))
-            setItem(2,talentItem(RemainTimeDown()))
-            setItem(20,talentItem(LowHitPlate()))
-            setItem(24,talentItem(AirSwingDown()))
-            setItem(42,talentItem(GateOpenHunterBuff()))
-            setItem(26,talentItem(FirstGameSpeedUp()))
-            setItem(40,talentItem(HealSpeedDown()))
-            setItem(38,talentItem(HighFootPrints()))
+            setItem(4,talentItem(HelpSpeedDown::class.java))
+            setItem(6,talentItem(PlateGlow::class.java))
+            setItem(22,talentItem(TalentPlane::class.java))
+            setItem(18,talentItem(EndGameSpeedUp::class.java))
+            setItem(2,talentItem(RemainTimeDown::class.java))
+            setItem(20,talentItem(LowHitPlate::class.java))
+            setItem(24,talentItem(AirSwingDown::class.java))
+            setItem(42,talentItem(GateOpenHunterBuff::class.java))
+            setItem(26,talentItem(FirstGameSpeedUp::class.java))
+            setItem(40,talentItem(HealSpeedDown::class.java))
+            setItem(38,talentItem(HighFootPrints::class.java))
 
             return true
         }
@@ -179,8 +180,8 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(45,46,47,48,50,51), glass())
             setItems(listOf(26),roadGlass())
-            setItem(25,talentItem(SkillDelayGenerator()))
-            setItem(44,talentItem(Menace()))
+            setItem(25,talentItem(SkillDelayGenerator::class.java))
+            setItem(44,talentItem(Menace::class.java))
             return true
         }
     }
@@ -194,8 +195,8 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(47,48,50,51,52,53), glass())
             setItems(listOf(18),roadGlass())
-            setItem(19,talentItem(SkillTeleport()))
-            setItem(0,talentItem(NoOneUp()))
+            setItem(19,talentItem(SkillTeleport::class.java))
+            setItem(0,talentItem(NoOneUp::class.java))
             return true
         }
     }
@@ -209,9 +210,9 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(45,46,47,48,51,52,53), glass())
             setItems(listOf(22,29,38,40),roadGlass())
-            setItem(20,talentItem(SurvivorHealedStop()))
-            setItem(31,talentItem(SurvivorJailedSpeedUp()))
-            setItem(13,talentItem(StunClear()))
+            setItem(20,talentItem(SurvivorHealedStop::class.java))
+            setItem(31,talentItem(SurvivorJailedSpeedUp::class.java))
+            setItem(13,talentItem(StunClear::class.java))
             return true
         }
     }
@@ -225,9 +226,9 @@ class HunterTalentInv(val data: HunterData) {
             })
             setItems(listOf(45,46,47,50,51,52,53), glass())
             setItems(listOf(4,6,15,22),roadGlass())
-            setItem(24,talentItem(FinishGateBuff()))
-            setItem(13,talentItem(StunTimeDown()))
-            setItem(31,talentItem(HelpGlow()))
+            setItem(24,talentItem(FinishGateBuff::class.java))
+            setItem(13,talentItem(StunTimeDown::class.java))
+            setItem(31,talentItem(HelpGlow::class.java))
             return true
         }
     }

@@ -14,6 +14,7 @@ import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 
 class Nurse : AbstractSurvivor("nurse") {
@@ -92,14 +93,13 @@ class Nurse : AbstractSurvivor("nurse") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("nurse_passive_lore_1"))
             .addLore(translate("nurse_passive_lore_2"))
+            .build()
         val speedUpItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore_1"))
             .addLore(translate("syringe_lore_2"))
+            .build()
 
         return arrayListOf(passiveItem,speedUpItem)
     }
 
-    override fun description(): String {
-        return translate("nurse_description")
-    }
 }

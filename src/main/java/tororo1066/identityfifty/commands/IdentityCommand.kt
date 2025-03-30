@@ -24,7 +24,10 @@ import tororo1066.tororopluginapi.sCommand.SCommandObject
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 
-class IdentityCommand : SCommand("identity","","identity.user") {
+class IdentityCommand : SCommand(
+    "identity",
+    perm = "identity.user",
+) {
 
     private fun createSurvivorData(p: Player): SurvivorData {
         return createPData(SurvivorData(),p)

@@ -17,7 +17,7 @@ class SurvivorInfoInv(val data: AbstractSurvivor): SInventory(IdentityFifty.plug
         data.info().forEachIndexed { index, itemStack ->
             setItem(index+1,itemStack)
         }
-        p.sendMessage(data.description())
+//        p.sendMessage(data.description())
         return true
     }
 }

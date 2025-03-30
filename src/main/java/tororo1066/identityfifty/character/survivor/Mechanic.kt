@@ -11,6 +11,7 @@ import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 
 class Mechanic: AbstractSurvivor("mechanic") {
 
@@ -40,8 +41,7 @@ class Mechanic: AbstractSurvivor("mechanic") {
             return@setInteractEvent true
         }.setInitialCoolDown(1200)
 
-        p.inventory.addItem(passiveItem)
-        p.inventory.addItem(slowSkillItem)
+        p.inventory.addItem(passiveItem,slowSkillItem)
     }
 
     override fun parameters(data: SurvivorData): SurvivorData {
@@ -81,15 +81,14 @@ class Mechanic: AbstractSurvivor("mechanic") {
             .addLore(translate("mechanic_passive_lore_1"))
             .addLore(translate("mechanic_passive_lore_2"))
             .addLore(translate("mechanic_passive_lore_3"))
+            .build()
 
         val slowSkill = SItem(Material.STICK).setDisplayName(translate("slow_timer")).setCustomModelData(12)
             .addLore(translate("slow_timer_lore_1"))
             .addLore(translate("slow_timer_lore_2"))
+            .build()
 
         return arrayListOf(passiveItem,slowSkill)
     }
 
-    override fun description(): String {
-        return translate("mechanic_description")
-    }
 }

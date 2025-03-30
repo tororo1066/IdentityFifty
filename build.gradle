@@ -1,5 +1,5 @@
 apply plugin: 'kotlin'
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'com.gradleup.shadow'
 
 group = 'tororo1066'
 version = '1.0-SNAPSHOT'
@@ -39,12 +39,13 @@ repositories {
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api 'tororo1066:tororopluginapi:4f634ad'
-    compileOnly 'tororo1066:base:4f634ad'
+    implementation 'tororo1066:tororopluginapi:4edd97c'
+    compileOnly 'tororo1066:base:4edd97c'
     implementation 'com.elmakers.mine.bukkit:EffectLib:9.4'
     compileOnly 'LibsDisguises:LibsDisguises:10.0.31'
-    api 'org.apache.httpcomponents.client5:httpclient5:5.2-beta1'
-    implementation 'net.dv8tion:JDA:5.0.0-beta.10'
+    implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2-beta1'
+    implementation('net.dv8tion:JDA:5.1.1')
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -56,25 +57,14 @@ processResources {
     }
 }
 buildscript {
-    ext.kotlin_version = '1.6.0'
+    ext.kotlin_version = '1.9.20'
     repositories {
         gradlePluginPortal()
         mavenCentral()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-    }
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
+        classpath 'com.gradleup.shadow:shadow-gradle-plugin:8.3.2'
     }
 }
 repositories {
@@ -89,11 +79,6 @@ tasks.withType(JavaCompile) {
 }
 
 shadowJar {
-    exclude("kotlin/**")
-    exclude("org/intellij/lang/annotations/**")
-    exclude("org/jetbrains/annotations/**")
-    relocate('kotlin', 'tororo1066.libs.kotlin')
-    relocate('org.jetbrains.kotlin', 'tororo1066.libs.kotlin.org.jetbrains.kotlin')
-    relocate('org.jetbrains.annotations', 'tororo1066.libs.kotlin.org.jetbrains.annotations')
     archiveFileName.set("${project.name}-${project.version}.jar")
+    exclude("kotlin/**")
 }

@@ -1,14 +1,11 @@
 package tororo1066.identityfifty.talent.survivor
 
 import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.attribute.AttributeModifier
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitRunnable
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.PrisonData
-import tororo1066.tororopluginapi.lang.SLang.Companion.translate
-import kotlin.math.floor
+import tororo1066.nmsutils.items.GlowColor
+import tororo1066.tororopluginapi.utils.toPlayer
 
 class ActionBuff : AbstractSurvivorTalent("action_buff", 2, RemainTimeUp::class.java) {
 

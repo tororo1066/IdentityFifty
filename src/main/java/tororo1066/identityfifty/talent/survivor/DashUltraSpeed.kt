@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.setPitchL
 
 class DashUltraSpeed : AbstractSurvivorTalent("dash_ultra_speed", 5, WoundedCowUp::class.java) {

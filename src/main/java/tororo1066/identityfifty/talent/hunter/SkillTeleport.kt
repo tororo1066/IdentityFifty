@@ -13,7 +13,7 @@ import tororo1066.identityfifty.data.GlowManager
 import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
-import java.util.UUID
+import tororo1066.tororopluginapi.utils.addItem
 
 class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::class.java) {
 
@@ -22,8 +22,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
     }
 
     private var task: BukkitRunnable? = null
-    private val generatorGlowManager = HashMap<UUID, GlowManager>()
-    private val ids = HashMap<UUID, MutableList<Int>>()
+    private val generatorGlowManager = HashMap<Entity, GlowManager>()
 
     override fun onStart(p: Player) {
         val teleportSkill = SItem(Material.STICK).setDisplayName(translate("skill_teleport")).setCustomModelData(21)
@@ -36,12 +35,14 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
 
         fun cancelGlowing() {
             glowing = false
-            generatorGlowManager.forEach { (uuid, manager) ->
-                ids[uuid]?.forEach { manager.cancelTask(it) }
+            generatorGlowManager.forEach { (entity, manager) ->
+                manager.cancelAll()
+                entity.remove()
             }
             if (p.getPotionEffect(PotionEffectType.BLINDNESS)?.amplifier == 1) {
                 p.removePotionEffect(PotionEffectType.BLINDNESS)
             }
+            generatorGlowManager.clear()
             task?.cancel()
         }
 
@@ -92,19 +93,23 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
                                 it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"), PersistentDataType.INTEGER) ||
                                 it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin, "PrisonLoc"), PersistentDataType.INTEGER_ARRAY)
                     }.forEach {
-                        val glowManager = generatorGlowManager.getOrPut(it.uniqueId) { GlowManager(it.uniqueId) }
-
-                        val id = ids.getOrPut(it.uniqueId) { mutableListOf() }
+                        val fakeEntity = p.world.spawn(it.location, it.type.entityClass?:return@forEach) { entity ->
+                            entity.isInvulnerable = true
+                            entity.isSilent = true
+                            entity.isInvisible = true
+                        }
+                        val uuid = fakeEntity.uniqueId
+                        val glowManager = generatorGlowManager.getOrPut(fakeEntity) { GlowManager(uuid) }
 
                         val glowColor = when(it.type) {
                             EntityType.SHEEP -> GlowColor.YELLOW
                             EntityType.COW -> GlowColor.BLUE
                             else -> GlowColor.RED
                         }
-                        id.addAll(glowManager.glow(mutableListOf(p), glowColor, 100000))
+                        glowManager.glow(mutableListOf(p), glowColor, 100000)
                     }
 
-                    task = IdentityFifty.speedModifier(p, -10.0, 999999, AttributeModifier.Operation.ADD_SCALAR)
+                    task = IdentityFifty.speedModifier(p, -1.0, 999999, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
                     p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS, 100000, 1))
                 }
             }
@@ -115,11 +120,24 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
         p.inventory.addItem(teleportSkillItem)
     }
 
+    override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
+        val glowingEntity = generatorGlowManager.keys.firstOrNull { it.location == dieLocation }?:return
+        generatorGlowManager.remove(glowingEntity)?.cancelAll()
+        glowingEntity.remove()
+    }
+
+    override fun onFinishedEscapeGenerator(dieLocation: Location, p: Player) {
+        val glowingEntity = generatorGlowManager.keys.firstOrNull { it.location == dieLocation }?:return
+        generatorGlowManager.remove(glowingEntity)?.cancelAll()
+        glowingEntity.remove()
+    }
+
     override fun onEnd(p: Player) {
-        generatorGlowManager.forEach { (uuid, manager) ->
-            ids[uuid]?.forEach { manager.cancelTask(it) }
+        generatorGlowManager.forEach { (entity, manager) ->
+            manager.cancelAll()
+            entity.remove()
         }
+        task?.cancel()
         generatorGlowManager.clear()
-        ids.clear()
     }
 }

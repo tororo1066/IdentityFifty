@@ -24,6 +24,7 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.setPitchL
 import tororo1066.tororopluginapi.utils.toPlayer
 
@@ -64,7 +65,7 @@ class Controller: AbstractSurvivor("controller") {
                             ItemStack(Material.AIR),
                             ItemStack(Material.AIR),
                             ItemStack(Material.AIR),
-                            SItem(Material.LEATHER_HELMET).setEnchantment(Enchantment.BINDING_CURSE,1)
+                            SItem(Material.LEATHER_HELMET).setEnchantment(Enchantment.BINDING_CURSE,1).build()
                         )
                     }, 1)
                     latestEntity = saveDisguise
@@ -126,7 +127,7 @@ class Controller: AbstractSurvivor("controller") {
 
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     player.inventory.setItem(EquipmentSlot.HEAD, SItem(Material.LEATHER_HELMET)
-                        .setEnchantment(Enchantment.BINDING_CURSE,1))
+                        .setEnchantment(Enchantment.BINDING_CURSE,1).build())
                 }, 23)
 
                 latestEntity = disguise
@@ -311,6 +312,7 @@ class Controller: AbstractSurvivor("controller") {
             .addLore(translate("controller_passive_lore_1"))
             .addLore(translate("controller_passive_lore_2"))
             .addLore(translate("controller_passive_lore_3"))
+            .build()
 
         val controllerSkill = SItem(Material.STICK).setDisplayName(translate("control_doll"))
             .addLore(translate("control_doll_lore_1"))
@@ -318,11 +320,9 @@ class Controller: AbstractSurvivor("controller") {
             .addLore(translate("control_doll_lore_3"))
             .addLore(translate("control_doll_lore_4"))
             .setCustomModelData(26)
+            .build()
 
         return arrayListOf(passiveItem,controllerSkill)
     }
 
-    override fun description(): String {
-        return translate("controller_description")
-    }
 }

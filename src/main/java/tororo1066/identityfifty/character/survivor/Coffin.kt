@@ -20,6 +20,7 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.util.UUID
 
@@ -71,7 +72,7 @@ class Coffin: AbstractSurvivor("coffin") {
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     coffinGlowTask = coffinGlowManager!!.glow(Bukkit.getOnlinePlayers().toMutableList(),GlowColor.WHITE,Int.MAX_VALUE).first()
                 }, 60)
-                it.setItem(EquipmentSlot.HEAD, SItem(Material.STICK).setCustomModelData(16))
+                it.setItem(EquipmentSlot.HEAD, SItem(Material.STICK).setCustomModelData(16).build())
 
                 sEvent.register(EntityDamageByEntityEvent::class.java){ e ->
                     if (e.entity.uniqueId == it.uniqueId){
@@ -181,6 +182,7 @@ class Coffin: AbstractSurvivor("coffin") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("coffin_passive_lore_1"))
             .addLore(translate("coffin_passive_lore_2"))
+            .build()
 
         val coffinSkill = SItem(Material.STICK).setDisplayName(translate("coffin_skill")).setCustomModelData(17)
             .addLore(translate("coffin_skill_lore_1"))
@@ -188,10 +190,9 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_3"))
             .addLore(translate("coffin_skill_lore_4"))
             .addLore(translate("coffin_skill_lore_5"))
+            .build()
+
         return arrayListOf(passiveItem, coffinSkill)
     }
 
-    override fun description(): String {
-        return translate("coffin_description")
-    }
 }

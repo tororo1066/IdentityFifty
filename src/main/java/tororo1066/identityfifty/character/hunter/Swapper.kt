@@ -21,6 +21,7 @@ import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sEvent.SEvent
 import tororo1066.tororopluginapi.sItem.SItem
+import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 
 class Swapper: AbstractHunter("swapper") {
@@ -30,7 +31,7 @@ class Swapper: AbstractHunter("swapper") {
 
     override fun onStart(p: Player) {
         fun generateCap(white: Boolean): ItemStack {
-            val cap = SItem(Material.LEATHER_HELMET)
+            val cap = ItemStack(Material.LEATHER_HELMET)
             cap.editMeta(LeatherArmorMeta::class.java) {
                 it.setColor(if (white) Color.WHITE else Color.BLACK)
             }
@@ -51,6 +52,7 @@ class Swapper: AbstractHunter("swapper") {
 
         val changeColorSkillItem = IdentityFifty.interactManager.createSInteractItem(changeColorSkill).setInteractEvent { e, _ ->
             val player = e.player
+            if (isStunned(player)) return@setInteractEvent false
             white = !white
 
             if (white) {
@@ -170,6 +172,7 @@ class Swapper: AbstractHunter("swapper") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("hunter_passive")).setCustomModelData(1)
             .addLore(translate("swapper_passive_lore_1"))
             .addLore(translate("swapper_passive_lore_2"))
+            .build()
 
         val changeColorSkill = SItem(Material.STICK).setDisplayName(translate("change_color")).setCustomModelData(28)
             .addLore(translate("change_color_lore_1"))
@@ -178,11 +181,9 @@ class Swapper: AbstractHunter("swapper") {
             .addLore(translate("change_color_lore_4"))
             .addLore(translate("change_color_lore_5"))
             .addLore(translate("change_color_lore_6"))
+            .build()
 
         return arrayListOf(passiveItem,changeColorSkill)
     }
 
-    override fun description(): String {
-        return translate("swapper_description")
-    }
 }
