@@ -5,14 +5,14 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.attribute.Attribute
 import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFifty.Companion.prefixMsg
 import tororo1066.identityfifty.IdentityFiftyTask
-import tororo1066.identityfifty.data.*
+import tororo1066.identityfifty.data.HunterData
+import tororo1066.identityfifty.data.SpectatorData
+import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.discord.DiscordClient
 import tororo1066.identityfifty.inventory.*
-import tororo1066.identityfifty.quickchat.QuickChatBarData
 import tororo1066.identityfifty.talent.hunter.AbstractHunterTalent
 import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
@@ -28,23 +28,6 @@ class IdentityCommand : SCommand(
     "identity",
     perm = "identity.user",
 ) {
-
-    private fun createSurvivorData(p: Player): SurvivorData {
-        return createPData(SurvivorData(),p)
-    }
-
-    private fun createHunterData(p: Player): HunterData {
-        return createPData(HunterData(),p)
-    }
-
-    private fun <V: PlayerData>createPData(data: V, p: Player): V {
-        data.uuid = p.uniqueId
-        data.name = p.name
-        data.glowManager = GlowManager(p.uniqueId)
-        data.skinModifier = SkinModifier(p.uniqueId)
-        data.quickChatBarData = QuickChatBarData(p.uniqueId)
-        return data
-    }
 
     private fun saveSurvivorTalents(data: SurvivorData): Pair<List<AbstractSurvivorTalent>,Int> {
         val talents = mutableListOf<AbstractSurvivorTalent>()
@@ -85,7 +68,7 @@ class IdentityCommand : SCommand(
                 IdentityFifty.hunters.remove(it.sender.uniqueId)
                 IdentityFifty.spectators.remove(it.sender.uniqueId)
                 val saveTalents = IdentityFifty.survivors[it.sender.uniqueId]?.let { it1 -> saveSurvivorTalents(it1) }
-                val data = createSurvivorData(it.sender)
+                val data = SurvivorData(it.sender)
                 abstractSurvivor.parameters(data)
                 saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz
@@ -105,7 +88,7 @@ class IdentityCommand : SCommand(
                 IdentityFifty.spectators.remove(p.uniqueId)
                 val saveTalents = IdentityFifty.survivors[p.uniqueId]?.let { it1 -> saveSurvivorTalents(it1) }
                 val abstractSurvivor = IdentityFifty.survivorsData[it.args[3]]!!.clone()
-                val data = createSurvivorData(p)
+                val data = SurvivorData(p)
                 abstractSurvivor.parameters(data)
                 saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz
@@ -132,7 +115,7 @@ class IdentityCommand : SCommand(
 
                 val saveTalents = IdentityFifty.hunters[it.sender.uniqueId]?.let { it1 -> saveHunterTalents(it1) }
                 val abstractHunter = IdentityFifty.huntersData[it.args[1]]!!.clone()
-                val data = createHunterData(it.sender)
+                val data = HunterData(it.sender)
                 abstractHunter.parameters(data)
                 saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz
@@ -154,7 +137,7 @@ class IdentityCommand : SCommand(
 
                 val saveTalents = IdentityFifty.hunters[p.uniqueId]?.let { it1 -> saveHunterTalents(it1) }
                 val abstractHunter = IdentityFifty.huntersData[it.args[3]]!!.clone()
-                val data = createHunterData(p)
+                val data = HunterData(p)
                 abstractHunter.parameters(data)
                 saveTalents?.first?.forEach { clazz ->
                     data.talentClasses[clazz.javaClass] = clazz

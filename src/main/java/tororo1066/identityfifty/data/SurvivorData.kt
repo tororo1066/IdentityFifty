@@ -1,11 +1,12 @@
 package tororo1066.identityfifty.data
 
 import org.bukkit.boss.BossBar
+import org.bukkit.entity.Player
 import tororo1066.identityfifty.character.survivor.AbstractSurvivor
 import tororo1066.identityfifty.talent.survivor.AbstractSurvivorTalent
 import java.util.UUID
 
-class SurvivorData : PlayerData() {
+class SurvivorData(player: Player) : PlayerData(player) {
 
     lateinit var survivorClass: AbstractSurvivor
     /**

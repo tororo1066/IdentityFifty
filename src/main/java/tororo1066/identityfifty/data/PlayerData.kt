@@ -1,14 +1,14 @@
 package tororo1066.identityfifty.data
 
+import org.bukkit.entity.Player
 import tororo1066.identityfifty.quickchat.QuickChatBarData
-import java.util.UUID
 
-abstract class PlayerData {
-    lateinit var uuid: UUID
-    var name = ""
-    lateinit var glowManager: GlowManager
-    lateinit var skinModifier: SkinModifier
-    lateinit var quickChatBarData: QuickChatBarData
+abstract class PlayerData(player: Player) {
+    val uuid = player.uniqueId
+    val name = player.name
+    val glowManager = GlowManager(uuid)
+    val skinModifier = SkinModifier(uuid)
+    val quickChatBarData = QuickChatBarData(uuid)
 
 
 }

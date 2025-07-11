@@ -38,6 +38,7 @@ class AreaMan: AbstractHunter("areaman") {
 
             val player = e.player
 
+            val task = IdentityFifty.identityFiftyTask ?: return@setInteractEvent false
             if (isStunned(player)) return@setInteractEvent false
 
             val length = 15
@@ -94,8 +95,6 @@ class AreaMan: AbstractHunter("areaman") {
     override fun onFinishedGenerator(dieLocation: Location, remainingGenerator: Int, p: Player) {
         val players = IdentityFifty.hunters.mapNotNull { Bukkit.getPlayer(it.key) }.toMutableList()
 
-        p.sendTranslateMsg("area_message")
-
         dieLocation.getNearbyPlayers(4.0).run {
             if (isNotEmpty()) p.sendTranslateMsg("area_message")
             forEach {
@@ -138,7 +137,7 @@ class AreaMan: AbstractHunter("areaman") {
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(IdentityFifty.plugin, Runnable {
-            for (i in 1..20){
+            (1..20).forEach { _ ->
                 Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
                     loc.getNearbyPlayers(20.0,7.0).forEach {
                         val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach

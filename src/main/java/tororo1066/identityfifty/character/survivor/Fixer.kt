@@ -96,13 +96,13 @@ class Fixer: AbstractSurvivor("fixer") {
 
                 if (action <= 0) {
                     var block = plateData.loc.block
-                    for (i in 0 until length) {
+                    (0 until length).forEach { _ ->
                         block.type = Material.AIR
                         block = block.getRelative(plateData.face)
                     }
 
                     var upBlock = plateData.loc.block
-                    for (i in 0 until plateData.length) {
+                    (0 until plateData.length).forEach { _ ->
                         upBlock.type = Material.OAK_STAIRS
                         val blockData = upBlock.blockData as Stairs
                         blockData.shape = Stairs.Shape.STRAIGHT

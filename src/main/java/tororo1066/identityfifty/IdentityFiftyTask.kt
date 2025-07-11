@@ -751,6 +751,8 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 //回復中のプレイヤーに追加
                 playerData.healingPlayers[helperData.uuid] = helperData
 
+                var particleInterval = 0
+
                 Bukkit.getScheduler().runTaskTimer(IdentityFifty.plugin, Consumer { task ->
                     if (playerData.healProcess >= 1.0){
                         val healingPlayers = playerData.healingPlayers.filter { filter -> filter.key.toPlayer() != null }
@@ -822,6 +824,13 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
                     if (playerData.healProcess <= 1.0){
                         playerData.healBossBar.progress = playerData.healProcess
+                    }
+
+                    //パーティクルの処理
+                    particleInterval++
+                    if (particleInterval >= 20){
+                        particleInterval = 0
+                        it.world.spawnParticle(Particle.VILLAGER_HAPPY, it.location, 10, 0.5, 1.0, 0.5)
                     }
 
                 },0,1)
@@ -1040,7 +1049,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                         }
                     }
                     footprints--
-                },0,20)
+                },0,5)
             } else {
                 data.footprintsCount++
             }

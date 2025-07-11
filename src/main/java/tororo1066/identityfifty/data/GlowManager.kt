@@ -26,7 +26,6 @@ class GlowManager(private val uuid: UUID) {
     private fun glowTask(visiblePlayer: Player, color: GlowColor, duration: Int): Int {
         glowTasks[visiblePlayer.uniqueId]?.let {
             if (it.tick <= duration) {
-//                it.cancel()
                 it.changeColor(color)
                 it.changeDuration(duration)
                 return it.taskId
