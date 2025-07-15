@@ -123,7 +123,7 @@ class Fixer: AbstractSurvivor("fixer") {
                     bossBar.removeAll()
                     slow.cancel()
                     if (slowTasks.size < 5) {
-                        slowTasks.add(IdentityFifty.speedModifier(player, -0.005, 9999999, AttributeModifier.Operation.ADD_NUMBER))
+                        slowTasks.add(IdentityFifty.speedModifier(player, -0.004, 9999999, AttributeModifier.Operation.ADD_NUMBER))
                     }
                     IdentityFifty.broadcastSpectators(
                         translate("spec_fix_plate_success", player.name),

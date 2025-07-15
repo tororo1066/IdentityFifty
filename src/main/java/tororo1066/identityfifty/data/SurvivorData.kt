@@ -54,7 +54,7 @@ class SurvivorData(player: Player) : PlayerData(player) {
     var onWindow = false
 
     val talentClasses = HashMap<Class<out AbstractSurvivorTalent>,AbstractSurvivorTalent>()
-    var talentCost = 10
+    var talentCost = TALENT_COST
 
     fun setHealth(int: Int){
         if (health == 1){
@@ -81,5 +81,9 @@ class SurvivorData(player: Player) : PlayerData(player) {
 
     fun getHealth(): Int {
         return health
+    }
+
+    companion object {
+        const val TALENT_COST = 10
     }
 }

@@ -66,22 +66,30 @@ class Gambler: AbstractHunter("gambler") {
                     p.sendTranslateMsg("gamble_dice_action_5")
                     p.world.getEntitiesByClass(Sheep::class.java).filter { it.persistentDataContainer.has(
                         NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) }.forEach {
-                        if (it.health + 200 > it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
-                            it.health = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue
+                        val maxHealth = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue ?: return@forEach
+                        if (it.health + 175 > maxHealth){
+                            it.health = maxHealth
                         } else {
                             it.health += 175
                         }
-                        it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
+                        it.customName = translate("sheep_generator",
+                            it.health.toInt(),
+                            maxHealth.toInt()
+                        )
                     }
 
                     p.world.getEntitiesByClass(Cow::class.java).filter { it.persistentDataContainer.has(
                         NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"), PersistentDataType.INTEGER) }.forEach {
-                        if (it.health + 100 > it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
-                            it.health = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue
+                        val maxHealth = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue ?: return@forEach
+                        if (it.health + 100 > maxHealth){
+                            it.health = maxHealth
                         } else {
                             it.health += 100
                         }
-                        it.customName = "§f§l牛型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
+                        it.customName = translate("cow_generator",
+                            it.health.toInt(),
+                            maxHealth.toInt()
+                        )
                     }
 
                     IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_5",p.name),
@@ -91,12 +99,16 @@ class Gambler: AbstractHunter("gambler") {
                     p.sendTranslateMsg("gamble_dice_action_6")
                     p.world.getEntitiesByClass(Sheep::class.java).filter { it.persistentDataContainer.has(
                         NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) }.forEach {
-                        if (it.health - 100 < 1){
+                        val maxHealth = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue ?: return@forEach
+                        if (it.health - 150 < 1){
                             it.health = 1.0
                         } else {
                             it.health -= 150
                         }
-                        it.customName = "§f§l羊型発電機§5(§e${it.health.toInt()}§f/§b${it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
+                        it.customName = translate("sheep_generator",
+                            it.health.toInt(),
+                            maxHealth.toInt()
+                        )
                     }
 
                     IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_6",p.name),
@@ -113,6 +125,12 @@ class Gambler: AbstractHunter("gambler") {
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice")).setCustomModelData(11)
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))
+            .addLore(translate("gamble_dice_lore_3"))
+            .addLore(translate("gamble_dice_lore_4"))
+            .addLore(translate("gamble_dice_lore_5"))
+            .addLore(translate("gamble_dice_lore_6"))
+            .addLore(translate("gamble_dice_lore_7"))
+            .addLore(translate("gamble_dice_lore_8"))
         val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, _ ->
             if (isStunned(e.player)) return@setInteractEvent false
             diceTask(e.player)
@@ -160,6 +178,12 @@ class Gambler: AbstractHunter("gambler") {
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("gamble_dice")).setCustomModelData(11)
             .addLore(translate("gamble_dice_lore_1"))
             .addLore(translate("gamble_dice_lore_2"))
+            .addLore(translate("gamble_dice_lore_3"))
+            .addLore(translate("gamble_dice_lore_4"))
+            .addLore(translate("gamble_dice_lore_5"))
+            .addLore(translate("gamble_dice_lore_6"))
+            .addLore(translate("gamble_dice_lore_7"))
+            .addLore(translate("gamble_dice_lore_8"))
             .build()
         return arrayListOf(passiveItem,firstSkillItem)
     }

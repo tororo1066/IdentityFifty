@@ -52,12 +52,12 @@ class AreaMan: AbstractHunter("areaman") {
             }
 
             val glowedPlayers = ArrayList<Player>()
-            for (i in 1..length){
+            (1..length).forEach { _ ->
                 loc.add(loc.direction.multiply(1)).getNearbyPlayers(width.toDouble()).filter {
-                    !glowedPlayers.contains(it) && IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.uniqueId) == true
+                    !glowedPlayers.contains(it) && task.aliveSurvivors().contains(it.uniqueId)
                 }.forEach {
                     val data = IdentityFifty.survivors[it.uniqueId]?:return@forEach
-                    data.glowManager.glow(players,GlowColor.RED,150)
+                    data.glowManager.glow(players,GlowColor.RED,140)
                     player.playSound(player.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     it.playSound(it.location,Sound.ENTITY_ARROW_HIT_PLAYER,1f,2f)
                     glowedPlayers.add(it)

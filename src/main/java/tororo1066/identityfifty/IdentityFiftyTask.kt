@@ -734,14 +734,14 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     playerData.healBossBar.addPlayer(e.player)
                     return@forEach
                 }
-                var healTime = 0 //これが助けるのに必要な時間(tick)
-                healTime += helperData.healTick //回復する側の必要時間をまず入れる(tick)
-
-                helperData.healTickModify.forEach { tick -> healTime = (healTime * tick.value).toInt() }
-
-                healTime += playerData.otherPlayerHealDelay //回復される側の他のサバイバーからの回復時間の遅延(tick)
-
-                healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt() //回復される側の他のサバイバーからの回復時間の遅延(パーセンテージ:0.00~1.00)
+//                var healTime = 0 //これが助けるのに必要な時間(tick)
+//                healTime += helperData.healTick //回復する側の必要時間をまず入れる(tick)
+//
+//                helperData.healTickModify.forEach { tick -> healTime = (healTime * tick.value).toInt() }
+//
+//                healTime += playerData.otherPlayerHealDelay //回復される側の他のサバイバーからの回復時間の遅延(tick)
+//
+//                healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt() //回復される側の他のサバイバーからの回復時間の遅延(パーセンテージ:0.00~1.00)
 
                 //bossbar作成+追加
                 playerData.healBossBar = Bukkit.createBossBar(translate("trying_heal", e.player, playerData.name),BarColor.GREEN,BarStyle.SOLID)
@@ -781,6 +781,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                         task.cancel()
                         return@Consumer
                     }
+
                     val players = it.location.getNearbyPlayers(3.0)
                     playerData.healingPlayers.forEach { (key, data) ->
                         val p = Bukkit.getPlayer(key)!!
@@ -815,8 +816,8 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     }
 
 
-                    healTime = allPlayerHealTick / healPlayers //回復合計時間 / 回復人数
-                    healTime = (healTime / (1 + (0.15 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.3 * (回復人数 - 1)))
+                    var healTime = allPlayerHealTick / healPlayers //回復合計時間 / 回復人数
+                    healTime = (healTime / (1 + (0.15 * (healPlayers - 1)))).toInt() //平均回復時間 / (1 + (0.15 * (回復人数 - 1)))
                     healTime += playerData.otherPlayerHealDelay
                     healTime += (playerData.otherPlayerHealDelayPercentage * healTime).toInt()
 
@@ -830,7 +831,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     particleInterval++
                     if (particleInterval >= 20){
                         particleInterval = 0
-                        it.world.spawnParticle(Particle.VILLAGER_HAPPY, it.location, 10, 0.5, 1.0, 0.5)
+                        it.world.spawnParticle(Particle.VILLAGER_HAPPY, it.location, 20, 0.3, 0.5, 0.3)
                     }
 
                 },0,1)

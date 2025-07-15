@@ -10,16 +10,15 @@ import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.data.SurvivorData
 import tororo1066.identityfifty.enumClass.AllowAction
-import tororo1066.nmsutils.items.GlowColor
 import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.addItem
-import tororo1066.tororopluginapi.utils.toPlayer
+import java.util.UUID
 
 class Nurse : AbstractSurvivor("nurse") {
 
-    private val glowTasks = ArrayList<Int>()
+    private var healModifyUUID = UUID.randomUUID()
     private var selfHealCooldown = 0
 
     override fun onStart(p: Player) {
@@ -54,13 +53,11 @@ class Nurse : AbstractSurvivor("nurse") {
 
     override fun onTryHeal(healPlayer: Player, p: Player): Boolean {
         val data = IdentityFifty.survivors[p.uniqueId]!!
-        val hunters = IdentityFifty.hunters.values.mapNotNull { it.uuid.toPlayer() }
         if (healPlayer == p){
             if (selfHealCooldown > 0){
                 return false
             }
-            glowTasks.addAll(data.glowManager.glow(ArrayList(hunters), GlowColor.GREEN,1000))
-            hunters.forEach { it.sendTranslateMsg("nurse_healing") }
+            data.healTickModify += healModifyUUID to 3.0
         }
         return true
     }
@@ -68,8 +65,7 @@ class Nurse : AbstractSurvivor("nurse") {
     override fun onHeal(isCancelled: Boolean, heal: Int, healedPlayer: Player, p: Player) {
         val data = IdentityFifty.survivors[p.uniqueId]!!
         if (healedPlayer == p){
-            glowTasks.forEach { data.glowManager.cancelTask(it) }
-            glowTasks.clear()
+            data.healTickModify -= healModifyUUID
             selfHealCooldown = 70
         }
     }

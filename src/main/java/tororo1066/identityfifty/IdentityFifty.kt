@@ -178,7 +178,7 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
     private fun registerAll() {
         register(Nurse(),Dasher(),RunAway(),Searcher(),Helper(),AreaMan(),
             DisguisePlayer(),Gambler(),Mechanic(),Fader(),Offense(),Marker(),
-            Coffin(),SerialKiller(),Controller(),Swapper(),Fixer())
+            Coffin(),SerialKiller(),Controller(),Swapper(),Fixer(),TraceCollector())
     }
     override fun onStart() {
         saveDefaultConfig()

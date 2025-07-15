@@ -51,6 +51,14 @@ class Mechanic: AbstractSurvivor("mechanic") {
         return data
     }
 
+    private fun generatorMultiply(): Double {
+        val players = IdentityFifty.survivors.filter { IdentityFifty.identityFiftyTask?.aliveSurvivors()?.contains(it.key) == true }.size
+        val survivors = IdentityFifty.survivors.size
+        val multiplyByPlayers = (1.0 - (players.toDouble() / survivors.toDouble())) * 0.2
+        val multiply = 1.2 + multiplyByPlayers
+        return multiply
+    }
+
     override fun sheepGeneratorModify(
         damage: Double,
         remainingGenerator: Int,
@@ -58,17 +66,11 @@ class Mechanic: AbstractSurvivor("mechanic") {
         nowHealth: Double,
         p: Player
     ): Double {
-        val players = IdentityFifty.survivors.filter { IdentityFifty.identityFiftyTask?.deadSurvivor?.contains(it.key) == false && IdentityFifty.identityFiftyTask?.escapedSurvivor?.contains(it.key) == false }.size
-        val survivors = IdentityFifty.survivors.size
-        val multiply = (1 + (survivors - players) * 0.5) + 0.2
-        return damage * multiply
+        return damage * generatorMultiply()
     }
 
     override fun cowGeneratorModify(damage: Double, maxHealth: Double, nowHealth: Double, p: Player): Double {
-        val players = IdentityFifty.survivors.filter { IdentityFifty.identityFiftyTask?.deadSurvivor?.contains(it.key) == false && IdentityFifty.identityFiftyTask?.escapedSurvivor?.contains(it.key) == false }.size
-        val survivors = IdentityFifty.survivors.size
-        val multiply = (1 + (survivors - players) * 0.5) + 0.2
-        return damage * multiply
+        return damage * generatorMultiply()
     }
 
     override fun onDieOtherSurvivor(diePlayer: Player, playerNumber: Int, p: Player) {

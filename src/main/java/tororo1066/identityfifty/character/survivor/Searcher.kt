@@ -41,12 +41,15 @@ class Searcher : AbstractSurvivor("searcher") {
                 survivor.sendTranslateMsg("search_lens_used_other",player.name)
             }
             IdentityFifty.hunters.forEach { (uuid, data) ->
-                Bukkit.getPlayer(uuid)?:return@forEach
+                uuid.toPlayer()?.sendTranslateMsg("search_lens_used_hunter", player.name)
                 data.glowManager.glow(players, GlowColor.RED,240)
             }
+
+            player.world.playSound(player.location, Sound.ENTITY_ARROW_HIT_PLAYER, 1f, 0.5f)
+
             IdentityFifty.broadcastSpectators(translate("spec_search_lens_used",player.name),AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
-        }.setInitialCoolDown(1100)
+        }.setInitialCoolDown(1200)
 
         p.inventory.addItem(searchSkill)
 

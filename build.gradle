@@ -9,10 +9,10 @@ targetCompatibility = '17'
 
 repositories {
     mavenCentral()
-    mavenLocal()
+//    mavenLocal()
     maven {
         name = 'papermc-repo'
-        url = 'https://papermc.io/repo/repository/maven-public/'
+        url = 'https://repo.papermc.io/repository/maven-public/'
     }
     maven {
         name = 'sonatype'
@@ -42,7 +42,7 @@ dependencies {
     implementation 'tororo1066:tororopluginapi:4edd97c'
     compileOnly 'tororo1066:base:4edd97c'
     implementation 'com.elmakers.mine.bukkit:EffectLib:9.4'
-    compileOnly 'LibsDisguises:LibsDisguises:10.0.31'
+    compileOnly 'me.libraryaddict.disguises:libsdisguises:11.0.0'
     implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2-beta1'
     implementation('net.dv8tion:JDA:5.1.1')

@@ -54,7 +54,7 @@ class SurvivorTalentInv(val data: SurvivorData) {
                                 .addLore(translate("talent_remove")).setCanClick(false).setClickEvent second@ { e ->
                                     if (e.click == ClickType.LEFT){
                                         val costs = pair.second.sumOf { sum -> sum.unlockCost }
-                                        val defaultCosts = SurvivorData().talentCost
+                                        val defaultCosts = SurvivorData.TALENT_COST
                                         if (defaultCosts < costs){
                                             p.sendTranslateMsg("not_enough_talent_point")
                                             return@second

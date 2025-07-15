@@ -51,7 +51,7 @@ class HunterTalentInv(val data: HunterData) {
                                 .addLore(translate("talent_remove")).setCanClick(false).setClickEvent second@ { e ->
                                     if (e.click == ClickType.LEFT){
                                         val costs = pair.second.sumOf { sum -> sum.unlockCost }
-                                        val defaultCosts = HunterData().talentCost
+                                        val defaultCosts = HunterData.TALENT_COST
                                         if (defaultCosts < costs){
                                             p.sendTranslateMsg("not_enough_talent_point")
                                             return@second
