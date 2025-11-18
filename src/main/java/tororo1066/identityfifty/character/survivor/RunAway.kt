@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.character.survivor
 
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.attribute.AttributeModifier
@@ -21,7 +22,9 @@ class RunAway : AbstractSurvivor("runaway") {
     private val blindSkillRadius = 12.0
     private val blindSkillStun = 20
     private val blindSkillBlind = 140
+    private val blindSkillDamagedBlind = 200
     private val blindSkillCoolDown = 1200
+    private val blindSkillDamagedCoolDown = 800
 
     private val footprintsModify = 0.75
 
@@ -31,24 +34,33 @@ class RunAway : AbstractSurvivor("runaway") {
         .addLore(translate("runaway_passive_lore_3"))
     private val blindSkillItem = SItem(Material.STICK).setDisplayName(translate("camouflage")).setCustomModelData(6)
         .addLore(translate("camouflage_lore_1"))
-        .addLore(translate("camouflage_lore_2", blindSkillCoolDown / 20))
+        .addLore(translate("camouflage_lore_2"))
+        .addLore(translate("camouflage_lore_3", blindSkillCoolDown / 20, blindSkillDamagedCoolDown / 20))
 
 
     override fun onStart(p: Player) {
         super.onStart(p)
-        val blindSkill = IdentityFifty.interactManager.createSInteractItem(blindSkillItem,true).setInteractEvent { e, _ ->
+        val blindSkill = IdentityFifty.createSInteractItem(blindSkillItem).setInteractEvent { e, item ->
             val player = e.player
+            val data = IdentityFifty.survivors[player.uniqueId] ?: return@setInteractEvent false
+            val damaged = data.getHealth() != 5
             val entities = player.location.getNearbyPlayers(blindSkillRadius)
             if (entities.isEmpty()){
                 IdentityFifty.broadcastSpectators(translate("spec_camouflage_miss",player.name), AllowAction.RECEIVE_SURVIVORS_ACTION)
                 player.sendTranslateMsg("camouflage_miss")
                 return@setInteractEvent true
             }
+            if (damaged) {
+                IdentityFifty.speedModifier(player, 0.2, 100, AttributeModifier.Operation.MULTIPLY_SCALAR_1)
+                Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+                    item.setInteractCoolDown(blindSkillDamagedCoolDown)
+                }, 1)
+            }
             player.world.playSound(player.location, Sound.ENTITY_COW_DEATH,1f,2f)
             entities.forEach {
                 if (!IdentityFifty.hunters.containsKey(it.uniqueId))return@forEach
                 IdentityFifty.stunEffect(it,0,blindSkillStun,StunState.OTHER)
-                it.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,blindSkillBlind,3,false,false,true))
+                it.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,if (damaged) blindSkillDamagedBlind else blindSkillBlind,3,false,false,true))
                 it.isSprinting = false
                 it.sendTranslateMsg("camouflage_hit_hunter")
                 player.sendTranslateMsg("camouflage_hit_survivor",it.name)

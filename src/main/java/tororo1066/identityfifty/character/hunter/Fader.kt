@@ -44,7 +44,7 @@ class Fader: AbstractHunter("fader"){
                 //透明解除
                 if (player.getPotionEffect(PotionEffectType.INVISIBILITY) != null){
                     player.world.playSound(player.location,Sound.ENTITY_GHAST_HURT,1f,2f)
-                    player.world.spawnParticle(Particle.SMOKE_LARGE,player.location,150,0.0,1.0,0.0)
+                    player.world.spawnParticle(Particle.LARGE_SMOKE,player.location,150,0.0,1.0,0.0)
                 }
                 player.removePotionEffect(PotionEffectType.INVISIBILITY)
                 val blindness = player.getPotionEffect(PotionEffectType.BLINDNESS)
@@ -64,7 +64,7 @@ class Fader: AbstractHunter("fader"){
                             ?.has(
                                 NamespacedKey(IdentityFifty.plugin, "glow_trap"),
                                 PersistentDataType.INTEGER
-                            ) == true) 1 else 0) < 3){ //トラップを二個以上持っていない時だけ与える
+                            ) == true) 1 else 0) < 2){ //トラップを二個以上持っていない時だけ与える
                 if (trapCooldown > 0) {
                     trapCooldown--
                     return@Runnable
@@ -77,12 +77,12 @@ class Fader: AbstractHunter("fader"){
                     .addLore(translate("glow_trap_lore_4"))
                     .addLore(translate("glow_trap_lore_5"))
                     .setCustomData(IdentityFifty.plugin,"glow_trap", PersistentDataType.INTEGER, 1)
-                val trapSkillItem = IdentityFifty.interactManager.createSInteractItem(trap, true).setInteractEvent { e, item ->
+                val trapSkillItem = IdentityFifty.createSInteractItem(trap).setInteractEvent { e, item ->
                     val itemPlayer = e.player
                     if (isStunned(itemPlayer)) return@setInteractEvent false
                     e.item!!.amount -= 1
                     item.delete()
-                    if (traps.size >= 3){ //設置済のトラップが2個以上ある場合は一番古いものを削除
+                    if (traps.size >= 2){ //設置済のトラップが2個以上ある場合は一番古いものを削除
                         val previousTrap = traps.entries.first()
                         Bukkit.getEntity(previousTrap.key)?.remove()
                         previousTrap.value.task.cancel()

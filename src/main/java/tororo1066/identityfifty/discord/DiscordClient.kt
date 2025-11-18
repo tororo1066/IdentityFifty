@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.discord
 
+import io.papermc.paper.event.player.PlayerServerFullCheckEvent
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -12,25 +13,21 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerLoginEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import tororo1066.identityfifty.IdentityFifty
 import tororo1066.identityfifty.IdentityFiftyTask
 import tororo1066.tororopluginapi.SStr
-import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.lang.SLang.Companion.translate
 import tororo1066.tororopluginapi.utils.sendMessage
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.awt.Color
 import java.util.UUID
-import kotlin.random.Random
 
 class DiscordClient: ListenerAdapter(), Listener {
 
@@ -137,37 +134,117 @@ class DiscordClient: ListenerAdapter(), Listener {
         survivorLimit = config.getInt("survivorLimit", 4)
     }
 
+//    @EventHandler(priority = EventPriority.HIGHEST)
+//    fun event(e: PlayerLoginEvent){
+//        val uuid = e.player.uniqueId
+//        if (himoMode && (!survivors.containsKey(uuid) && !hunters.containsKey(uuid)
+//                    && !spectators.containsKey(uuid)) && discordSQL.getFromUUID(uuid) == null){
+//            var random = Random.nextInt(100000,999999)
+//            while (himo.containsKey(random)){
+//                random = Random.nextInt(100000,999999)
+//            }
+//            himo[random] = uuid to e.player.name
+//            e.allow()
+//            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
+//                e.player.sendMessage(Component.text("§d${e.player.name}のコード $random(クリックでコピー)").clickEvent(
+//                    ClickEvent.copyToClipboard(random.toString())
+//                ))
+//                e.player.sendMessage("§c10秒後に切断されます...")
+//            })
+//            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+//                e.player.kick(Component.text("コードを入力してください $random"))
+//            },200)
+//            return
+//        }
+//        if (!enable)return
+//        if ((!survivors.containsKey(uuid) && !hunters.containsKey(uuid)
+//                    && !spectators.containsKey(uuid)
+//                    && (!invite.any { it.value.contains(uuid) } || !enableInvite))
+//                    && !e.player.hasPermission("identity.op")){
+//            e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Component.text("Discord: https://discord.gg/yTubxkj"))
+//            return
+//        }
+//        e.allow()
+//        Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
+//            val map = IdentityFifty.maps[this.map]!!
+//            map.lobbyLocation?.let {
+//                if (IdentityFifty.identityFiftyTask == null) {
+//                    e.player.teleport(it)
+//                }
+//            }
+//            if (invite.any { it.value.contains(uuid) }){
+//                val inviter = invite.entries.first { it.value.contains(uuid) }.key
+//                val p = e.player
+//                p.sendMessage("§aあなたは${Bukkit.getOfflinePlayer(inviter).name}に招待されました")
+//                p.sendMessage("§d何でエントリーするか選択してください")
+//                p.sendMessage(
+//                    SStr("§b§l[サバイバー(${survivors.size}/$survivorLimit)]")
+//                        .commandText("/identity acceptInvite survivor")
+//                        .hoverText("サバイバーを選択します")
+//                        .append(
+//                            SStr(" §c§l[ハンター(${hunters.size}/$hunterLimit)]")
+//                                .commandText("/identity acceptInvite hunter")
+//                                .hoverText("ハンターを選択します")
+//                        )
+//                        .append(
+//                            SStr(" §7§l[観戦者]")
+//                                .commandText("/identity acceptInvite spectator")
+//                                .hoverText("観戦者を選択します")
+//                        )
+//                )
+//
+//                return@Runnable
+//            }
+//            if (spectators.containsKey(e.player.uniqueId)){
+//                e.player.performCommand("identity spectator")
+//                e.player.gameMode = GameMode.SPECTATOR
+//                return@Runnable
+//            }
+//            if (survivors.containsKey(uuid)){
+//                e.player.sendMessage("§aサバイバー${if (enableTalent) "と§c天賦§a" else ""}を選択してください")
+//            } else if (hunters.containsKey(uuid)){
+//                e.player.sendMessage("§aハンター${if (enableTalent) "と§c天賦§a" else ""}を選択してください")
+//            }
+//        },20)
+//    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
-    fun event(e: PlayerLoginEvent){
-        val uuid = e.player.uniqueId
-        if (himoMode && (!survivors.containsKey(uuid) && !hunters.containsKey(uuid)
-                    && !spectators.containsKey(uuid)) && discordSQL.getFromUUID(uuid) == null){
-            var random = Random.nextInt(100000,999999)
-            while (himo.containsKey(random)){
-                random = Random.nextInt(100000,999999)
-            }
-            himo[random] = uuid to e.player.name
-            e.allow()
-            Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
-                e.player.sendMessage(Component.text("§d${e.player.name}のコード $random(クリックでコピー)").clickEvent(
-                    ClickEvent.copyToClipboard(random.toString())
-                ))
-                e.player.sendMessage("§c10秒後に切断されます...")
-            })
-            Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
-                e.player.kick(Component.text("コードを入力してください $random"))
-            },200)
+    fun event(e: PlayerServerFullCheckEvent) {
+        val uuid = e.playerProfile.id
+        val name = e.playerProfile.name
+        if (uuid == null || name == null) {
+            e.deny(Component.text("You can't join the server"))
             return
         }
-        if (!enable)return
+        if (himoMode && (!survivors.containsKey(uuid) && !hunters.containsKey(uuid))
+                    && !spectators.containsKey(uuid) && discordSQL.getFromUUID(uuid) == null) {
+            var random = (100000..999999).random()
+            while (himo.containsKey(random)) {
+                random = (100000..999999).random()
+            }
+            himo[random] = uuid to name
+            e.deny(Component.text("${name}のコード: $random"))
+            return
+        }
+
+        if (!enable) return
+
+        val offlinePlayer = Bukkit.getOfflinePlayer(uuid)
+
         if ((!survivors.containsKey(uuid) && !hunters.containsKey(uuid)
                     && !spectators.containsKey(uuid)
                     && (!invite.any { it.value.contains(uuid) } || !enableInvite))
-                    && !e.player.hasPermission("identity.op")){
-            e.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, Component.text("Discord: https://discord.gg/yTubxkj"))
+                    && !IdentityFifty.permissionManager.playerHas(null, offlinePlayer, "identity.op")) {
+            e.deny(Component.text("Discord: https://discord.gg/yTubxkj"))
             return
         }
-        e.allow()
+        e.allow(true)
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun onPlayerJoin(e: PlayerJoinEvent) {
+        val uuid = e.player.uniqueId
+        if (!enable)return
         Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
             val map = IdentityFifty.maps[this.map]!!
             map.lobbyLocation?.let {
@@ -195,12 +272,10 @@ class DiscordClient: ListenerAdapter(), Listener {
                                 .hoverText("観戦者を選択します")
                         )
                 )
-
                 return@Runnable
             }
             if (spectators.containsKey(e.player.uniqueId)){
                 e.player.performCommand("identity spectator")
-                e.player.gameMode = GameMode.SPECTATOR
                 return@Runnable
             }
             if (survivors.containsKey(uuid)){
@@ -221,15 +296,10 @@ class DiscordClient: ListenerAdapter(), Listener {
                 }
 
                 Thread.sleep(7000)
-                val lang = SLang.langFile[SLang.defaultLanguage]
 
                 Bukkit.getScheduler().runTask(IdentityFifty.plugin, Runnable {
                     (survivors + hunters + spectators).forEach {
-                        if (lang != null) {
-                            it.key.toPlayer()?.kick(Component.text(lang.getStringList("tips").randomOrNull()?:""))
-                        } else {
-                            it.key.toPlayer()?.kick(Component.text("遊んでくれてありがとう:heart:"))
-                        }
+                        it.key.toPlayer()?.kick(Component.text("遊んでくれてありがとう:heart:"))
                     }
                 })
 

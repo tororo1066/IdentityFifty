@@ -59,7 +59,7 @@ class TraceCollector: AbstractHunter("trace_collector") {
             collectedTraces[uuid] = 0
         }
 
-        val chaseSkill = IdentityFifty.interactManager.createSInteractItem(chaseSkillItem, true).setInteractEvent { e, _ ->
+        val chaseSkill = IdentityFifty.createSInteractItem(chaseSkillItem).setInteractEvent { e, _ ->
             val player = e.player
             if (isStunned(player)) return@setInteractEvent false
             val task = IdentityFifty.identityFiftyTask ?: return@setInteractEvent false
@@ -82,7 +82,7 @@ class TraceCollector: AbstractHunter("trace_collector") {
                     val duration = min(targets.size * 60, 300)
                     val durationSeconds = duration / 20
                     p.addPotionEffect(
-                        PotionEffect(PotionEffectType.SPEED, duration, 0)
+                        PotionEffect(PotionEffectType.SPEED, duration, 1)
                     )
                     p.sendTranslateMsg("chase_1", durationSeconds)
                     IdentityFifty.broadcastSpectators(
@@ -182,18 +182,19 @@ class TraceCollector: AbstractHunter("trace_collector") {
                         else -> Color.BLACK
                     }
                     repeat(30) {
-                        player.spawnParticle(
-                            Particle.SPELL_MOB_AMBIENT,
-                            location.clone().add(
-                                Random.nextDouble(-0.5, 0.5),
-                                Random.nextDouble(-0.5, 0.5),
-                                Random.nextDouble(-0.5, 0.5)
-                            ),
-                            0,
-                            color.red / 255.0,
-                            color.green / 255.0,
-                            color.blue / 255.0
-                        )
+                        Particle.ENTITY_EFFECT.builder()
+                            .location(
+                                location.clone().add(
+                                    Random.nextDouble(-0.5, 0.5),
+                                    Random.nextDouble(-0.5, 0.5),
+                                    Random.nextDouble(-0.5, 0.5)
+                                )
+                            )
+                            .count(0)
+                            .extra(1.0)
+                            .color(color)
+                            .receivers(player)
+                            .spawn()
                     }
                 }
                 trace.duration -= 1
@@ -250,7 +251,7 @@ class TraceCollector: AbstractHunter("trace_collector") {
                     )
 
                     e.player.addPotionEffect(
-                        PotionEffect(PotionEffectType.SPEED, 200, 1)
+                        PotionEffect(PotionEffectType.SPEED, 200, 0)
                     )
 
                     survivor.sendTranslateMsg("trace_collected_glow_self")
@@ -275,7 +276,7 @@ class TraceCollector: AbstractHunter("trace_collector") {
         sEvent.unregisterAll()
     }
 
-    override fun scoreboards(p: Player): ArrayList<Pair<Int, String>>? {
+    override fun scoreboards(p: Player): ArrayList<Pair<Int, String>> {
         val list = ArrayList<Pair<Int, String>>()
 
         list.add(Pair(-1, translate("trace_collector_scoreboard")))

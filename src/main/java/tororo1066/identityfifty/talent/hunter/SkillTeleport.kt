@@ -46,7 +46,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
             task?.cancel()
         }
 
-        val teleportSkillItem = IdentityFifty.interactManager.createSInteractItem(teleportSkill, true).setInteractEvent { e, _ ->
+        val teleportSkillItem = IdentityFifty.createSInteractItem(teleportSkill).setInteractEvent { e, _ ->
             if (e.action.isLeftClick && glowing) {
                 val ray = p.location
                 for (i in 0 until  400) {
@@ -61,7 +61,7 @@ class SkillTeleport: AbstractHunterTalent("skill_teleport",5,FirstGameSpeedUp::c
 
                     if (entities.isNotEmpty()) {
                         cancelGlowing()
-                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 60, 5))
+                        p.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS, 60, 5))
                         val entity = entities[0]
                         p.world.spawnParticle(Particle.DUST_COLOR_TRANSITION, entity.location, 100, 0.5, 3.0, 0.5, DustTransition(Color.RED, Color.RED, 1f))
                         p.world.playSound(entity.location, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.2f, 1f)

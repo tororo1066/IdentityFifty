@@ -16,7 +16,7 @@ class TalentSQLV2 {
     val sDatabase = SDatabase.newInstance(IdentityFifty.plugin)
 
     init {
-        sDatabase.createTable(
+        sDatabase.asyncCreateTable(
             "talent", mapOf(
                 "id" to SDBVariable(SDBVariable.Int, autoIncrement = true),
                 "uuid" to SDBVariable(SDBVariable.VarChar, length = 36),
@@ -25,7 +25,9 @@ class TalentSQLV2 {
                 "type" to SDBVariable(SDBVariable.VarChar, length = 16),
                 "talent_list" to SDBVariable(SDBVariable.Text),
             )
-        )
+        ).exceptionally {
+            null
+        }
     }
 
     private fun getTalents(searchUUID: UUID, isSurvivor: Boolean): CompletableFuture<List<Pair<String, List<Any>>>> {

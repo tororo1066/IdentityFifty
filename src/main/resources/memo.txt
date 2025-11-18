@@ -3,3 +3,4 @@ scoreboard
   PlateSpeedUp -10 -11 -12
   DamagedDelay -13 -14
   HideFromHunter -15 -16
+  SuperHelpSpeedUp -17 -18

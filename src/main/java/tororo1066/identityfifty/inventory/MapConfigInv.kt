@@ -203,6 +203,15 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
 
         items.add(windowBlock)
 
+        val disableThirdPersonView = SItem(Material.ENDER_EYE).setDisplayName("§a三人称視点を無効化")
+            .addLore("§a現在の値：§e${if (mapData.disableThirdPersonView) "無効化" else "有効化"}")
+            .toSInventoryItem().setCanClick(false).setClickEvent { e ->
+                mapData.disableThirdPersonView = !mapData.disableThirdPersonView
+                renderInventory(nowPage)
+            }
+
+        items.add(disableThirdPersonView)
+
         val save = SItem(Material.LIME_STAINED_GLASS).setDisplayName("§a保存").toSInventoryItem().setCanClick(false).setClickEvent { e ->
             e.whoClicked.closeInventory()
             editNow.remove(mapName)
@@ -497,6 +506,7 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
         config.set("lobbyLocation",mapData.lobbyLocation)
         config.set("mapId",mapData.mapId)
         config.set("windowBlock",mapData.windowBlock.name)
+        config.set("disableThirdPersonView",mapData.disableThirdPersonView)
         sConfig.saveConfig(config,"map/${mapName}")
         IdentityFifty.maps[mapName] = mapData
         return true

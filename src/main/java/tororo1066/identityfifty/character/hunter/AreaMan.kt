@@ -34,7 +34,7 @@ class AreaMan: AbstractHunter("areaman") {
             .addLore(translate("area_skill_lore_3"))
             .addLore(translate("area_skill_lore_4"))
 
-        val areaSkillItem = IdentityFifty.interactManager.createSInteractItem(areaSkill,true).setInitialCoolDown(600).setInteractEvent { e, _ ->
+        val areaSkillItem = IdentityFifty.createSInteractItem(areaSkill).setInitialCoolDown(600).setInteractEvent { e, _ ->
 
             val player = e.player
 
@@ -107,7 +107,7 @@ class AreaMan: AbstractHunter("areaman") {
         if (remainingGenerator == 0){
             val survivor = IdentityFifty.survivors.filter { IdentityFifty.identityFiftyTask?.deadSurvivor?.contains(it.key) == false && it.value.getHealth() != 0 }.entries.random()
             val player = Bukkit.getPlayer(survivor.key)!!
-            player.addPotionEffect(PotionEffect(PotionEffectType.SLOW,120,4))
+            player.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS,120,4))
             survivor.value.glowManager.glow(players,GlowColor.DARK_RED,300)
             p.sendTranslateMsg("area_message")
             player.sendTranslateMsg("area_spec_message",p.name)

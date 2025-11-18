@@ -39,10 +39,10 @@ class StunClear : AbstractHunterTalent("stun_clear",5,SurvivorJailedSpeedUp::cla
             if(!noImp){
                 p.world.playSound(p.location, Sound.BLOCK_BEACON_POWER_SELECT,1f,0.85f)
                 p.removePotionEffect(PotionEffectType.BLINDNESS)
-                p.removePotionEffect(PotionEffectType.SLOW)
-                p.removePotionEffect(PotionEffectType.JUMP)
+                p.removePotionEffect(PotionEffectType.SLOWNESS)
+                p.removePotionEffect(PotionEffectType.JUMP_BOOST)
                 p.removePotionEffect(PotionEffectType.WEAKNESS)
-                p.removePotionEffect(PotionEffectType.SLOW_DIGGING)
+                p.removePotionEffect(PotionEffectType.MINING_FATIGUE)
                 return@setInteractEvent true
             }
 

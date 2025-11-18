@@ -49,7 +49,7 @@ class Controller: AbstractSurvivor("controller") {
             .addLore(translate("control_doll_lore_4"))
             .setCustomModelData(26)
 
-        val controllerSkillItem = IdentityFifty.interactManager.createSInteractItem(controllerSkill,true).setInteractEvent { e, item ->
+        val controllerSkillItem = IdentityFifty.createSInteractItem(controllerSkill).setInteractEvent { e, item ->
             val player = e.player
             fun saveDisguise(loc: Location){
                 player.world.spawn(loc, Chicken::class.java) { chicken ->
@@ -74,7 +74,7 @@ class Controller: AbstractSurvivor("controller") {
 
             fun teleport(p: Player, loc: Location, movingNow: Boolean){
                 p.isInvisible = true
-                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 23, 100, false, false, false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS, 23, 100, false, false, false))
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     p.teleport(loc)
                     this.movingNow = movingNow
@@ -174,7 +174,7 @@ class Controller: AbstractSurvivor("controller") {
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
                             GlowColor.DARK_PURPLE, 200
                         )
-                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
+                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)
                     } else if (e.entity == latestEntity?.entity) { //人形が攻撃を受けた場合
                         if (!IdentityFifty.hunters.containsKey(e.damager.uniqueId)){
@@ -190,7 +190,7 @@ class Controller: AbstractSurvivor("controller") {
                             IdentityFifty.hunters.mapNotNull { map -> map.key.toPlayer() }.toMutableList(),
                             GlowColor.DARK_PURPLE, 200
                         )
-                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 200, 2, false, false, true))
+                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS, 200, 2, false, false, true))
                         item.setInteractCoolDown(2400)
                         IdentityFifty.stunEffect(e.damager as Player, 20, 40, StunState.DAMAGED)
                     }

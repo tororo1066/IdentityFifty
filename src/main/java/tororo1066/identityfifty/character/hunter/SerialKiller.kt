@@ -38,7 +38,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
             .addLore(translate("kill_find_lore_2"))
             .addLore(translate("kill_find_lore_3"))
 
-        val killFindSkillItem = IdentityFifty.interactManager.createSInteractItem(killFindSkill).setInteractEvent { e, _ ->
+        val killFindSkillItem = IdentityFifty.createSInteractItem(killFindSkill).setInteractEvent { e, _ ->
             val player = e.player
             if (isStunned(player)) return@setInteractEvent false
             player.world.playSound(player.location, Sound.ENTITY_WITHER_AMBIENT, 1f, 1f)
@@ -70,7 +70,7 @@ class SerialKiller: AbstractHunter("serialkiller") {
                     if (!damageFlag){
                         val data = IdentityFifty.hunters[player.uniqueId]!!
                         data.glowManager.glow(IdentityFifty.survivors.mapNotNull { map -> map.key.toPlayer() }.toMutableList(), GlowColor.RED, 200)
-                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOW,200,1))
+                        player.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS,200,1))
                         player.sendTranslateMsg("kill_find_failed")
                         IdentityFifty.survivors.keys.forEach { uuid ->
                             uuid.toPlayer()?.sendTranslateMsg("kill_find_failed_survivor")
@@ -115,11 +115,11 @@ class SerialKiller: AbstractHunter("serialkiller") {
     }
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,100,1))
+        p.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS,100,1))
     }
 
     override fun onSurvivorHelp(helper: Player, gotHelpPlayer: Player, p: Player) {
-        p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,100,1))
+        p.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS,100,1))
     }
 
     override fun onFinishedAttack(attackPlayer: Player, result: Int, p: Player) {

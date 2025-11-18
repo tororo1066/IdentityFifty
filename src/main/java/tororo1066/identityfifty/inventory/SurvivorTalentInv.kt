@@ -198,7 +198,7 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(47,48,50,51,52,53), glass())
             setItems(listOf(18),roadGlass())
-            setItem(19,talentItem(DamagedDelay::class.java))
+            setItem(19,talentItem(GateOpenBoost::class.java))
             setItem(0,talentItem(DamagedBoost::class.java))
 
             return true
@@ -231,7 +231,7 @@ class SurvivorTalentInv(val data: SurvivorData) {
             })
             setItems(listOf(45,46,47,50,51,52,53), glass())
             setItems(listOf(4,6,15,22),roadGlass())
-            setItem(24,talentItem(GateOpenBoost::class.java))
+            setItem(24,talentItem(SuperHelpSpeedUp::class.java))
             setItem(13,talentItem(WoundedGeneratorUp::class.java))
             setItem(31,talentItem(HelpHeal::class.java))
 

@@ -1,6 +1,7 @@
 package tororo1066.identityfifty.talent.survivor
 
 import org.bukkit.Bukkit
+import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
@@ -25,7 +26,7 @@ class HideFromHunter: AbstractSurvivorTalent("hide_from_hunter", 5, WoundedCowUp
             p.location.getNearbyPlayers(4.0)
                 .firstOrNull { it.uniqueId in IdentityFifty.hunters} ?: return@Runnable
 
-            p.world.spawnParticle(org.bukkit.Particle.SMOKE_NORMAL, p.location, 10, 0.5, 0.5, 0.5, 0.1)
+            p.world.spawnParticle(Particle.SMOKE, p.location, 10, 0.5, 0.5, 0.5, 0.1)
             p.world.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f)
             p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 60, 0))
             val data = IdentityFifty.survivors[p.uniqueId]!!

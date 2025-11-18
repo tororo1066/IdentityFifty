@@ -8,7 +8,7 @@ import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
 import java.util.UUID
 
-class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 2,FinishedSheepGlow::class.java) {
+class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 5, FullCowUp::class.java) {
     override fun lore(): List<String> {
         return listOf("gate_open_boost_lore_1","gate_open_boost_lore_2")
     }
@@ -38,4 +38,4 @@ class GateOpenBoost : AbstractSurvivorTalent("gate_open_boost", 2,FinishedSheepG
     }
 
 
-}//旧仲直りの位置にFullCowUPを接続
+}

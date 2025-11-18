@@ -5,8 +5,7 @@ import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import tororo1066.identityfifty.IdentityFifty
-import tororo1066.tororopluginapi.lang.SLang.Companion.sendTranslateMsg
-import java.util.*
+import java.util.UUID
 
 class SurvivorHealedStop : AbstractHunterTalent("survivor_healed_stop",2,RemainTimeDown::class.java) {
     override fun lore(): List<String> {
@@ -14,7 +13,7 @@ class SurvivorHealedStop : AbstractHunterTalent("survivor_healed_stop",2,RemainT
     }
 
     override fun onSurvivorHeal(healPlayer: Player, healedPlayer: Player, p: Player) {
-        healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.SLOW,140,1))
+        healedPlayer.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS,140,1))
         val data = IdentityFifty.survivors[healedPlayer.uniqueId]!!
         val uuid = UUID.randomUUID()
         data.footprintsModify += uuid to 2.0

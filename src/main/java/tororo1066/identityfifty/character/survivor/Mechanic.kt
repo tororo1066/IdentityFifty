@@ -26,7 +26,7 @@ class Mechanic: AbstractSurvivor("mechanic") {
             .addLore(translate("slow_timer_lore_1"))
             .addLore(translate("slow_timer_lore_2"))
 
-        val slowSkillItem = IdentityFifty.interactManager.createSInteractItem(slowSkill,true).setInteractEvent { e, _ ->
+        val slowSkillItem = IdentityFifty.createSInteractItem(slowSkill).setInteractEvent { e, _ ->
             val player = e.player
             IdentityFifty.util.repeatDelay(3,7) {
                 player.playSound(player.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
@@ -34,12 +34,12 @@ class Mechanic: AbstractSurvivor("mechanic") {
             player.location.getNearbyPlayers(10.0).forEach {
                 if (it == player)return@forEach
                 it.playSound(player.location, Sound.UI_BUTTON_CLICK, 2f, 1f)
-                it.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 60, 2, false))
+                it.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS, 60, 2, false))
             }
             IdentityFifty.broadcastSpectators(translate("spec_slow_timer_used",player.name),
                 AllowAction.RECEIVE_SURVIVORS_ACTION)
             return@setInteractEvent true
-        }.setInitialCoolDown(1200)
+        }.setInitialCoolDown(2000)
 
         p.inventory.addItem(passiveItem,slowSkillItem)
     }
@@ -73,9 +73,13 @@ class Mechanic: AbstractSurvivor("mechanic") {
         return damage * generatorMultiply()
     }
 
+    private var previousSpeedBoost = 0.0f
+
     override fun onDieOtherSurvivor(diePlayer: Player, playerNumber: Int, p: Player) {
         val multiply = 0.04f / playerNumber
-        p.walkSpeed = 0.2f + multiply
+        p.walkSpeed -= previousSpeedBoost
+        p.walkSpeed += multiply
+        previousSpeedBoost = multiply
     }
 
     override fun info(): ArrayList<ItemStack> {

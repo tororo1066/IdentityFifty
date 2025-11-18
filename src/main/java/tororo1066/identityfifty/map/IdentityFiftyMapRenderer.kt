@@ -79,7 +79,7 @@ class IdentityFiftyMapRenderer(val map: MapData): MapRenderer() {
         val cursorZ = ((p.location.blockZ - view.centerZ) / scale).toInt().toByte()
         previousCursor = canvas.cursors.addCursor(
             MapCursor(cursorX, cursorZ, yawToDirectionIndex(p.location.yaw),
-                MapCursor.Type.GREEN_POINTER, true, null as Component?)
+                MapCursor.Type.PLAYER, true, null as Component?)
         )
     }
 

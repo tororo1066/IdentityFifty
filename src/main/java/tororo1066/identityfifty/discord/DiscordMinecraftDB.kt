@@ -14,12 +14,14 @@ class DiscordMinecraftDB {
     private var database = SDatabase.newInstance(SJavaPlugin.plugin)
 
     init {
-        database.createTable("discord_minecraft", mapOf(
+        database.asyncCreateTable("discord_minecraft", mapOf(
             "id" to SDBVariable(SDBVariable.Int, autoIncrement = true),
             "discordId" to SDBVariable(SDBVariable.BigInt),
             "uuid" to SDBVariable(SDBVariable.VarChar, 36),
             "mcid" to SDBVariable(SDBVariable.VarChar, 16)
-        ))
+        )).exceptionally {
+            null
+        }
     }
 
     fun getFromDiscordId(id: Long): SDBResultSet? {

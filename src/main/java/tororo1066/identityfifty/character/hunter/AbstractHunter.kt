@@ -61,6 +61,6 @@ abstract class AbstractHunter(val name: String): Cloneable {
     }
 
     protected fun isStunned(p: Player): Boolean {
-        return p.getPotionEffect(PotionEffectType.SLOW)?.amplifier == 200
+        return p.getPotionEffect(PotionEffectType.SLOWNESS)?.amplifier == 200
     }
 }

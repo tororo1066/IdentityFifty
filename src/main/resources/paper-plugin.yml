@@ -13,3 +13,5 @@ dependencies:
       required: true
     NMSUtils:
       required: true
+    Vault:
+      required: true

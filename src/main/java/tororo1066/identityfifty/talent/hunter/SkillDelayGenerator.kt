@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.talent.hunter
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
@@ -23,7 +24,7 @@ class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, EndG
             .addLore(translate("skill_delay_generator_lore_1"))
             .addLore(translate("skill_delay_generator_lore_2"))
 
-        val delayGeneratorSkillItem = IdentityFifty.interactManager.createSInteractItem(delayGeneratorSkill,true).setInteractEvent { _, _ ->
+        val delayGeneratorSkillItem = IdentityFifty.createSInteractItem(delayGeneratorSkill).setInteractEvent { _, _ ->
 
             val targetEntity = p.getTargetEntity(4)?:return@setInteractEvent false
             if (!targetEntity.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"Generator"),
@@ -31,12 +32,16 @@ class SkillDelayGenerator: AbstractHunterTalent("skill_delay_generator", 5, EndG
 
             p.playSound(p.location, Sound.BLOCK_ANVIL_USE,0.8f,2f)
             targetEntity as Sheep
-            if (targetEntity.health + 300 > targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue){
-                targetEntity.health = targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue
+            val maxHealth = targetEntity.getAttribute(Attribute.MAX_HEALTH)!!.baseValue
+            if (targetEntity.health + 300 > maxHealth){
+                targetEntity.health = maxHealth
             } else {
                 targetEntity.health += 300
             }
-            targetEntity.customName = "§f§l羊型発電機§5(§e${targetEntity.health.toInt()}§f/§b${targetEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue.toInt()}§5)"
+            targetEntity.customName(
+                Component.text(
+                translate("sheep_generator", targetEntity.health.toInt(), maxHealth.toInt())
+            ))
             return@setInteractEvent true
         }.setInitialCoolDown(1800)
 

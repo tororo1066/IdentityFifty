@@ -18,7 +18,7 @@ import java.util.UUID
 
 class Nurse : AbstractSurvivor("nurse") {
 
-    private var healModifyUUID = UUID.randomUUID()
+    private val healModifyUUID = UUID.randomUUID()
     private var selfHealCooldown = 0
 
     override fun onStart(p: Player) {
@@ -26,11 +26,12 @@ class Nurse : AbstractSurvivor("nurse") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("nurse_passive_lore_1"))
             .addLore(translate("nurse_passive_lore_2"))
+            .addLore(translate("nurse_passive_lore_3"))
 
         val speedUpItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore_1"))
             .addLore(translate("syringe_lore_2"))
-        val speedUpSkillItem = IdentityFifty.interactManager.createSInteractItem(speedUpItem,true).setInteractEvent { e, _ ->
+        val speedUpSkillItem = IdentityFifty.createSInteractItem(speedUpItem).setInteractEvent { e, _ ->
             val player = e.player
             val data = IdentityFifty.survivors[player.uniqueId]!!
             if (data.getHealth() <= 2){
@@ -53,10 +54,9 @@ class Nurse : AbstractSurvivor("nurse") {
 
     override fun onTryHeal(healPlayer: Player, p: Player): Boolean {
         val data = IdentityFifty.survivors[p.uniqueId]!!
-        if (healPlayer == p){
-            if (selfHealCooldown > 0){
-                return false
-            }
+        if (healPlayer == p) {
+            if (selfHealCooldown > 0) return false
+            if (p.location.pitch < 70) return false
             data.healTickModify += healModifyUUID to 3.0
         }
         return true
@@ -64,7 +64,7 @@ class Nurse : AbstractSurvivor("nurse") {
 
     override fun onHeal(isCancelled: Boolean, heal: Int, healedPlayer: Player, p: Player) {
         val data = IdentityFifty.survivors[p.uniqueId]!!
-        if (healedPlayer == p){
+        if (healedPlayer == p) {
             data.healTickModify -= healModifyUUID
             selfHealCooldown = 70
         }
@@ -78,7 +78,7 @@ class Nurse : AbstractSurvivor("nurse") {
     }
 
     override fun scoreboards(p: Player): ArrayList<Pair<Int, String>> {
-        return if (selfHealCooldown > 0){
+        return if (selfHealCooldown > 0) {
             arrayListOf(Pair(-1, translate("nurse_scoreboard", selfHealCooldown)))
         } else {
             arrayListOf(Pair(-1, translate("nurse_scoreboard_usable")))
@@ -89,6 +89,7 @@ class Nurse : AbstractSurvivor("nurse") {
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
             .addLore(translate("nurse_passive_lore_1"))
             .addLore(translate("nurse_passive_lore_2"))
+            .addLore(translate("nurse_passive_lore_3"))
             .build()
         val speedUpItem = SItem(Material.STICK).setDisplayName(translate("syringe")).setCustomModelData(2)
             .addLore(translate("syringe_lore_1"))

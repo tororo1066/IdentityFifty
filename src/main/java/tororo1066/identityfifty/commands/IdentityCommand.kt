@@ -699,8 +699,8 @@ class IdentityCommand : SCommand(
             .addArg(SCommandArg("resetAttributes"))
             .setNormalExecutor {
                 val player = it.args[2].toPlayer()?:return@setNormalExecutor
-                player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!.modifiers.forEach { modifier ->
-                    player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!.removeModifier(modifier)
+                player.getAttribute(Attribute.MOVEMENT_SPEED)!!.modifiers.forEach { modifier ->
+                    player.getAttribute(Attribute.MOVEMENT_SPEED)!!.removeModifier(modifier)
                 }
             })
 

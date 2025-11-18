@@ -50,7 +50,7 @@ class Swapper: AbstractHunter("swapper") {
             .addLore(translate("change_color_lore_5"))
             .addLore(translate("change_color_lore_6"))
 
-        val changeColorSkillItem = IdentityFifty.interactManager.createSInteractItem(changeColorSkill).setInteractEvent { e, _ ->
+        val changeColorSkillItem = IdentityFifty.createSInteractItem(changeColorSkill).setInteractEvent { e, _ ->
             val player = e.player
             if (isStunned(player)) return@setInteractEvent false
             white = !white
@@ -116,7 +116,7 @@ class Swapper: AbstractHunter("swapper") {
             }
             if (entity !is LivingEntity)return@register
             if (entity is Player) e.isCancelled = true
-            if (player.getPotionEffect(PotionEffectType.SLOW_DIGGING)?.amplifier == 200) {
+            if (player.getPotionEffect(PotionEffectType.MINING_FATIGUE)?.amplifier == 200) {
                 return@register
             }
             entity.damage(1.0, player)

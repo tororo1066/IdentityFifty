@@ -30,7 +30,7 @@ class Helper : AbstractSurvivor("helper") {
             .addLore(translate("helper_protect_lore_2"))
             .addLore(translate("helper_protect_lore_3"))
 
-        val protectSkillItem = IdentityFifty.interactManager.createSInteractItem(protectSkill,true).setInteractEvent { e, _ ->
+        val protectSkillItem = IdentityFifty.createSInteractItem(protectSkill).setInteractEvent { e, _ ->
             val player = e.player
             if (inPrison(player))return@setInteractEvent false
             val nearPlayer = player.location.getNearbyPlayers(8.0).firstOrNull {
@@ -45,8 +45,8 @@ class Helper : AbstractSurvivor("helper") {
 
             player.playSound(player.location, Sound.ITEM_TOTEM_USE,1f,1f)
             nearPlayer.playSound(player.location, Sound.ITEM_TOTEM_USE,1f,1f)
-            player.spawnParticle(Particle.TOTEM,player.location,5)
-            nearPlayer.spawnParticle(Particle.TOTEM,player.location,5)
+            player.spawnParticle(Particle.TOTEM_OF_UNDYING,player.location,5)
+            nearPlayer.spawnParticle(Particle.TOTEM_OF_UNDYING,player.location,5)
 
             val nearData = IdentityFifty.survivors[nearPlayer.uniqueId]!!
             val pData = IdentityFifty.survivors[player.uniqueId]!!

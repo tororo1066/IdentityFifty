@@ -15,7 +15,7 @@ import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.addItem
 import tororo1066.tororopluginapi.utils.toPlayer
 
-class Searcher : AbstractSurvivor("searcher") {
+class Searcher: AbstractSurvivor("searcher") {
     override fun onStart(p: Player) {
         super.onStart(p)
         val passiveItem = SItem(Material.STICK).setDisplayName(translate("passive")).setCustomModelData(8)
@@ -30,7 +30,7 @@ class Searcher : AbstractSurvivor("searcher") {
             .addLore(translate("search_lens_lore_2"))
             .addLore(translate("search_lens_lore_3"))
 
-        val searchSkill = IdentityFifty.interactManager.createSInteractItem(searchSkillItem).setInteractEvent { e, _ ->
+        val searchSkill = IdentityFifty.createSInteractItem(searchSkillItem).setInteractEvent { e, _ ->
             val player = e.player
             player.sendTranslateMsg("search_lens_used")
             val players = ArrayList<Player>()

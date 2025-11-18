@@ -43,7 +43,7 @@ class Fixer: AbstractSurvivor("fixer") {
     override fun onStart(p: Player) {
         super.onStart(p)
 
-        val fixPlateSkill = IdentityFifty.interactManager.createSInteractItem(fixPlateItem, true).setInteractEvent { e, item ->
+        val fixPlateSkill = IdentityFifty.createSInteractItem(fixPlateItem).setInteractEvent { e, item ->
             val player = e.player
             val task = IdentityFifty.identityFiftyTask?:return@setInteractEvent false
             val plate = player.location.getNearbyEntitiesByType(ArmorStand::class.java, 3.0)

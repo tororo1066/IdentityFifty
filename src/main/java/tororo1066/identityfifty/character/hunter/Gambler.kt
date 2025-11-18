@@ -1,5 +1,6 @@
 package tororo1066.identityfifty.character.hunter
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
@@ -58,7 +59,7 @@ class Gambler: AbstractHunter("gambler") {
                 }
                 in 51..65->{
                     p.sendTranslateMsg("gamble_dice_action_4")
-                    p.addPotionEffect(PotionEffect(PotionEffectType.SLOW, 300, 0, false, false))
+                    p.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS, 300, 0, false, false))
                     IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_4",p.name),
                         AllowAction.RECEIVE_HUNTERS_ACTION)
                 }
@@ -66,30 +67,34 @@ class Gambler: AbstractHunter("gambler") {
                     p.sendTranslateMsg("gamble_dice_action_5")
                     p.world.getEntitiesByClass(Sheep::class.java).filter { it.persistentDataContainer.has(
                         NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) }.forEach {
-                        val maxHealth = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue ?: return@forEach
+                        val maxHealth = it.getAttribute(Attribute.MAX_HEALTH)?.baseValue ?: return@forEach
                         if (it.health + 175 > maxHealth){
                             it.health = maxHealth
                         } else {
                             it.health += 175
                         }
-                        it.customName = translate("sheep_generator",
-                            it.health.toInt(),
-                            maxHealth.toInt()
-                        )
+                        it.customName(Component.text(
+                            translate("sheep_generator",
+                                it.health.toInt(),
+                                maxHealth.toInt()
+                            )
+                        ))
                     }
 
                     p.world.getEntitiesByClass(Cow::class.java).filter { it.persistentDataContainer.has(
                         NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"), PersistentDataType.INTEGER) }.forEach {
-                        val maxHealth = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue ?: return@forEach
+                        val maxHealth = it.getAttribute(Attribute.MAX_HEALTH)?.baseValue ?: return@forEach
                         if (it.health + 100 > maxHealth){
                             it.health = maxHealth
                         } else {
                             it.health += 100
                         }
-                        it.customName = translate("cow_generator",
-                            it.health.toInt(),
-                            maxHealth.toInt()
-                        )
+                        it.customName(Component.text(
+                            translate("cow_generator",
+                                it.health.toInt(),
+                                maxHealth.toInt()
+                            )
+                        ))
                     }
 
                     IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_5",p.name),
@@ -99,16 +104,18 @@ class Gambler: AbstractHunter("gambler") {
                     p.sendTranslateMsg("gamble_dice_action_6")
                     p.world.getEntitiesByClass(Sheep::class.java).filter { it.persistentDataContainer.has(
                         NamespacedKey(IdentityFifty.plugin, "Generator"), PersistentDataType.INTEGER) }.forEach {
-                        val maxHealth = it.getAttribute(Attribute.GENERIC_MAX_HEALTH)?.baseValue ?: return@forEach
+                        val maxHealth = it.getAttribute(Attribute.MAX_HEALTH)?.baseValue ?: return@forEach
                         if (it.health - 150 < 1){
                             it.health = 1.0
                         } else {
                             it.health -= 150
                         }
-                        it.customName = translate("sheep_generator",
-                            it.health.toInt(),
-                            maxHealth.toInt()
-                        )
+                        it.customName(Component.text(
+                            translate("sheep_generator",
+                                it.health.toInt(),
+                                maxHealth.toInt()
+                            )
+                        ))
                     }
 
                     IdentityFifty.broadcastSpectators(translate("spec_gamble_dice_action_6",p.name),
@@ -131,7 +138,7 @@ class Gambler: AbstractHunter("gambler") {
             .addLore(translate("gamble_dice_lore_6"))
             .addLore(translate("gamble_dice_lore_7"))
             .addLore(translate("gamble_dice_lore_8"))
-        val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, _ ->
+        val firstSkill = IdentityFifty.createSInteractItem(firstSkillItem).setInteractEvent { e, _ ->
             if (isStunned(e.player)) return@setInteractEvent false
             diceTask(e.player)
             return@setInteractEvent true
@@ -153,16 +160,16 @@ class Gambler: AbstractHunter("gambler") {
             return 4
         } else {
             when(Random.nextInt(1..100)){
-                in 1..25 ->{
+                in 1..20 -> {
                     return 1
                 }
-                in 26..65->{
+                in 21..60 -> {
                     return 2
                 }
-                in 66..85->{
+                in 61..85 -> {
                     return 3
                 }
-                in 86..100->{
+                in 86..100 -> {
                     return 4
                 }
             }

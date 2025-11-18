@@ -44,7 +44,7 @@ class DisguisePlayer: AbstractSurvivor("disguise") {
             .addLore(translate("disguise_skill_lore_2"))
             .addLore(translate("disguise_skill_lore_3"))
 
-        val disguiseSkillItem = IdentityFifty.interactManager.createSInteractItem(disguiseSkill,true).setInteractEvent { e, _ ->
+        val disguiseSkillItem = IdentityFifty.createSInteractItem(disguiseSkill).setInteractEvent { e, _ ->
             val player = e.player
             val target = player.getTargetEntity(4)?:return@setInteractEvent false
             if (target !is Player)return@setInteractEvent false

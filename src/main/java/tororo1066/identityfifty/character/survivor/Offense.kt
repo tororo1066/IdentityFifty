@@ -34,12 +34,12 @@ class Offense : AbstractSurvivor("offense") {
             .addLore(translate("rugby_ball_lore_4"))
 
 
-        val tackleItem = IdentityFifty.interactManager.createSInteractItem(tackleSkillItem,true).setInteractEvent { e, item ->
+        val tackleItem = IdentityFifty.createSInteractItem(tackleSkillItem).setInteractEvent { e, item ->
             val player = e.player
             var actionTime = 0
             fun end(){
                 IdentityFifty.util.runTask {
-                    player.addPotionEffect(PotionEffect(PotionEffectType.SLOW, (actionTime.toDouble()*1.5).toInt(), 10))
+                    player.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS, (actionTime.toDouble()*1.5).toInt(), 10))
                 }
                 item.setInteractCoolDown(actionTime*18 + 100)
             }

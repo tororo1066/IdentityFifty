@@ -1,17 +1,18 @@
 package tororo1066.identityfifty
 
-import com.sun.net.httpserver.HttpExchange
-import com.sun.net.httpserver.HttpHandler
-import com.sun.net.httpserver.HttpServer
 import de.slikey.effectlib.EffectManager
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.UseCooldown
+import net.kyori.adventure.key.Key
+import net.milkbowl.vault.permission.Permission
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
 import org.bukkit.Particle
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
@@ -32,11 +33,11 @@ import tororo1066.tororopluginapi.Proxy
 import tororo1066.tororopluginapi.SJavaPlugin
 import tororo1066.tororopluginapi.lang.SLang
 import tororo1066.tororopluginapi.otherUtils.UsefulUtility
-import tororo1066.tororopluginapi.sEvent.SEvent
+import tororo1066.tororopluginapi.sItem.SInteractItem
 import tororo1066.tororopluginapi.sItem.SInteractItemManager
+import tororo1066.tororopluginapi.sItem.SItem
 import tororo1066.tororopluginapi.utils.toPlayer
 import java.io.File
-import java.net.InetSocketAddress
 import java.util.UUID
 
 class IdentityFifty : SJavaPlugin(UseOption.SInput) {
@@ -57,6 +58,7 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
         lateinit var interactManager: SInteractItemManager
         /** エフェクトのマネージャー **/
         lateinit var effectManager: EffectManager
+        lateinit var permissionManager: Permission
         /** このプラグイン **/
         lateinit var plugin: IdentityFifty
         /** 言語マネージャー **/
@@ -81,11 +83,6 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
 
         const val PREFIX = "§b[§cIdentity§eFifty§b]§r"
 
-        /** リソパのurl **/
-        var resourceUrl = ""
-        /** リソパのサーバー **/
-        var http: HttpServer? = null
-
         /** スタンのエフェクト(デフォルトの時間) **/
         fun stunEffect(p: Player) {
             stunEffect(p,110,120,StunState.DAMAGED)
@@ -104,19 +101,19 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
             }
             Bukkit.getScheduler().runTask(plugin, Runnable {
                 p.addPotionEffect(PotionEffect(PotionEffectType.BLINDNESS,stunTime.first,3,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW,stunTime.second,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP,stunTime.second,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.SLOWNESS,stunTime.second,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.JUMP_BOOST,stunTime.second,200,true,false,false))
                 p.addPotionEffect(PotionEffect(PotionEffectType.WEAKNESS,stunTime.second,200,true,false,false))
-                p.addPotionEffect(PotionEffect(PotionEffectType.SLOW_DIGGING,stunTime.second,200,true,false,false))
+                p.addPotionEffect(PotionEffect(PotionEffectType.MINING_FATIGUE,stunTime.second,200,true,false,false))
             })
         }
 
         fun speedModifier(p: Player, speed: Double, duration: Int,
                           type: AttributeModifier.Operation = AttributeModifier.Operation.ADD_NUMBER
         ): BukkitRunnable {
-            val speedAttribute = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)
+            val speedAttribute = p.getAttribute(Attribute.MOVEMENT_SPEED)
             val uuid = UUID.randomUUID()
-            val modifier = AttributeModifier(uuid, uuid.toString(), speed, type)
+            val modifier = AttributeModifier(NamespacedKey(plugin, uuid.toString()), speed, type)
             fun removeModifier() {
                 speedAttribute?:return
                 speedAttribute.removeModifier(modifier)
@@ -135,6 +132,17 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
                     super.cancel()
                 }
             }
+        }
+
+        @Suppress("UnstableApiUsage")
+        fun createSInteractItem(sItem: SItem): SInteractItem {
+            val itemStack = sItem.build()
+            itemStack.setData(
+                DataComponentTypes.USE_COOLDOWN,
+                UseCooldown.useCooldown(0.1f)
+                    .cooldownGroup(Key.key("identityfifty", "${UUID.randomUUID()}"))
+            )
+            return interactManager.createSInteractItem(itemStack, true)
         }
 
         /** prefix付きでメッセージを送信 **/
@@ -184,15 +192,31 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
         saveDefaultConfig()
         
         plugin = this
+
+        val permissionProvider = server.servicesManager.getRegistration(Permission::class.java)
+        if (permissionProvider == null){
+            logger.severe("This plugin requires Vault to run. Disabling...")
+            server.pluginManager.disablePlugin(this)
+            return
+        }
+
         sLang = SLang(this, PREFIX)
         util = UsefulUtility(this)
         sNms = getSNms()
         packetListener = Proxy(this, "tororo1066.nmsutils").getProxy(PacketListener::class.java)
 
         interactManager = SInteractItemManager(this)
+        interactManager.setOnSetCoolDownEvent { cooldown, sInteractItem ->
+            val itemStack = sInteractItem.itemStack
+            Bukkit.getOnlinePlayers().forEach { player ->
+                player.setCooldown(itemStack, cooldown)
+            }
+        }
         talentSQL = TalentSQLV2()
 
         effectManager = EffectManager(this)
+        permissionManager = permissionProvider.provider
+
         registerAll()
 
         for (file in File(dataFolder.path + "/map/").listFiles()!!) {
@@ -206,39 +230,11 @@ class IdentityFifty : SJavaPlugin(UseOption.SInput) {
             discordClient = DiscordClient()
         }
 
-        val packLines = File(dataFolder.path + "/secrecy/resourcePackUrl.txt").readLines()
-        resourceUrl = packLines[0]
-        http = HttpServer.create(InetSocketAddress(8000), 0)
-        saveResource("IdentityFifty.zip",true)
-        http?.createContext("/Resource",FileHandler(File(dataFolder.path + "/IdentityFifty.zip")))
-        http?.start()
-
         characterLogSQL = IdentityFiftyCharacterLogSQL()
-
-        SEvent(this).register(PlayerJoinEvent::class.java) { e ->
-            if (e.player.name == "tororo_1066"){
-                e.player.setResourcePack("http://localhost:8000/Resource")
-            } else {
-                e.player.setResourcePack(resourceUrl)
-            }
-        }
-
     }
 
     override fun onEnd() {
-        http?.stop(0)
         discordClient.jda.shutdownNow()
-    }
-
-    class FileHandler(private val file: File): HttpHandler {
-        override fun handle(exchange: HttpExchange) {
-            val bytes = file.readBytes()
-            exchange.sendResponseHeaders(200,bytes.size.toLong())
-            val writer = exchange.responseBody
-            writer.write(bytes)
-            writer.close()
-            exchange.close()
-        }
     }
 
 

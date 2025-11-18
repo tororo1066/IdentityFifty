@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.title.Title
 import org.bukkit.*
 import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.Bisected
 import org.bukkit.block.data.type.Door
@@ -103,6 +104,8 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 else-> blockFace
             }
         }
+
+        private val DISABLE_THIRD_PERSON_KEY = NamespacedKey(IdentityFifty.plugin,"disable_third_person")
     }
 
     //終了処理
@@ -128,8 +131,8 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             runTask {
                 Bukkit.getEntity(it)?.remove()
             }
-            map.prisons.forEach {
-                it.value.inPlayer.clear()
+            map.prisons.forEach { entry ->
+                entry.value.inPlayer.clear()
             }
         }
 
@@ -163,6 +166,8 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     }
                     clazz.tasks.clear()
                 }
+
+                p.getAttribute(Attribute.CAMERA_DISTANCE)?.removeModifier(DISABLE_THIRD_PERSON_KEY)
             }
 
             it.survivorClass.tasks.forEach {  task ->
@@ -183,6 +188,8 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     }
                     clazz.tasks.clear()
                 }
+
+                p.getAttribute(Attribute.CAMERA_DISTANCE)?.removeModifier(DISABLE_THIRD_PERSON_KEY)
             }
 
             it.hunterClass.tasks.forEach { task ->
@@ -302,7 +309,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {
-                val attribute = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!
+                val attribute = p.getAttribute(Attribute.MOVEMENT_SPEED)!!
                 attribute.modifiers.forEach {
                     attribute.removeModifier(it)
                 }
@@ -323,7 +330,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             val p = Bukkit.getPlayer(uuid)!!
 
             runTask {
-                val attribute = p.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)!!
+                val attribute = p.getAttribute(Attribute.MOVEMENT_SPEED)!!
                 attribute.modifiers.forEach {
                     attribute.removeModifier(it)
                 }
@@ -367,7 +374,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
             runTask {
                 var block = data.loc.block
-                for (i in 0 until data.length) {
+                repeat(data.length){
                     block.type = Material.AIR
                     block = block.getRelative(data.face)
                 }
@@ -406,7 +413,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
                 //階段の設置処理
                 var upBlock = data.loc.block
-                for (i in 0 until data.length) {
+                repeat(data.length) {
                     upBlock.type = Material.OAK_STAIRS
                     val blockData = upBlock.blockData as Stairs
                     blockData.shape = Shape.STRAIGHT
@@ -415,25 +422,36 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     upBlock.blockData = blockData
 
                     upBlock = upBlock.getRelative(BlockFace.UP)
-
                 }
             }
         }
 
         //羊型発電機のスポーン
-        for (i in 1..map.generatorLimit){
+        repeat(map.generatorLimit) {
             val data = generatorList.removeAt(0)
             runTask {
-                map.world.spawn(data.location,Sheep::class.java) {
-                    it.setAI(false)
-                    it.isSilent = true
-                    it.color = DyeColor.WHITE
-                    generatorUUID.add(it.uniqueId)
-                    it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
-                    it.health = data.health.toDouble()
-                    it.customName = translate("sheep_generator", it.health.toInt().toString(), data.health.toString())
-                    it.noDamageTicks = 0
-                    it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"Generator"), PersistentDataType.INTEGER,1)
+                map.world.spawn(data.location, Sheep::class.java) { sheep ->
+                    sheep.setAI(false)
+                    sheep.isSilent = true
+                    sheep.color = DyeColor.WHITE
+                    generatorUUID.add(sheep.uniqueId)
+                    sheep.getAttribute(Attribute.MAX_HEALTH)!!.baseValue = data.health.toDouble()
+                    sheep.health = data.health.toDouble()
+                    sheep.customName(
+                        Component.text(
+                            translate(
+                                "sheep_generator",
+                                sheep.health.toInt().toString(),
+                                data.health.toString()
+                            )
+                        )
+                    )
+                    sheep.noDamageTicks = 0
+                    sheep.persistentDataContainer.set(
+                        NamespacedKey(IdentityFifty.plugin, "Generator"),
+                        PersistentDataType.INTEGER,
+                        1
+                    )
                 }
             }
         }
@@ -518,7 +536,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 }
             }
             if (remainingGenerator != 0)return@register
-            //残り暗号機が0だったら 一撃死状態にする(60秒)
+            //残り暗号機が0だったら 一撃死状態にする
             bossBar.progress = 1.0
             bossBar.setTitle(translate("lets_open_gate_no_one"))
             bossBar.color = BarColor.RED
@@ -543,18 +561,30 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             }
 
             //牛型発電機のスポーン
-            for (i in 1..map.escapeGeneratorLimit){
+            repeat(map.escapeGeneratorLimit) {
                 val data = escapeGeneratorList.removeAt(0)
                 runTask {
-                    map.world.spawn(data.location,Cow::class.java) {
-                        it.setAI(false)
-                        it.isSilent = true
-                        it.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health.toDouble()
-                        it.health = data.health.toDouble()
-                        it.customName = translate("cow_generator", it.health.toInt().toString(), data.health.toString())
-                        it.noDamageTicks = 0
-                        it.persistentDataContainer.set(NamespacedKey(IdentityFifty.plugin,"EscapeGenerator"), PersistentDataType.INTEGER,1)
-                        escapeGeneratorUUID.add(it.uniqueId)
+                    map.world.spawn(data.location, Cow::class.java) { cow ->
+                        cow.setAI(false)
+                        cow.isSilent = true
+                        cow.getAttribute(Attribute.MAX_HEALTH)!!.baseValue = data.health.toDouble()
+                        cow.health = data.health.toDouble()
+                        cow.customName(
+                            Component.text(
+                                translate(
+                                    "cow_generator",
+                                    cow.health.toInt().toString(),
+                                    data.health.toString()
+                                )
+                            )
+                        )
+                        cow.noDamageTicks = 0
+                        cow.persistentDataContainer.set(
+                            NamespacedKey(IdentityFifty.plugin, "EscapeGenerator"),
+                            PersistentDataType.INTEGER,
+                            1
+                        )
+                        escapeGeneratorUUID.add(cow.uniqueId)
                     }
                 }
             }
@@ -613,9 +643,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
             //牛型発電機が出たら羊型発電機はもういらないので削除
             generatorUUID.forEach {
-                runTask {
-                    Bukkit.getEntity(it)?.remove()
-                }
+                Bukkit.getEntity(it)?.remove()
             }
             generatorUUID.clear()
 
@@ -648,6 +676,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
                     var helpTime = 0 //これが助けるのに必要な時間(tick)
                     helpTime += helperData.helpTick //助ける側の必要時間をまず入れる(tick)
+                    helperData.helpTickModify.forEach { tick -> helpTime = (helpTime * tick.value).toInt() }
 
                     //サバイバーの救助される時間が延長されるパッシブの計算
                     for (uuid in prisonData.inPlayer){
@@ -831,7 +860,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     particleInterval++
                     if (particleInterval >= 20){
                         particleInterval = 0
-                        it.world.spawnParticle(Particle.VILLAGER_HAPPY, it.location, 20, 0.3, 0.5, 0.3)
+                        it.world.spawnParticle(Particle.HAPPY_VILLAGER, it.location, 20, 0.3, 0.5, 0.3)
                     }
 
                 },0,1)
@@ -920,7 +949,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
         }
 
         sEvent.register(HangingBreakByEntityEvent::class.java) { e ->
-            val remover = e.remover?:return@register
+            val remover = e.remover
             if (IdentityFifty.survivors.containsKey(remover.uniqueId) ||
                 IdentityFifty.hunters.containsKey(remover.uniqueId)){
                 e.isCancelled = true
@@ -1043,7 +1072,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     if (!e.player.isSneaking){
                         IdentityFifty.hunters.forEach { (uuid,_) ->
                             (1..2).forEach { _ ->
-                                Bukkit.getPlayer(uuid)?.spawnParticle(Particle.REDSTONE,e.to,2,
+                                Bukkit.getPlayer(uuid)?.spawnParticle(Particle.DUST_COLOR_TRANSITION,e.to,2,
                                     Random.nextDouble(-0.2,0.2),0.2,
                                     Random.nextDouble(-0.2,0.2), Particle.DustTransition(Color.RED,Color.WHITE,1.2f))
                             }
@@ -1063,72 +1092,69 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     e.player.inventory.setItemInOffHand(ItemStack(Material.AIR))
                 }
             } else {
-                if (e.player.inventory.itemInOffHand.type == Material.AIR){
-                    entities.forEach {
+                val plate = entities.sortedBy { it.location.distanceSquared(e.player.location) }
+                    .find { it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PlateLoc"),
+                        PersistentDataType.INTEGER_ARRAY) }
 
-                        if (it.persistentDataContainer.has(NamespacedKey(IdentityFifty.plugin,"PlateLoc"),
-                                PersistentDataType.INTEGER_ARRAY)){
-                                    val intArray = it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"PlateLoc"), PersistentDataType.INTEGER_ARRAY]!!
-                                    val plateData = map.woodPlates[Location(map.world,intArray[0].toDouble(),intArray[1].toDouble(),intArray[2].toDouble())]!!
-                                    val item = IdentityFifty.interactManager.createSInteractItem(SItem(Material.STICK).setDisplayName("§e板倒し").setCustomModelData(3),true).setInteractEvent { e, item ->
-                                        var upBlock = plateData.loc.block
-                                        for (i in 0 until plateData.length) {
-                                            upBlock.type = Material.AIR
-                                            upBlock = upBlock.getRelative(BlockFace.UP)
-                                        }
-
-                                        var faceBlock = plateData.loc.block
-
-                                        for (i in 0 until plateData.length){
-                                            faceBlock.type = Material.OAK_STAIRS
-                                            val blockData = faceBlock.blockData as Stairs
-                                            blockData.shape = Shape.STRAIGHT
-                                            blockData.half = Bisected.Half.TOP
-                                            blockData.facing = plateData.face
-                                            faceBlock.blockData = blockData
-                                            faceBlock = faceBlock.getRelative(plateData.face)
-                                        }
-
-                                        map.world.playSound(it.location,Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,1f,0.8f)
-
-                                        data.talentClasses.values.forEach { clazz ->
-                                            clazz.onWoodPlate(it.location,data.uuid.toPlayer()!!)
-                                        }
-                                        it.location.getNearbyPlayers(if (plateData.length * 0.5 > 2.0) 2.0 else plateData.length * 0.5).forEach second@ { p ->
-                                            if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
-                                            val hunterData = IdentityFifty.hunters[p.uniqueId]!!
-                                            var hunterModify = hunterData.hunterClass.onDamagedWoodPlate(e.player, it.location,140,160, p)
-                                            if (hunterModify.first <= 0 && hunterModify.second <= 0)return@second
-                                            hunterData.talentClasses.values.forEach { clazz ->
-                                                hunterModify = clazz.onDamagedWoodPlate(e.player, it.location, hunterModify.first, hunterModify.second, p)
-                                            }
-                                            map.world.playSound(it.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
-                                            map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
-                                            var modify = data.survivorClass.onHitWoodPlate(p, it.location,hunterModify.first,hunterModify.second, e.player)
-                                            data.talentClasses.values.forEach { clazz ->
-                                                modify = clazz.onHitWoodPlate(p, it.location,modify.first,modify.second,e.player)
-                                            }
-                                            IdentityFifty.stunEffect(p,modify.first,modify.second,StunState.WOODPLATE)
-                                            IdentityFifty.broadcastSpectators(
-                                                translate("spec_hit_wood_plate", e.player.name, p.name),
-                                                AllowAction.RECEIVE_HUNTERS_ACTION
-                                            )
-                                        }
-                                        it.persistentDataContainer.remove(NamespacedKey(IdentityFifty.plugin,"PlateLoc"))
-                                        it.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"UsedPlate"), PersistentDataType.INTEGER_ARRAY] = intArrayOf(
-                                            plateData.loc.blockX,
-                                            plateData.loc.blockY,
-                                            plateData.loc.blockZ
-                                        )
-                                        e.player.inventory.setItemInOffHand(ItemStack(Material.AIR))
-                                        item.delete()
-                                        return@setInteractEvent true
-                                    }
-
-                            e.player.inventory.setItemInOffHand(item.itemStack)
-
+                if (plate != null){
+                    val intArray = plate.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"PlateLoc"), PersistentDataType.INTEGER_ARRAY]!!
+                    val plateData = map.woodPlates[Location(map.world,intArray[0].toDouble(),intArray[1].toDouble(),intArray[2].toDouble())]!!
+                    val item = IdentityFifty.interactManager.createSInteractItem(SItem(Material.STICK).setDisplayName(translate("plate_item")).setCustomModelData(3),true).setInteractEvent { e, item ->
+                        var upBlock = plateData.loc.block
+                        repeat(plateData.length) {
+                            upBlock.type = Material.AIR
+                            upBlock = upBlock.getRelative(BlockFace.UP)
                         }
+
+                        var faceBlock = plateData.loc.block
+
+                        repeat(plateData.length){
+                            faceBlock.type = Material.OAK_STAIRS
+                            val blockData = faceBlock.blockData as Stairs
+                            blockData.shape = Shape.STRAIGHT
+                            blockData.half = Bisected.Half.TOP
+                            blockData.facing = plateData.face
+                            faceBlock.blockData = blockData
+                            faceBlock = faceBlock.getRelative(plateData.face)
+                        }
+
+                        map.world.playSound(plate.location,Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR,1f,0.8f)
+
+                        data.talentClasses.values.forEach { clazz ->
+                            clazz.onWoodPlate(plate.location,data.uuid.toPlayer()!!)
+                        }
+                        plate.location.getNearbyPlayers(if (plateData.length * 0.5 > 2.0) 2.0 else plateData.length * 0.5).forEach second@ { p ->
+                            if (!IdentityFifty.hunters.containsKey(p.uniqueId))return@second
+                            val hunterData = IdentityFifty.hunters[p.uniqueId]!!
+                            var hunterModify = hunterData.hunterClass.onDamagedWoodPlate(e.player, plate.location,140,160, p)
+                            if (hunterModify.first <= 0 && hunterModify.second <= 0)return@second
+                            hunterData.talentClasses.values.forEach { clazz ->
+                                hunterModify = clazz.onDamagedWoodPlate(e.player, plate.location, hunterModify.first, hunterModify.second, p)
+                            }
+                            map.world.playSound(plate.location,Sound.BLOCK_ANVIL_PLACE,0.2f,0.5f)
+                            map.world.spawnParticle(Particle.ELECTRIC_SPARK,p.location.add(0.0,0.5,0.0),30)
+                            var modify = data.survivorClass.onHitWoodPlate(p, plate.location,hunterModify.first,hunterModify.second, e.player)
+                            data.talentClasses.values.forEach { clazz ->
+                                modify = clazz.onHitWoodPlate(p, plate.location,modify.first,modify.second,e.player)
+                            }
+                            IdentityFifty.stunEffect(p,modify.first,modify.second,StunState.WOODPLATE)
+                            IdentityFifty.broadcastSpectators(
+                                translate("spec_hit_wood_plate", e.player.name, p.name),
+                                AllowAction.RECEIVE_HUNTERS_ACTION
+                            )
+                        }
+                        plate.persistentDataContainer.remove(NamespacedKey(IdentityFifty.plugin,"PlateLoc"))
+                        plate.persistentDataContainer[NamespacedKey(IdentityFifty.plugin,"UsedPlate"), PersistentDataType.INTEGER_ARRAY] = intArrayOf(
+                            plateData.loc.blockX,
+                            plateData.loc.blockY,
+                            plateData.loc.blockZ
+                        )
+                        e.player.inventory.setItemInOffHand(ItemStack(Material.AIR))
+                        item.delete()
+                        return@setInteractEvent true
                     }
+
+                    e.player.inventory.setItemInOffHand(item.itemStack)
                 }
 
             }
@@ -1209,7 +1235,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     if (survivorData.getHealth() == 1){
                         broadcast(translate("send_jail",e.entity.name))
                         survivorData.healProcess = 0.0
-                        val prisons = map.prisons.filter { it.value.inPlayer.size == 0 }.entries.shuffled()
+                        val prisons = map.prisons.filter { it.value.inPlayer.isEmpty() }.entries.shuffled()
                         val data = if (prisons.isNotEmpty()) prisons[0] else map.prisons.entries.shuffled()[0]
                         survivorData.survivorClass.onJail(data.value,e.entity as Player)
                         survivorData.talentClasses.values.forEach {
@@ -1258,7 +1284,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 var multiply = 1 - (survivors * 0.25)
                 if (multiply < 0.3) multiply = 0.3
 
-                val maxHealth = sheep.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                val maxHealth = sheep.getAttribute(Attribute.MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p) * multiply
                 survivorData.talentClasses.values.forEach { clazz ->
                     e.damage = clazz.sheepGeneratorModify(e.damage,remainingGenerator,maxHealth,sheep.health,p)
@@ -1274,7 +1300,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     sheep.noDamageTicks = 0
-                    e.entity.customName = translate("sheep_generator", sheep.health.toInt().toString(), maxHealth.toInt().toString())
+                    e.entity.customName(Component.text(translate("sheep_generator", sheep.health.toInt().toString(), maxHealth.toInt().toString())))
                 }, 0)
 
                 survivorData.cancelGeneratorAttack = true
@@ -1294,7 +1320,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                 var multiply = 1 - (survivors * 0.25)
                 if (multiply < 0.3) multiply = 0.3
 
-                val maxHealth = cow.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value
+                val maxHealth = cow.getAttribute(Attribute.MAX_HEALTH)!!.value
                 e.damage = survivorData.survivorClass.cowGeneratorModify(e.damage,maxHealth,cow.health,p) * multiply
                 survivorData.talentClasses.values.forEach { clazz ->
                     e.damage = clazz.cowGeneratorModify(e.damage,maxHealth,cow.health,p)
@@ -1310,7 +1336,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
 
                 Bukkit.getScheduler().runTaskLater(IdentityFifty.plugin, Runnable {
                     cow.noDamageTicks = 0
-                    e.entity.customName = translate("cow_generator", cow.health.toInt().toString(), maxHealth.toInt().toString())
+                    e.entity.customName(Component.text(translate("cow_generator", cow.health.toInt().toString(), maxHealth.toInt().toString())))
                 }, 0)
 
                 survivorData.cancelGeneratorAttack = true
@@ -1423,7 +1449,18 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
             mapItem.itemMeta = meta
         }
 
-
+        (IdentityFifty.survivors.keys + IdentityFifty.hunters.keys).forEach {
+            val p = Bukkit.getPlayer(it)!!
+            if (map.disableThirdPersonView) {
+                p.getAttribute(Attribute.CAMERA_DISTANCE)?.addModifier(
+                    AttributeModifier(
+                        DISABLE_THIRD_PERSON_KEY,
+                        -1.0,
+                        AttributeModifier.Operation.MULTIPLY_SCALAR_1
+                    )
+                )
+            }
+        }
 
         IdentityFifty.survivors.forEach { (uuid, data) ->
             val p = Bukkit.getPlayer(uuid)!!
@@ -1450,8 +1487,10 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
         }
 
         Bukkit.getOnlinePlayers()
-            .filter { map -> !IdentityFifty.survivors.containsKey(map.uniqueId) &&
-                    !IdentityFifty.hunters.containsKey(map.uniqueId) }
+            .filter { map ->
+                !IdentityFifty.survivors.containsKey(map.uniqueId) &&
+                        !IdentityFifty.hunters.containsKey(map.uniqueId)
+            }
             .forEach {
                 titleTask(it) {}
             }
@@ -1470,7 +1509,7 @@ class IdentityFiftyTask(val map: MapData, private val saveResult: Boolean) : Thr
                     data.heartProcess = 0.0
                     val p = Bukkit.getPlayer(uuid)!!
                     p.playSound(p.location,"identity.heart",1f,1f)
-                    p.spawnParticle(Particle.SPELL_WITCH,p.location,20,0.0,0.5,0.0)
+                    p.spawnParticle(Particle.WITCH,p.location,20,0.0,0.5,0.0)
                 }
             }
         },0,10)

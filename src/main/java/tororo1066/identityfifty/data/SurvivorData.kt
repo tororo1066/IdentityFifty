@@ -32,6 +32,7 @@ class SurvivorData(player: Player) : PlayerData(player) {
     var footprintsTime = 2.0
     var footprintsModify = HashMap<UUID,Double>()
     var helpTick = 100
+    var helpTickModify = HashMap<UUID,Double>()
     var otherPlayerHelpDelay = 0
     var otherPlayerHelpDelayPercentage = 0.0
     var healProcess = 0.0

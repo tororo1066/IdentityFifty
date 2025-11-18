@@ -45,7 +45,7 @@ class Coffin: AbstractSurvivor("coffin") {
             .addLore(translate("coffin_skill_lore_4"))
             .addLore(translate("coffin_skill_lore_5"))
 
-        val coffinSkillItem = IdentityFifty.interactManager.createSInteractItem(coffinSkill,true).setInteractEvent { e, item ->
+        val coffinSkillItem = IdentityFifty.createSInteractItem(coffinSkill).setInteractEvent { e, item ->
             val player = e.player
             if (inPrison(player)){
                 return@setInteractEvent false

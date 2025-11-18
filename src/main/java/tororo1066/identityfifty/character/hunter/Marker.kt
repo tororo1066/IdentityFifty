@@ -47,7 +47,7 @@ class Marker: AbstractHunter("marker") {
 
 
 
-        val crossBowSkillItem = IdentityFifty.interactManager.createSInteractItem(crossBowSkill,true).setInteractEvent { e, _ ->
+        val crossBowSkillItem = IdentityFifty.createSInteractItem(crossBowSkill).setInteractEvent { e, _ ->
             val player = e.player
             if (isStunned(player)) return@setInteractEvent false
             val arrow = player.launchProjectile(Arrow::class.java)

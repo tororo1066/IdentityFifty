@@ -6,10 +6,6 @@ import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.map.MapView.Scale
-import tororo1066.identityfifty.enumClass.AllowAction
-import kotlin.math.max
-import kotlin.math.min
 
 class MapData: Cloneable {
 
@@ -84,6 +80,8 @@ class MapData: Cloneable {
 
             data.windowBlock = Material.valueOf(config.getString("windowBlock","SOUL_SAND")!!)
 
+            data.disableThirdPersonView = config.getBoolean("disableThirdPersonView",false)
+
             return data
         }
     }
@@ -105,6 +103,7 @@ class MapData: Cloneable {
     var woodPlates = HashMap<Location,WoodPlateData>()
     var hatches = HashMap<Location,HatchData>()
     lateinit var windowBlock: Material
+    var disableThirdPersonView = false
 
     var lobbyLocation: Location? = null
 

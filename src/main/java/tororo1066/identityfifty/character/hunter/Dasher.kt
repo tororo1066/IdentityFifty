@@ -23,7 +23,7 @@ class Dasher : AbstractHunter("dasher") {
         val firstSkillItem = SItem(Material.STICK).setDisplayName(translate("hyper_engine")).setCustomModelData(4)
             .addLore(translate("hyper_engine_lore_1"))
             .addLore(translate("hyper_engine_lore_2"))
-        val firstSkill = IdentityFifty.interactManager.createSInteractItem(firstSkillItem,true).setInteractEvent { e, _ ->
+        val firstSkill = IdentityFifty.createSInteractItem(firstSkillItem).setInteractEvent { e, _ ->
             //加速
             val player = e.player
             if (isStunned(player)) return@setInteractEvent false
