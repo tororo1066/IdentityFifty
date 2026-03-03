@@ -70,6 +70,10 @@ class Fixer: AbstractSurvivor("fixer") {
             )
             val plateData = task.map.woodPlates[location]?:return@setInteractEvent false
             val length = plateData.length
+            if (length > 4) {
+                player.sendTranslateMsg("fix_plate_too_long")
+                return@setInteractEvent false
+            }
             var action = (fixTime + (length * fixLengthMultiplier))
             val actionInit = action
             val bossBar = Bukkit.createBossBar(translate("fix_plate_bossbar"), BarColor.BLUE, BarStyle.SOLID)

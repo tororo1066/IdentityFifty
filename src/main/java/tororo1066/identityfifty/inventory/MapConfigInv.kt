@@ -205,7 +205,7 @@ class MapConfigInv(private val mapName: String, private val mapData: MapData) : 
 
         val disableThirdPersonView = SItem(Material.ENDER_EYE).setDisplayName("§a三人称視点を無効化")
             .addLore("§a現在の値：§e${if (mapData.disableThirdPersonView) "無効化" else "有効化"}")
-            .toSInventoryItem().setCanClick(false).setClickEvent { e ->
+            .toSInventoryItem().setCanClick(false).setClickEvent { _ ->
                 mapData.disableThirdPersonView = !mapData.disableThirdPersonView
                 renderInventory(nowPage)
             }

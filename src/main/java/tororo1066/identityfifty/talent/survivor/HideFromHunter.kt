@@ -27,7 +27,7 @@ class HideFromHunter: AbstractSurvivorTalent("hide_from_hunter", 5, WoundedCowUp
                 .firstOrNull { it.uniqueId in IdentityFifty.hunters} ?: return@Runnable
 
             p.world.spawnParticle(Particle.SMOKE, p.location, 10, 0.5, 0.5, 0.5, 0.1)
-            p.world.playSound(p.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f)
+            p.world.playSound(p.location, Sound.ENTITY_BAT_TAKEOFF, 1f, 2f)
             p.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 60, 0))
             val data = IdentityFifty.survivors[p.uniqueId]!!
             val uuid = UUID.randomUUID()

@@ -91,14 +91,31 @@ class GlowManager(private val uuid: UUID) {
         }
 
         override fun cancel() {
-            SEntity.getSEntity(entity).sendGlow(false, listOf(visiblePlayer))
+            val sEntity = SEntity.getSEntity(entity)
+            sEntity.sendGlow(false, listOf(visiblePlayer))
+            sEntity.setTeam(color.name, listOf(visiblePlayer), remove = true)
+
             if (IdentityFifty.survivors.containsKey(entity.uniqueId)){
-                IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(entity.name)
+                val teamName = IdentityFifty.identityFiftyTask?.survivorTeam?.name
+                if (teamName != null) {
+                    sEntity.setTeam(teamName, listOf(visiblePlayer))
+                }
             }
 
-            if (IdentityFifty.hunters.containsKey(entity.uniqueId)){
-                IdentityFifty.identityFiftyTask?.hunterTeam?.addEntry(entity.name)
+            if (IdentityFifty.hunters.containsKey(entity.uniqueId)) {
+                val teamName = IdentityFifty.identityFiftyTask?.hunterTeam?.name
+                if (teamName != null) {
+                    sEntity.setTeam(teamName, listOf(visiblePlayer))
+                }
             }
+
+//            if (IdentityFifty.survivors.containsKey(entity.uniqueId)){
+//                IdentityFifty.identityFiftyTask?.survivorTeam?.addEntry(entity.name)
+//            }
+//
+//            if (IdentityFifty.hunters.containsKey(entity.uniqueId)){
+//                IdentityFifty.identityFiftyTask?.hunterTeam?.addEntry(entity.name)
+//            }
             super.cancel()
             glowTasks.remove(visiblePlayer.uniqueId)
         }

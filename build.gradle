@@ -26,6 +26,7 @@ repositories {
         url 'https://repo.md-5.net/content/groups/public/'
     }
     maven { url 'https://jitpack.io' }
+    maven { url "https://mvn.lib.co.nz/public" }
 
     maven {
         url = uri('https://maven.pkg.github.com/tororo1066/TororoPluginAPI')
@@ -41,8 +42,8 @@ dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'tororo1066:tororopluginapi:64ec55c'
     compileOnly 'tororo1066:base:64ec55c'
-    implementation 'com.elmakers.mine.bukkit:EffectLib:9.4'
-    compileOnly 'me.libraryaddict.disguises:libsdisguises:11.0.0'
+    implementation 'com.elmakers.mine.bukkit:EffectLib:10.5'
+    compileOnly 'me.libraryaddict.disguises:libsdisguises:11.0.13'
     compileOnly('com.github.MilkBowl:VaultAPI:1.7') {
         exclude group: 'org.bukkit', module: 'bukkit'
     }
